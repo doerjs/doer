@@ -1,0 +1,14 @@
+{
+  "name": "@traveler/prettier-config",
+  "version": "0.0.0",
+  "description": "",
+  "author": "FaureWu <502556093@qq.com>",
+  "license": "MIT",
+  "main": "prettier.config.js",
+  "files": [
+    "prettier.config.js"
+  ],
+  "peerDependencies": {
+    "prettier": ">= 2"
+  }
+}

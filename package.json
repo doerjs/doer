@@ -1,0 +1,29 @@
+{
+  "name": "traveler",
+  "scripts": {
+    "bootstrap": "lerna bootstrap",
+    "publish": "yarn build && lerna publish",
+    "build": "lerna run build"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.16.7",
+    "@babel/eslint-parser": "^7.16.5",
+    "@commitlint/cli": "^16.0.1",
+    "@commitlint/config-conventional": "^16.0.0",
+    "eslint": "^8.6.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "husky": "^7.0.4",
+    "lerna": "^4.0.0",
+    "lint-staged": "^12.1.5",
+    "prettier": "^2.5.1"
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,json}": [
+      "prettier --write",
+      "eslint",
+      "git add"
+    ]
+  }
+}

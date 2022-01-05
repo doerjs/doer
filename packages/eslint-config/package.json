@@ -1,0 +1,22 @@
+{
+  "name": "@traveler/eslint-config",
+  "version": "0.0.0",
+  "description": "",
+  "author": "FaureWu <502556093@qq.com>",
+  "license": "MIT",
+  "main": "eslint.config.js",
+  "files": [
+    "eslint.config.js"
+  ],
+  "devDependencies": {
+    "eslint-config-standard": "^16.0.3"
+  },
+  "peerDependencies": {
+    "@babel/core": ">= 7.2.0",
+    "@babel/eslint-parser": ">= 7.2.0",
+    "eslint": ">= 8",
+    "eslint-plugin-import": ">= 2.25.4",
+    "eslint-plugin-node": ">= 11.1.0",
+    "eslint-plugin-promise": ">= 6"
+  }
+}
