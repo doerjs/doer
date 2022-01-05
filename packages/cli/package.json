@@ -1,0 +1,19 @@
+{
+  "name": "@traveler/cli",
+  "version": "0.0.0",
+  "description": "",
+  "author": "FaureWu <502556093@qq.com>",
+  "license": "MIT",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "traveler": "bin/traveler.js"
+  },
+  "devDependencies": {
+    "chalk": "^5.0.0",
+    "compare-versions": "^4.1.2",
+    "inquirer": "^8.2.0",
+    "minimist": "^1.2.5",
+    "org": "^0.2.0"
+  }
+}
