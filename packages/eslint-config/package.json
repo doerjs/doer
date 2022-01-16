@@ -8,7 +8,7 @@
   "files": [
     "eslint.config.js"
   ],
-  "devDependencies": {
+  "dependencies": {
     "eslint-config-standard": "^16.0.3"
   },
   "peerDependencies": {

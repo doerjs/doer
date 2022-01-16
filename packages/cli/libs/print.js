@@ -1,5 +1,11 @@
 import chalk from 'chalk'
+import figlet from 'figlet'
+
 import helper from './helper.js'
+
+function printLogo() {
+  console.log(figlet.textSync('Traveler', 'Ghost'))
+}
 
 function printLog(message) {
   console.log(`👣 [ ] ${message}`)
@@ -58,6 +64,7 @@ function printHelp() {
 }
 
 export default {
+  printLogo,
   printLog,
   printWarn,
   printError,
