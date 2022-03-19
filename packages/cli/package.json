@@ -1,6 +1,6 @@
 {
   "name": "@traveler/cli",
-  "version": "0.0.0",
+  "version": "0.0.1-beta.4+52ef4af",
   "description": "",
   "author": "FaureWu <502556093@qq.com>",
   "license": "MIT",
@@ -19,9 +19,9 @@
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
     "@svgr/webpack": "^6.2.1",
-    "@traveler/eslint-config": "^0.0.0",
-    "@traveler/prettier-config": "^0.0.0",
-    "@traveler/utils": "^0.0.0",
+    "@traveler/eslint-config": "^0.0.1-beta.4+52ef4af",
+    "@traveler/prettier-config": "^0.0.1-beta.4+52ef4af",
+    "@traveler/utils": "^0.0.1-beta.4+52ef4af",
     "babel-loader": "^8.2.3",
     "chalk": "4.1.2",
     "css-loader": "^6.6.0",
@@ -49,5 +49,9 @@
     "terser-webpack-plugin": "^5.3.1",
     "webpack": "^5.68.0",
     "webpack-dev-server": "^4.7.4"
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "52ef4af5cfa9c2c141e7936bbc4e983318ecc742"
 }

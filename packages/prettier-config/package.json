@@ -1,6 +1,6 @@
 {
   "name": "@traveler/prettier-config",
-  "version": "0.0.0",
+  "version": "0.0.1-beta.4+52ef4af",
   "description": "",
   "author": "FaureWu <502556093@qq.com>",
   "license": "MIT",
@@ -10,5 +10,9 @@
   ],
   "peerDependencies": {
     "prettier": ">= 2"
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "52ef4af5cfa9c2c141e7936bbc4e983318ecc742"
 }
