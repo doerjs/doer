@@ -1,10 +1,13 @@
 {
   "name": "traveler",
   "scripts": {
-    "publish": "yarn build && lerna publish",
+    "init": "lerna bootstrap",
+    "publish": "lerna run build && lerna publish",
+    "beta": "lerna run build && lerna publish --canary --preid beta",
+    "link": "lerna link --force-local",
     "build": "lerna run build",
-    "lint": "eslint --ext .js,.jsx ./",
-    "example": "zx ./scripts/example.mjs"
+    "clean": "lerna clean",
+    "lint": "eslint --ext .js,.jsx ./"
   },
   "lint-staged": {
     "**/*.{js,jsx,json}": [
