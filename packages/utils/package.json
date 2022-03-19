@@ -1,6 +1,6 @@
 {
   "name": "@traveler/utils",
-  "version": "0.0.1-beta.4+52ef4af",
+  "version": "0.0.1-beta.5+604c621",
   "description": "",
   "author": "FaureWu <502556093@qq.com>",
   "license": "MIT",
@@ -9,5 +9,5 @@
     "index.js",
     "is.js"
   ],
-  "gitHead": "52ef4af5cfa9c2c141e7936bbc4e983318ecc742"
+  "gitHead": "604c6218681013895e094612d3fb288d52d65880"
 }
