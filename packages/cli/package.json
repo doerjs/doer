@@ -5,21 +5,49 @@
   "author": "FaureWu <502556093@qq.com>",
   "license": "MIT",
   "main": "index.js",
-  "type": "module",
   "bin": {
     "traveler": "bin/traveler.js"
   },
   "dependencies": {
-    "chalk": "^5.0.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-router-dom": "^6.2.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.17.5",
+    "@babel/plugin-transform-runtime": "^7.17.0",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-react": "^7.16.7",
+    "@svgr/webpack": "^6.2.1",
+    "@traveler/eslint-config": "^0.0.0",
+    "@traveler/prettier-config": "^0.0.0",
+    "@traveler/utils": "^0.0.0",
+    "babel-loader": "^8.2.3",
+    "chalk": "4.1.2",
+    "css-loader": "^6.6.0",
+    "css-minimizer-webpack-plugin": "^3.4.1",
     "dotenv": "^10.0.0",
     "dotenv-expand": "^5.1.0",
     "ejs": "^3.1.6",
+    "external-remotes-plugin": "^1.0.0",
     "figlet": "^1.5.2",
+    "html-webpack-plugin": "^5.5.0",
     "inquirer": "^8.2.0",
+    "less-loader": "^10.2.0",
+    "mini-css-extract-plugin": "^2.5.3",
     "minimist": "^1.2.5",
     "org": "^0.2.0",
+    "postcss": "^8.4.7",
+    "postcss-flexbugs-fixes": "^5.0.2",
+    "postcss-loader": "^6.2.1",
+    "postcss-normalize": "^10.0.1",
+    "postcss-preset-env": "^7.4.1",
     "prettier": "^2.5.1",
     "semver": "^7.3.5",
-    "shelljs": "^0.8.5"
+    "source-map-loader": "^3.0.1",
+    "style-loader": "^3.3.1",
+    "terser-webpack-plugin": "^5.3.1",
+    "webpack": "^5.68.0",
+    "webpack-dev-server": "^4.7.4"
   }
 }

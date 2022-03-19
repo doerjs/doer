@@ -1,14 +1,45 @@
-#! /usr/bin/env node
+#!/usr/bin/env node
+'use strict'
 
-import minimist from 'minimist'
-import print from '../libs/print.js'
-import assert from '../libs/assert.js'
-import create from '../scripts/create.js'
+const minimist = require('minimist')
+const figlet = require('figlet')
+const chalk = require('chalk')
+const logger = require('../libs/utils/logger')
+const create = require('../scripts/create')
+const paths = require('../libs/paths')
 
-print.printLogo()
-print.printVersion()
+function printLogo() {
+  console.log(figlet.textSync('Traveler', 'Ghost'))
+}
 
-assert.assertNodeVersion()
+function printVersion() {
+  const version = require(paths.cliPaths.packageJsonPath).version
+
+  console.log()
+  if (version) {
+    console.log(`👣 Traveler v${version}`)
+  } else {
+    console.log('👣 Traveler Unknown Version')
+  }
+  console.log()
+}
+
+function printHelp() {
+  console.log('👣 用法: traveler <命令> [选项]')
+  console.log()
+  console.log('👣 选项:')
+  console.log('👣   -v, --version       输出命令行版本号')
+  console.log('👣   -h, --help          输出命令行用法信息')
+  console.log()
+  console.log('👣 命令:')
+  console.log('👣   create [项目名称]     初始化默认模版项目')
+  console.log('👣   dev                  启动开发环境')
+  console.log('👣   build                打包项目文件用于发布')
+  console.log()
+}
+
+printLogo()
+printVersion()
 
 const argv = minimist(process.argv.slice(2), {
   string: [],
@@ -28,15 +59,18 @@ if (!command) {
   if (argv.version) {
     // no action
   } else {
-    print.printHelp()
+    printHelp()
   }
 
-  process.exit()
+  process.exit(-1)
 }
 
 if (!isValidCommand) {
-  print.printUnValidCommand(command)
-  process.exit(9)
+  logger.fail(
+    `无效的命令参数 ${chalk.bold(command)}，执行 \`${chalk.bold('traveler --help | traveler -h')}\` 获取帮助信息。`,
+  )
+  console.log()
+  process.exit(-1)
 }
 
 switch (command) {

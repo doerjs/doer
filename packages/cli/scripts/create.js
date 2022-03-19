@@ -1,22 +1,25 @@
-import inquirer from 'inquirer'
-import ora from 'ora'
-import shelljs from 'shelljs'
-import chalk from 'chalk'
-import ejs from 'ejs'
-import file from '../libs/file.js'
-import path, { cliPaths } from '../libs/path.js'
-import print from '../libs/print.js'
-import helper from '../libs/helper.js'
+'use strict'
 
-function qa(options) {
-  const { name = '' } = options
+const path = require('path')
+const inquirer = require('inquirer')
+const ora = require('ora')
+const chalk = require('chalk')
+const ejs = require('ejs')
 
+const file = require('../libs/utils/file')
+const paths = require('../libs/paths')
+const logger = require('../libs/utils/logger')
+const shell = require('../libs/utils/shell')
+
+const spinning = ora()
+
+function qa(params) {
   return inquirer.prompt([
     {
       type: 'input',
       name: 'name',
       message: '请输入应用名称',
-      default: name,
+      default: params.name,
       validate(value) {
         if (!/^[a-zA-Z]{1}[A-Za-z0-9_-]+$/.test(value)) {
           return '应用名称只能由字母、数字、下划线、中横线组成，且首字符为字母！'
@@ -24,87 +27,7 @@ function qa(options) {
         return true
       },
     },
-    {
-      type: 'confirm',
-      name: 'mock',
-      message: '是否启用数据模拟服务',
-      default: true,
-    },
-    {
-      type: 'confirm',
-      name: 'eslint',
-      message: '是否启用Eslint语法检查',
-      default: true,
-    },
-    {
-      type: 'confirm',
-      name: 'prettier',
-      message: '是否启用Prettier格式化',
-      default: true,
-    },
-    // {
-    //   type: 'list',
-    //   name: 'style',
-    //   message: '请选择样式预处理语言',
-    //   default: 'less',
-    //   choices: ['less', 'scss', 'css'],
-    // },
   ])
-}
-
-// 初步匹配模版文件名中的可能正确的表达式
-const templateExprRegExp = /^\[(.*?)\]/
-
-// 忽略的模板文件
-const ignoreFiles = [/\.DS_Store/]
-
-// 解析模板文件中的表达式
-function resolveTemplateExpr(fileName) {
-  const matched = fileName.match(templateExprRegExp)
-  if (!matched) {
-    return
-  }
-
-  const [expr, content = ''] = matched
-
-  // 布尔类型表达式[?name]
-  const isBooleanExpr = content.indexOf('?') === 0
-  if (isBooleanExpr) {
-    return { name: content.replace('?', ''), value: true, expr }
-  }
-
-  // 相等类型表达式[name=value]
-  const exprParts = content.split('=')
-  const isEqualExpr = exprParts.length === 2 && exprParts[0]
-  if (isEqualExpr) {
-    return { name: exprParts[0], value: exprParts[1], expr }
-  }
-}
-
-/**
- * 校验模版文件是否需要生成
- */
-function validTemplateFileNameExpr(fileName, options) {
-  const templateExpr = resolveTemplateExpr(fileName)
-
-  if (helper.isUndefined(templateExpr)) {
-    return true
-  }
-
-  return options[templateExpr.name] === templateExpr.value
-}
-
-/**
- * 去除模板文件变量
- */
-function removeTemplateFileNameExpr(filePath) {
-  const { base: fileName } = path.parse(filePath)
-  const templateExpr = resolveTemplateExpr(fileName)
-
-  if (helper.isUndefined(templateExpr)) {
-    return filePath
-  }
-  return filePath.replace(templateExpr.expr, '')
 }
 
 /**
@@ -112,104 +35,184 @@ function removeTemplateFileNameExpr(filePath) {
  * isDirectory 是否是目录
  * isFile 是否是文件
  * isEjs 是否是ejs模板引擎文件
- * templateFilePath 模板文件地址
- * targetFilePath 目标文件文件地址
+ * rawTemplateFilePath 原模板文件地址
+ * templateFilePath 去掉模版引擎文件后缀地址
  */
-function readTemplateDeep(templatePath, options) {
-  const templates = []
+function readTemplates(templatePath) {
+  function resolveTemplate(result, filePath) {
+    const { dir, ext, name } = path.parse(filePath)
 
-  const readDirFiles = file.readDirFactory(function (filePath) {
-    const { dir, base: fileName, ext, name } = path.parse(filePath)
+    if (name === '.DS_Store') return result
 
-    if (file.isDirectory(filePath) && validTemplateFileNameExpr(fileName, options)) {
-      templates.push({
+    if (file.isDirectory(filePath)) {
+      result.push({
         isDirectory: true,
+        rawTemplateFilePath: filePath,
         templateFilePath: filePath,
-        targetFilePath: removeTemplateFileNameExpr(filePath),
       })
-      readDirFiles(filePath)
-      return
+
+      const readChildTemplates = file.reduceReaddirFactory((res, item) => {
+        return resolveTemplate(res, item)
+      }, result)
+
+      return readChildTemplates(filePath)
     }
 
-    const isIgnore = ignoreFiles.some((regExp) => regExp.test(filePath))
-    if (isIgnore) {
-      return
-    }
+    const isEjs = ext === '.ejs'
+    result.push({
+      isFile: true,
+      isEjs,
+      rawTemplateFilePath: filePath,
+      templateFilePath: isEjs ? path.resolve(dir, name) : filePath,
+    })
 
-    if (validTemplateFileNameExpr(fileName, options)) {
-      const isEjs = ext === '.ejs'
-
-      const template = {
-        isFile: true,
-        isEjs,
-        templateFilePath: filePath,
-        targetFilePath: removeTemplateFileNameExpr(filePath),
-      }
-
-      if (template.isEjs) {
-        template.targetFilePath = removeTemplateFileNameExpr(path.resolve(dir, name))
-      }
-
-      templates.push(template)
-    }
-  })
-
-  readDirFiles(templatePath)
-
-  return templates
-}
-
-export default async function create(options) {
-  const answers = await qa(options)
-
-  const loading = ora()
-  const appPath = path.resolve(cliPaths.runtimePath, answers.name)
-  if (file.isExist(appPath)) {
-    console.log()
-    print.printError(`目录已经存在，无法正常创建：${appPath}`)
-    console.log()
-    process.exit()
+    return result
   }
 
+  const read = file.reduceReaddirFactory((result, filePath) => {
+    return resolveTemplate(result, filePath)
+  })
+
+  spinning.text = '[获取模版] 基础应用模版'
+  spinning.start()
+  try {
+    const templates = read(templatePath)
+    spinning.succeed()
+    return templates
+  } catch (error) {
+    spinning.fail()
+    throw error
+  }
+}
+
+function getEJSRenderData(answers) {
+  const cliPackage = require(paths.cliPaths.packageJsonPath)
+  const eslintPackage = require('@traveler/eslint-config/package.json')
+  const prettierPackage = require('@traveler/prettier-config/package.json')
+
+  return {
+    answers,
+    packages: {
+      cli: {
+        version: cliPackage.version,
+        name: cliPackage.name,
+      },
+      eslint: {
+        version: eslintPackage.version,
+        name: eslintPackage.name,
+      },
+      prettier: {
+        version: prettierPackage.version,
+        name: prettierPackage.name,
+      },
+    },
+  }
+}
+
+/**
+ * 安装应用依赖
+ */
+async function installDependencies(appPath) {
+  spinning.text = '[安装依赖] 应用依赖'
+  spinning.start()
+  const { stdout } = await shell.exec(`cd ${appPath} && npm install`).catch((error) => {
+    spinning.fail()
+    throw new Error(error)
+  })
+
+  spinning.succeed()
+  console.log(stdout)
+}
+
+function createDirectory(filePath) {
+  spinning.text = `[创建目录] ${filePath}`
+  spinning.start()
+  const { stderr } = shell.execSync(`mkdir ${filePath}`)
+  if (stderr) {
+    spinning.fail()
+    throw new Error(stderr.toString())
+  }
+  spinning.succeed()
+}
+
+function createFile(filePath, { template, data }) {
+  spinning.text = `[创建文件] ${filePath}`
+  spinning.start()
+  try {
+    let fileContent = file.readFileContent(template.rawTemplateFilePath)
+    if (template.isEjs) {
+      fileContent = ejs.render(fileContent, data)
+    }
+    file.writeFileContent(filePath, fileContent)
+    spinning.succeed()
+  } catch (error) {
+    spinning.fail()
+    throw error
+  }
+}
+
+// 通过应用模版创建应用
+async function createApplication(appPath, answers) {
   console.log()
   console.log(`👣 正在创建全新应用 ${chalk.greenBright(answers.name)}...`)
   console.log()
 
-  loading.start()
+  const templates = readTemplates(paths.cliPaths.templatePath)
 
-  loading.text = `[创建应用] ${chalk.cyan(answers.name)}`
-  shelljs.mkdir('-p', answers.name)
-  loading.succeed()
+  createDirectory(appPath)
 
-  loading.text = `[进入应用] ${chalk.cyan(answers.name)}`
-  shelljs.cd(answers.name)
-  loading.succeed()
-
-  loading.text = '[获取模版] 基础应用模版'
-  const templates = readTemplateDeep(cliPaths.templatePath, answers)
-  loading.succeed()
+  // 获取模版渲染数据，并输出模版
+  const data = getEJSRenderData(answers)
   templates.forEach((template) => {
-    const fileName = template.targetFilePath.replace(cliPaths.templatePath + path.sep, '')
+    const fileName = template.templateFilePath.replace(paths.cliPaths.templatePath + path.sep, '')
     const filePath = path.resolve(appPath, fileName)
 
     if (template.isDirectory) {
-      loading.text = `[创建目录] ${chalk.greenBright(fileName)}`
-      shelljs.mkdir('-p', filePath)
-      loading.succeed()
+      createDirectory(filePath)
       return
     }
 
-    loading.text = `[创建文件] ${fileName}`
-    let fileContent = file.readFile(template.templateFilePath)
-    if (template.isEjs) {
-      fileContent = ejs.render(fileContent, answers)
-    }
-    file.writeFile(filePath, fileContent)
-    loading.succeed()
+    createFile(filePath, { template, data })
   })
 
-  loading.stop()
+  // 安装依赖失败时，不影响后续流程
+  await installDependencies(appPath).catch((error) => {
+    // no action
+    console.error(error)
+  })
+
   console.log()
-  console.log('👣 应用创建成功，开始你的代码之旅吧')
+  console.log('👣 应用创建成功，感谢使用Traveler')
   console.log()
+  console.log('👣 你可以执行如下命令来启动程序')
+  console.log('')
+  console.log(`👣 ${chalk.yellowBright('cd ' + answers.name)}`)
+  console.log('')
+  console.log('👣 启动开发环境')
+  console.log('')
+  console.log(`👣 ${chalk.yellowBright('npm run dev')}`)
+  console.log('')
+  console.log('👣 启动数据模拟环境')
+  console.log('')
+  console.log(`👣 ${chalk.yellowBright('npm run mock')}`)
+  console.log('')
+  console.log('👣 打包生产环境')
+  console.log('')
+  console.log(`👣 ${chalk.yellowBright('npm run build')}`)
+  console.log('')
+  console.log('👣 开始你的欢乐代码之旅吧!!!')
+  console.log('')
+}
+
+module.exports = async function create(params) {
+  const answers = await qa(params)
+  const appPath = path.resolve(paths.cliPaths.runtimePath, answers.name)
+  if (file.isExist(appPath)) {
+    console.log()
+    logger.fail(`目录已经存在，无法正常创建：${appPath}`)
+    console.log()
+    process.exit(-1)
+  }
+
+  createApplication(appPath, answers)
 }

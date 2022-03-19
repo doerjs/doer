@@ -1,24 +1,22 @@
-import dotenv from 'dotenv'
-import dotenvExpand from 'dotenv-expand'
-import { appPaths } from './path.js'
-import file from './file.js'
+'use strict'
 
-const defaultEnv = {
-  ENV: 'prod',
-  NODE_ENV: 'production',
-}
+const dotenv = require('dotenv')
+const dotenvExpand = require('dotenv-expand')
 
-const env = process.env.ENV || defaultEnv.ENV
+const paths = require('./paths')
+const file = require('./utils/file')
+
+const env = process.env.ENV || 'prod'
 
 const envFiles = [
   // 当前环境生效的本地环境变量
-  `${appPaths.env}.${env}.local`,
+  `${paths.appPaths.env}.${env}.local`,
   // 所有环境生效的本地环境变量
-  `${appPaths.env}.local`,
+  `${paths.appPaths.env}.local`,
   // 当前环境生效的环境变量
-  `${appPaths.env}.${env}`,
+  `${paths.appPaths.env}.${env}`,
   // 所有环境生效的环境变量
-  appPaths.env,
+  paths.appPaths.env,
 ]
 
 envFiles.forEach((envFile) => {
@@ -28,7 +26,9 @@ envFiles.forEach((envFile) => {
 })
 
 // 获取项目中可以直接获取的环境变量
-export default function getAppEnv(options) {
+function getAppEnv() {
+  const cliPackage = require(paths.cliPaths.packageJsonPath)
+
   const IS_APP_ENV = /^APP_/i
 
   const raw = Object.keys(process.env)
@@ -39,13 +39,13 @@ export default function getAppEnv(options) {
         return result
       },
       {
-        NODE_ENV: process.env.NODE_ENV || defaultEnv.NODE_ENV,
-        // 静态资源部署路径
-        HOMEPAGE: options.homepage,
+        NODE_ENV: process.env.NODE_ENV,
+        // app环境
+        ENV: process.env.ENV,
         // app版本号
-        VERSION: options.version,
+        VERSION: cliPackage.version,
         // app名称
-        NAME: options.name,
+        NAME: cliPackage.name,
       },
     )
 
@@ -59,3 +59,5 @@ export default function getAppEnv(options) {
 
   return { raw, stringified }
 }
+
+module.exports = getAppEnv()

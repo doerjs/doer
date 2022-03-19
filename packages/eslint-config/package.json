@@ -8,9 +8,6 @@
   "files": [
     "eslint.config.js"
   ],
-  "dependencies": {
-    "eslint-config-standard": "^16.0.3"
-  },
   "peerDependencies": {
     "@babel/core": ">= 7.2.0",
     "@babel/eslint-parser": ">= 7.2.0",

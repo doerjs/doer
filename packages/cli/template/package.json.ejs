@@ -1,5 +1,34 @@
 {
   "private": true,
+  "name": "<%= answers.name %>",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "ENV=dev traveler dev",
+    "mock": "ENV=mock traveler dev",
+    "build": "ENV=prod traveler build"
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,json}": [
+      "prettier --write",
+      "eslint",
+      "git add"
+    ]
+  },
   "dependencies": {},
-  "scripts": {}
+  "devDependencies": {
+    "@babel/core": "^7.16.7",
+    "@babel/eslint-parser": "^7.16.5",
+    "@babel/runtime": "^7.16.7",
+    "@babel/runtime-corejs3": "^7.16.7",
+    "<%= packages.cli.name %>": "<%= packages.cli.version %>"
+    "<%= packages.eslint.name %>": "<%= packages.eslint.version %>",
+    "<%= packages.prettier.name %>": "<%= packages.prettier.version %>",
+    "eslint": "^8.6.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "prettier": "^2.5.1",
+    "husky": "^7.0.4",
+    "lint-staged": "^12.1.5"
+  }
 }
