@@ -1,9 +1,10 @@
 {
-  "name": "traveler",
+  "name": "doer",
   "scripts": {
     "init": "lerna bootstrap",
     "publish": "lerna run build && lerna publish",
-    "beta": "lerna run build && lerna publish --canary --preid beta",
+    "canary": "lerna run build && lerna publish --canary",
+    "beta": "lerna run build && lerna publish --dist-tag beta",
     "link": "lerna link --force-local",
     "build": "lerna run build",
     "clean": "lerna clean",

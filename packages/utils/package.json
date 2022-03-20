@@ -1,6 +1,6 @@
 {
-  "name": "@traveler/utils",
-  "version": "0.0.1-beta.5+604c621",
+  "name": "@doerjs/utils",
+  "version": "0.0.1-alpha.7+578bd32",
   "description": "",
   "author": "FaureWu <502556093@qq.com>",
   "license": "MIT",
@@ -9,5 +9,5 @@
     "index.js",
     "is.js"
   ],
-  "gitHead": "604c6218681013895e094612d3fb288d52d65880"
+  "gitHead": "578bd328f20a6a13c0d771b9075d11404cbccd2e"
 }

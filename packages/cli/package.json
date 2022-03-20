@@ -1,12 +1,12 @@
 {
-  "name": "@traveler/cli",
-  "version": "0.0.1-beta.5+604c621",
+  "name": "@doerjs/cli",
+  "version": "0.0.1-alpha.7+578bd32",
   "description": "",
   "author": "FaureWu <502556093@qq.com>",
   "license": "MIT",
   "main": "index.js",
   "bin": {
-    "traveler": "bin/traveler.js"
+    "doer": "bin/doer.js"
   },
   "dependencies": {
     "react": "^17.0.2",
@@ -19,9 +19,9 @@
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
     "@svgr/webpack": "^6.2.1",
-    "@traveler/eslint-config": "^0.0.1-beta.5+604c621",
-    "@traveler/prettier-config": "^0.0.1-beta.5+604c621",
-    "@traveler/utils": "^0.0.1-beta.5+604c621",
+    "@doerjs/eslint-config": "^0.0.1-alpha.7+578bd32",
+    "@doerjs/prettier-config": "^0.0.1-alpha.7+578bd32",
+    "@doerjs/utils": "^0.0.1-alpha.7+578bd32",
     "babel-loader": "^8.2.3",
     "chalk": "4.1.2",
     "css-loader": "^6.6.0",
@@ -53,5 +53,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "604c6218681013895e094612d3fb288d52d65880"
+  "gitHead": "578bd328f20a6a13c0d771b9075d11404cbccd2e"
 }

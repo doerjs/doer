@@ -12,7 +12,7 @@ const { WebpackManifestPlugin } = require('webpack-manifest-plugin')
 const ExternalRemotesPlugin = require('external-remotes-plugin')
 
 const HtmlEjsWebpackPlugin = require('./plugins/HtmlEjsWebpackPlugin')
-const TravelerWebpackPlugin = require('./plugins/TravelerWebpackPlugin')
+const DoerWebpackPlugin = require('./plugins/DoerWebpackPlugin')
 
 const paths = require('./paths')
 const env = require('./env')
@@ -41,10 +41,10 @@ function getComplierTempPath() {
   const isProduction = process.env.NODE_ENV === 'production'
 
   if (isProduction) {
-    return path.resolve(paths.cliPaths.runtimePath, 'src/.traveler.prod')
+    return path.resolve(paths.cliPaths.runtimePath, 'src/.doer.prod')
   }
 
-  return path.resolve(paths.cliPaths.runtimePath, 'src/.traveler')
+  return path.resolve(paths.cliPaths.runtimePath, 'src/.doer')
 }
 
 // 获取模块共享配置
@@ -276,7 +276,7 @@ function createConfig(appConfig) {
       // 项目共享支持动态域名
       new ExternalRemotesPlugin(),
 
-      new TravelerWebpackPlugin({
+      new DoerWebpackPlugin({
         outputPath: getComplierTempPath(),
         pageRootPath: path.resolve(paths.appPaths.srcPath, 'pages'),
         layoutRootPath: path.resolve(paths.appPaths.srcPath, 'layouts'),
