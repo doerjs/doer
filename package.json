@@ -6,7 +6,7 @@
     "link": "lerna link --force-local",
     "build": "lerna run build",
     "clean": "lerna clean",
-    "lint": "eslint --ext .js,.jsx ./"
+    "lint": "eslint --ext .js,.jsx,.mjs ./"
   },
   "lint-staged": {
     "**/*.{js,jsx,json}": [
