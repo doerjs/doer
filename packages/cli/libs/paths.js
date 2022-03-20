@@ -21,7 +21,7 @@ function getAppPublicUrlPath() {
   publicPath = publicPath.endsWith('/') ? publicPath : publicPath + '/'
 
   if (process.env.NODE_ENV === 'development') {
-    const publicUrl = new URL(publicPath, 'https://traveler.cli.com')
+    const publicUrl = new URL(publicPath, 'https://doer.cli.com')
     return publicUrl.pathname
   }
 
@@ -32,7 +32,7 @@ const appPaths = {
   // 环境变量路径
   env: path.resolve(cliPaths.runtimePath, './env'),
   // app配置文件路径
-  configPath: path.resolve(cliPaths.runtimePath, '.travelerrc.js'),
+  configPath: path.resolve(cliPaths.runtimePath, '.doerrc.js'),
   srcPath: path.resolve(cliPaths.runtimePath, 'src'),
   buildPath: path.resolve(cliPaths.runtimePath, 'dist'),
   packageJsonPath: path.resolve(cliPaths.runtimePath, 'package.json'),

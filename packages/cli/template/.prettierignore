@@ -3,5 +3,5 @@
 
 # 应用编译时自动生成的目录
 dist
-.traveler
-.traveler-prod
+.doer
+.doer-prod

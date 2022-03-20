@@ -9,7 +9,7 @@ const create = require('../scripts/create')
 const paths = require('../libs/paths')
 
 function printLogo() {
-  console.log(figlet.textSync('Traveler', 'Ghost'))
+  console.log(figlet.textSync('Doer', 'Ghost'))
 }
 
 function printVersion() {
@@ -17,15 +17,15 @@ function printVersion() {
 
   console.log()
   if (version) {
-    console.log(`👣 Traveler v${version}`)
+    console.log(`👣 Doer v${version}`)
   } else {
-    console.log('👣 Traveler Unknown Version')
+    console.log('👣 Doer Unknown Version')
   }
   console.log()
 }
 
 function printHelp() {
-  console.log('👣 用法: traveler <命令> [选项]')
+  console.log('👣 用法: doer <命令> [选项]')
   console.log()
   console.log('👣 选项:')
   console.log('👣   -v, --version       输出命令行版本号')
@@ -66,9 +66,7 @@ if (!command) {
 }
 
 if (!isValidCommand) {
-  logger.fail(
-    `无效的命令参数 ${chalk.bold(command)}，执行 \`${chalk.bold('traveler --help | traveler -h')}\` 获取帮助信息。`,
-  )
+  logger.fail(`无效的命令参数 ${chalk.bold(command)}，执行 \`${chalk.bold('doer --help | doer -h')}\` 获取帮助信息。`)
   console.log()
   process.exit(-1)
 }

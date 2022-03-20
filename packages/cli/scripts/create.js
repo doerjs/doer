@@ -87,8 +87,8 @@ function readTemplates(templatePath) {
 
 function getEJSRenderData(answers) {
   const cliPackage = require(paths.cliPaths.packageJsonPath)
-  const eslintPackage = require('@traveler/eslint-config/package.json')
-  const prettierPackage = require('@traveler/prettier-config/package.json')
+  const eslintPackage = require('@doerjs/eslint-config/package.json')
+  const prettierPackage = require('@doerjs/prettier-config/package.json')
 
   return {
     answers,
@@ -182,7 +182,7 @@ async function createApplication(appPath, answers) {
   })
 
   console.log()
-  console.log('👣 应用创建成功，感谢使用Traveler')
+  console.log('👣 应用创建成功，感谢使用Doer')
   console.log()
   console.log('👣 你可以执行如下命令来启动程序')
   console.log('')

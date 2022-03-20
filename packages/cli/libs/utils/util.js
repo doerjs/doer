@@ -1,7 +1,7 @@
 'use strict'
 
 const path = require('path')
-const is = require('@traveler/utils/is')
+const is = require('@doerjs/utils/is')
 const logger = require('./logger')
 
 function assert(check, message) {
