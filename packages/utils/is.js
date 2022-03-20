@@ -44,8 +44,6 @@ function isBoolean(data) {
   return check(data, 'Boolean')
 }
 
-function isTest() {}
-
 module.exports = {
   isUndefined,
   isNull,

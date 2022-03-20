@@ -1,6 +1,6 @@
 {
   "name": "@doerjs/cli",
-  "version": "0.0.2-alpha.1",
+  "version": "0.0.2-alpha.2",
   "description": "",
   "author": "FaureWu <502556093@qq.com>",
   "license": "MIT",
@@ -20,7 +20,7 @@
     "@babel/preset-react": "^7.16.7",
     "@doerjs/eslint-config": "^0.0.2-alpha.1",
     "@doerjs/prettier-config": "^0.0.2-alpha.1",
-    "@doerjs/utils": "^0.0.2-alpha.1",
+    "@doerjs/utils": "^0.0.2-alpha.2",
     "@svgr/webpack": "^6.2.1",
     "babel-loader": "^8.2.3",
     "chalk": "4.1.2",
@@ -52,5 +52,6 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "gitHead": "1deb952d483213a805b67569d61e8fb431fa8d89"
 }
