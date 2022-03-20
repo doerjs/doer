@@ -1,6 +1,6 @@
 {
   "name": "@doerjs/utils",
-  "version": "0.0.2-alpha.2",
+  "version": "0.0.2-alpha.3",
   "description": "",
   "author": "FaureWu <502556093@qq.com>",
   "license": "MIT",
@@ -12,5 +12,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "1deb952d483213a805b67569d61e8fb431fa8d89"
+  "gitHead": "84610b5b79ac4fde04b62128b8ac0a79f9e61445"
 }
