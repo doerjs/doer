@@ -1,10 +1,8 @@
 {
   "name": "doer",
   "scripts": {
-    "init": "lerna bootstrap",
+    "bootstrap": "lerna bootstrap",
     "publish": "lerna run build && lerna publish",
-    "canary": "lerna run build && lerna publish --canary",
-    "beta": "lerna run build && lerna publish --dist-tag beta",
     "link": "lerna link --force-local",
     "build": "lerna run build",
     "clean": "lerna clean",

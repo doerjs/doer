@@ -1,6 +1,6 @@
 {
   "name": "@doerjs/utils",
-  "version": "0.0.1-alpha.7+578bd32",
+  "version": "0.0.1-alpha.0",
   "description": "",
   "author": "FaureWu <502556093@qq.com>",
   "license": "MIT",
@@ -9,5 +9,5 @@
     "index.js",
     "is.js"
   ],
-  "gitHead": "578bd328f20a6a13c0d771b9075d11404cbccd2e"
+  "gitHead": "7f77578c0366e01c91cc7dd5dce027dfe462bcd1"
 }
