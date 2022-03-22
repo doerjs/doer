@@ -46,6 +46,7 @@ function getAppEnv() {
         VERSION: cliPackage.version,
         // app名称
         NAME: cliPackage.name,
+        PUBLIC_URL: process.env.PUBLIC_URL || '/',
       },
     )
 

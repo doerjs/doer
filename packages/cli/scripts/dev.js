@@ -4,21 +4,22 @@ process.env.NODE_ENV = 'development'
 
 require('../libs/env')
 const createDevServer = require('../libs/webpackDevServer')
-const createCompiler = require('../libs/webapckComplier')
+const createCompiler = require('../libs/webpackComplier')
 const paths = require('../libs/paths')
 
 process.on('unhandledRejection', (err) => {
   throw err
 })
 
-const appConfig = paths.getAppConfig()
+module.exports = function dev() {
+  const appConfig = paths.getAppConfig()
 
-const compiler = createCompiler({
-  appConfig,
-})
-const server = createDevServer({
-  compiler,
-  appConfig,
-})
+  const compiler = createCompiler({
+    appConfig,
+  })
 
-server.start()
+  createDevServer({
+    compiler,
+    appConfig,
+  })
+}

@@ -5,8 +5,10 @@ const minimist = require('minimist')
 const figlet = require('figlet')
 const chalk = require('chalk')
 const logger = require('../libs/utils/logger')
-const create = require('../scripts/create')
 const paths = require('../libs/paths')
+
+const create = require('../scripts/create')
+const dev = require('../scripts/dev')
 
 function printLogo() {
   console.log(figlet.textSync('Doer', 'Ghost'))
@@ -76,6 +78,7 @@ switch (command) {
     create({ name })
     break
   case 'dev':
+    dev()
     break
   case 'build':
     break

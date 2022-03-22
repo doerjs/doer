@@ -9,9 +9,10 @@ const CssMinimizerWebpackPlugin = require('css-minimizer-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin')
-const ExternalRemotesPlugin = require('external-remotes-plugin')
+const ProgressWebpackPlugin = require('webpackbar')
+// const ExternalRemotesPlugin = require('external-remotes-plugin')
 
-const HtmlEjsWebpackPlugin = require('./plugins/HtmlEjsWebpackPlugin')
+const ReplaceHtmlEnvWebpackPlugin = require('./plugins/ReplaceHtmlEnvWebpackPlugin')
 const DoerWebpackPlugin = require('./plugins/DoerWebpackPlugin')
 
 const paths = require('./paths')
@@ -21,12 +22,7 @@ const scriptLoader = require('./loaders/script')
 const styleLoader = require('./loaders/style')
 const svgLoader = require('./loaders/svg')
 
-const { ModuleFederationPlugin } = webpack.container
-
-// 自定义webpack日志输出
-function webpackLogger() {
-  // TODO
-}
+// const { ModuleFederationPlugin } = webpack.container
 
 // 创建webpack缓存版本号
 function createWebpackCacheVersion() {
@@ -48,34 +44,34 @@ function getComplierTempPath() {
 }
 
 // 获取模块共享配置
-function getModuleFederationConfig({ appConfig, appPackageJson }) {
-  const { exposes = {}, remotes = {}, shared = [] } = appConfig.moduleFederation || {}
+// function getModuleFederationConfig({ appConfig, appPackageJson }) {
+//   const { exposes = {}, remotes = {}, shared = [] } = appConfig.moduleFederation || {}
 
-  return {
-    name: appPackageJson.name,
-    filename: 'remote.js',
-    exposes,
-    remotes,
-    shared: shared.reduce(
-      (result, item) => {
-        result[item] = { singleton: true }
-        return result
-      },
-      {
-        'react': { singleton: true },
-        'react-dom': { singleton: true },
-        'react-router-dom': { singleton: true },
-      },
-    ),
-  }
-}
+//   return {
+//     name: appPackageJson.name,
+//     filename: 'remote.js',
+//     exposes,
+//     remotes,
+//     shared: shared.reduce(
+//       (result, item) => {
+//         result[item] = { singleton: true }
+//         return result
+//       },
+//       {
+//         'react': { singleton: true },
+//         'react-dom': { singleton: true },
+//         'react-router-dom': { singleton: true },
+//       },
+//     ),
+//   }
+// }
 
 function createConfig(appConfig) {
   const isProduction = process.env.NODE_ENV === 'production'
   const isEnableProfiler = isProduction && process.env.ENABLE_PROFILER === 'true'
   const imageInlineLimitSize = parseInt(process.env.IMAGE_INLINE_LIMIT_SIZE) || 10000
   const assetModuleFilename = 'static/media/[name].[hash].[ext]'
-  const appPackageJson = require(paths.appPaths.packageJsonPath)
+  // const appPackageJson = require(paths.appPaths.packageJsonPath)
 
   return {
     mode: isProduction ? 'production' : 'development',
@@ -109,10 +105,10 @@ function createConfig(appConfig) {
       },
     },
 
-    // 设置自定义的输出日志
-    infrastructureLogging: {
-      console: webpackLogger,
-    },
+    // 关闭输出日志
+    // infrastructureLogging: {
+    //   level: 'log',
+    // },
 
     // 资源压缩，分包相关配置
     optimization: {
@@ -135,25 +131,25 @@ function createConfig(appConfig) {
       ],
 
       // 分包配置
-      splitChunks: {
-        chunks: 'all',
-        runtimeChunk: 'single',
-        cacheGroups: {
-          // 核心库不会经常升级，单独提取出来
-          react: {
-            test: /[\\/]node_modules[\\/](react|react-dom|react-router-dom)[\\/]/,
-            priority: 1,
-            chunks: 'all',
-            name: 'framework',
-          },
-          // 其他包提取到
-          vendors: {
-            test: /[\\/]node_modules[\\/]/,
-            chunks: 'all',
-            name: 'vendors',
-          },
-        },
-      },
+      // splitChunks: {
+      //   chunks: 'all',
+      //   runtimeChunk: 'single',
+      //   cacheGroups: {
+      //     // 核心库不会经常升级，单独提取出来
+      //     react: {
+      //       test: /[\\/]node_modules[\\/](react|react-dom|react-router-dom)[\\/]/,
+      //       priority: 1,
+      //       chunks: 'all',
+      //       name: 'framework',
+      //     },
+      //     // 其他包提取到
+      //     vendors: {
+      //       test: /[\\/]node_modules[\\/]/,
+      //       chunks: 'all',
+      //       name: 'vendors',
+      //     },
+      //   },
+      // },
     },
 
     resolve: {
@@ -166,17 +162,18 @@ function createConfig(appConfig) {
         // 设置应用程序别名
         ...appConfig.alias,
       },
+      symlinks: true,
       modules: [paths.appPaths.nodeModulesPath, paths.cliPaths.nodeModulesPath],
       // 自动解析的扩展名
-      extensions: ['js', 'jsx', 'json'],
+      extensions: ['.js', '.jsx', '.json'],
     },
 
     // 为了自定义日志输出，这里先关闭它，后续通过其他方式进行提示
-    performance: false,
+    // performance: false,
 
     module: {
       // 将缺失的导出提示成错误而不是警告
-      strictExportPresence: true,
+      // strictExportPresence: true,
       rules: [
         {
           enforce: 'pre',
@@ -231,7 +228,7 @@ function createConfig(appConfig) {
       }),
 
       // html入口文件支持EJS模版语法，默认注入环境变量
-      new HtmlEjsWebpackPlugin(HtmlWebpackPlugin, env.raw),
+      new ReplaceHtmlEnvWebpackPlugin(HtmlWebpackPlugin, env.raw),
       // 向应用中注入环境变量，方便在JS中使用
       new webpack.DefinePlugin(env.stringified),
 
@@ -267,21 +264,25 @@ function createConfig(appConfig) {
       }),
 
       // 项目之间实现资源共享
-      new ModuleFederationPlugin(
-        getModuleFederationConfig({
-          appConfig,
-          appPackageJson,
-        }),
-      ),
+      // new ModuleFederationPlugin(
+      //   getModuleFederationConfig({
+      //     appConfig,
+      //     appPackageJson,
+      //   }),
+      // ),
       // 项目共享支持动态域名
-      new ExternalRemotesPlugin(),
+      // new ExternalRemotesPlugin(),
 
       new DoerWebpackPlugin({
         outputPath: getComplierTempPath(),
         pageRootPath: path.resolve(paths.appPaths.srcPath, 'pages'),
         layoutRootPath: path.resolve(paths.appPaths.srcPath, 'layouts'),
       }),
+
+      new ProgressWebpackPlugin(),
     ].filter(Boolean),
+
+    stats: 'none',
   }
 }
 
@@ -291,4 +292,6 @@ module.exports = function createCompiler({ appConfig }) {
   compiler.hooks.done.tap('done', async (stats) => {
     // 编译完成后执行
   })
+
+  return compiler
 }

@@ -26,6 +26,8 @@
     "ejs": "^3.1.6",
     "external-remotes-plugin": "^1.0.0",
     "figlet": "^1.5.2",
+    "file-loader": "^6.2.0",
+    "friendly-errors-webpack-plugin": "^1.7.0",
     "html-webpack-plugin": "^5.5.0",
     "inquirer": "^8.2.0",
     "less-loader": "^10.2.0",
@@ -46,7 +48,9 @@
     "style-loader": "^3.3.1",
     "terser-webpack-plugin": "^5.3.1",
     "webpack": "^5.68.0",
-    "webpack-dev-server": "^4.7.4"
+    "webpack-dev-server": "^4.7.4",
+    "webpack-manifest-plugin": "^5.0.0",
+    "webpackbar": "^5.0.2"
   },
   "publishConfig": {
     "access": "public"

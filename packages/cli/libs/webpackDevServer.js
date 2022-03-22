@@ -32,9 +32,9 @@ function getHttpsConfig() {
 
 function createConfig(appConfig) {
   return {
+    allowedHosts: 'all',
     host: process.env.HOST || '0.0.0.0',
     port: process.env.PORT || '3000',
-    allowedHosts: 'all',
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': '*',
@@ -43,47 +43,41 @@ function createConfig(appConfig) {
     compress: true,
     static: {
       directory: paths.appPaths.publicDirectory,
-      publicPath: [paths.appPaths.publicUrlPath],
+      publicPath: paths.appPaths.publicUrlPath,
     },
     client: {
+      logging: 'none',
       overlay: false,
+      progress: true,
     },
+    open: true,
+    hot: false,
+    liveReload: true,
     devMiddleware: {
       publicPath: paths.appPaths.publicUrlPath.slice(0, -1),
     },
     https: getHttpsConfig(),
-    historyApiFallback: {
-      disableDotRule: true,
-      index: paths.appPaths.publicUrlPath,
-    },
-    proxy: appConfig.proxy,
+    // TODO
+    // proxy: appConfig.proxy,
   }
 }
 
 module.exports = function createDevServer({ webpackConfig, compiler, appConfig }) {
   const server = new WebpackDevServer(createConfig(appConfig), compiler)
 
-  function start() {
-    server.start()
-
-    // 注册结束信号监听
-    const closeSigns = ['SIGINT', 'SIGTERM']
-    closeSigns.forEach((sign) => {
-      process.on(sign, () => {
-        stop()
-        process.exit(0)
-      })
-    })
-
-    process.stdin.on('end', () => {
-      stop()
+  // 注册结束信号监听
+  const closeSigns = ['SIGINT', 'SIGTERM']
+  closeSigns.forEach((sign) => {
+    process.on(sign, () => {
+      server.stop()
       process.exit(0)
     })
-  }
+  })
 
-  function stop() {
+  process.stdin.on('end', () => {
     server.stop()
-  }
+    process.exit(0)
+  })
 
   server.startCallback(() => {
     // 服务器启动成功
@@ -92,9 +86,4 @@ module.exports = function createDevServer({ webpackConfig, compiler, appConfig }
   server.stopCallback(() => {
     // 服务器停止成功
   })
-
-  return {
-    start,
-    stop,
-  }
 }

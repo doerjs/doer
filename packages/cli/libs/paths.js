@@ -4,8 +4,8 @@ const path = require('path')
 
 const file = require('./utils/file')
 
-const cliRootPath = path.resolve(__dirname, '../')
 const cliRuntimePath = process.cwd()
+const cliRootPath = path.resolve(__dirname, '../')
 
 const cliPaths = {
   rootPath: cliRootPath,
@@ -16,7 +16,7 @@ const cliPaths = {
 }
 
 function getAppPublicUrlPath() {
-  let publicPath = process.env.APP_PUBLIC_URL || '/'
+  let publicPath = process.env.PUBLIC_URL || '/'
 
   publicPath = publicPath.endsWith('/') ? publicPath : publicPath + '/'
 

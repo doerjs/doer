@@ -9,7 +9,7 @@ const util = require('../utils/util')
 
 // index.js
 const indexTemplate = `
-import('bootstrap')
+import(/* webpackChunkName: "bootstrap" */'./bootstrap')
 `
 
 // bootstrap.js
@@ -35,10 +35,10 @@ import Router from './router'
 
 export default function App() {
   return (
-    <Suspense>
+    <Suspense fallback={<div>loading</div>}>
       <HashRouter>
         <Layout>
-          <Suspense>
+          <Suspense fallback={<div>loading</div>}>
             <Router />
           </Suspense>
         </Layout>
@@ -83,7 +83,7 @@ export default function Router() {
   return (
     <Routes>
       <% pages.forEach(function(page) { %>
-      <Route<% if (page.isIndex) { %> index<% } %> path="<%= page.routePath %>" element={<<%= page.pageName %> />} />
+      <Route path="<%= page.routePath %>" element={<<%= page.pageName %> />} />
       <% }) %>
       <Route path="*" element={<NotFound />} />
     </Routes>
@@ -120,24 +120,29 @@ function resolvePage(pageFile, options) {
 
   const basename = path.basename(pagePath)
 
-  const [suffix] = basename.match(pageRegex)
+  const [suffix] = basename.match(pageRegex) || []
   const routeString = basename.replace(suffix, '')
 
   const routeParts = routeString.split('.').filter((item) => item)
 
   // 根据目录文件名解析路由地址
   const routePath = routeParts
-    .map((name) => {
+    .reduce((result, name, index) => {
       if (name.startsWith('$')) {
-        return `:${name.replace('$', '')}`
+        result.push(`:${name.replace('$', '')}`)
+      } else if (name.endsWith('$')) {
+        result.push(`*${name.replace('$', '')}`)
       }
 
-      if (name.endsWith('$')) {
-        return `*${name.replace('$', '')}`
+      // 最后一个名称为index时，省略
+      if (index === routeParts.length - 1 && name === 'index') {
+        return result
       }
 
-      return name
-    })
+      result.push(name)
+
+      return result
+    }, [])
     .join('/')
 
   const pageName =
@@ -155,7 +160,6 @@ function resolvePage(pageFile, options) {
   return {
     routePath,
     pageName,
-    isIndex: basename === 'index',
     dynamicPageFilePath: path.resolve(options.outputPath, `pages/${pageName}.js`),
     rawPageFilePath: pageFile,
   }
@@ -223,7 +227,7 @@ class TravelerWebpackPlugin {
     pages.forEach((page) => {
       // 获取相对路径并格式化为webpack识别的路径
       const relativeRawPageFilePath = util.formatToPosixPath(
-        path.relative(page.rawPageFilePath, page.dynamicPageFilePath),
+        path.relative(path.dirname(page.dynamicPageFilePath), page.rawPageFilePath),
       )
 
       this.write(page.dynamicPageFilePath, dynamicPageTemplate, {
