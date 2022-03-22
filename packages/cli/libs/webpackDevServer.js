@@ -46,11 +46,11 @@ function createConfig(appConfig) {
       publicPath: paths.appPaths.publicUrlPath,
     },
     client: {
-      logging: 'none',
+      logging: 'warn',
       overlay: false,
       progress: true,
     },
-    open: true,
+    open: false,
     hot: false,
     liveReload: true,
     devMiddleware: {

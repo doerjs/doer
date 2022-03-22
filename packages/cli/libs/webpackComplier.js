@@ -9,11 +9,13 @@ const CssMinimizerWebpackPlugin = require('css-minimizer-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin')
+const CompressionWebpackPlugin = require('compression-webpack-plugin')
 const ProgressWebpackPlugin = require('webpackbar')
 // const ExternalRemotesPlugin = require('external-remotes-plugin')
 
 const ReplaceHtmlEnvWebpackPlugin = require('./plugins/ReplaceHtmlEnvWebpackPlugin')
 const DoerWebpackPlugin = require('./plugins/DoerWebpackPlugin')
+const LogWebpackPlugin = require('./plugins/LogWebpackPlugin')
 
 const paths = require('./paths')
 const env = require('./env')
@@ -69,6 +71,7 @@ function getComplierTempPath() {
 function createConfig(appConfig) {
   const isProduction = process.env.NODE_ENV === 'production'
   const isEnableProfiler = isProduction && process.env.ENABLE_PROFILER === 'true'
+  const isEnableGzip = isProduction && process.env.GZIP === 'true'
   const imageInlineLimitSize = parseInt(process.env.IMAGE_INLINE_LIMIT_SIZE) || 10000
   const assetModuleFilename = 'static/media/[name].[hash].[ext]'
   // const appPackageJson = require(paths.appPaths.packageJsonPath)
@@ -105,11 +108,6 @@ function createConfig(appConfig) {
       },
     },
 
-    // 关闭输出日志
-    // infrastructureLogging: {
-    //   level: 'log',
-    // },
-
     // 资源压缩，分包相关配置
     optimization: {
       minimize: isProduction,
@@ -129,27 +127,6 @@ function createConfig(appConfig) {
         // 压缩css样式
         new CssMinimizerWebpackPlugin(),
       ],
-
-      // 分包配置
-      // splitChunks: {
-      //   chunks: 'all',
-      //   runtimeChunk: 'single',
-      //   cacheGroups: {
-      //     // 核心库不会经常升级，单独提取出来
-      //     react: {
-      //       test: /[\\/]node_modules[\\/](react|react-dom|react-router-dom)[\\/]/,
-      //       priority: 1,
-      //       chunks: 'all',
-      //       name: 'framework',
-      //     },
-      //     // 其他包提取到
-      //     vendors: {
-      //       test: /[\\/]node_modules[\\/]/,
-      //       chunks: 'all',
-      //       name: 'vendors',
-      //     },
-      //   },
-      // },
     },
 
     resolve: {
@@ -168,12 +145,9 @@ function createConfig(appConfig) {
       extensions: ['.js', '.jsx', '.json'],
     },
 
-    // 为了自定义日志输出，这里先关闭它，后续通过其他方式进行提示
-    // performance: false,
-
     module: {
       // 将缺失的导出提示成错误而不是警告
-      // strictExportPresence: true,
+      strictExportPresence: true,
       rules: [
         {
           enforce: 'pre',
@@ -279,10 +253,24 @@ function createConfig(appConfig) {
         layoutRootPath: path.resolve(paths.appPaths.srcPath, 'layouts'),
       }),
 
-      new ProgressWebpackPlugin(),
+      // 显示编译进度
+      new ProgressWebpackPlugin({
+        name: 'Doer',
+        color: '#08979c',
+      }),
+
+      // 自定义日志显示
+      new LogWebpackPlugin(),
+
+      // 开启gzip压缩
+      isEnableGzip && new CompressionWebpackPlugin(),
     ].filter(Boolean),
 
+    // 通过自定义日志输出插件输出日志
     stats: 'none',
+    infrastructureLogging: {
+      level: 'none',
+    },
   }
 }
 
