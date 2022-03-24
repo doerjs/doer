@@ -73,7 +73,7 @@ function createConfig(appConfig) {
   const isEnableProfiler = isProduction && process.env.ENABLE_PROFILER === 'true'
   const isEnableGzip = isProduction && process.env.GZIP === 'true'
   const imageInlineLimitSize = parseInt(process.env.IMAGE_INLINE_LIMIT_SIZE) || 10000
-  const assetModuleFilename = 'static/media/[name].[hash].[ext]'
+  const assetModuleFilename = isProduction ? 'static/media/[name].[contenthash:8].[ext]' : 'static/media/[name].[ext]'
   // const appPackageJson = require(paths.appPaths.packageJsonPath)
 
   return {
@@ -207,11 +207,10 @@ function createConfig(appConfig) {
       new webpack.DefinePlugin(env.stringified),
 
       // 提取样式为独立文件
-      isProduction &&
-        new MiniCssExtractPlugin({
-          filename: 'static/css/[name].[contenthash:8].css',
-          chunkFilename: 'static/css/[name].[contenthash:8].chunk.css',
-        }),
+      new MiniCssExtractPlugin({
+        filename: isProduction ? 'static/css/[name].[contenthash:8].css' : 'static/css/[name].css',
+        chunkFilename: isProduction ? 'static/css/[name].[contenthash:8].chunk.css' : 'static/css/[name].chunk.css',
+      }),
 
       // 提取公共资源路径，用于服务端生成html或者微前端资源注入读取
       new WebpackManifestPlugin({
@@ -253,14 +252,14 @@ function createConfig(appConfig) {
         layoutRootPath: path.resolve(paths.appPaths.srcPath, 'layouts'),
       }),
 
+      // 自定义日志显示
+      new LogWebpackPlugin(),
+
       // 显示编译进度
       new ProgressWebpackPlugin({
         name: 'Doer',
         color: '#08979c',
       }),
-
-      // 自定义日志显示
-      new LogWebpackPlugin(),
 
       // 开启gzip压缩
       isEnableGzip && new CompressionWebpackPlugin(),

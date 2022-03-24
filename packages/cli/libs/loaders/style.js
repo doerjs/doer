@@ -5,16 +5,20 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 function getLessStyleLoaders({ isProduction, isModule, appConfig }) {
   const loaders = [
     // 用于将样式文件通过style标签挂载
-    isProduction ? MiniCssExtractPlugin.loader : require.resolve('style-loader'),
+    MiniCssExtractPlugin.loader,
     {
       loader: require.resolve('css-loader'),
       options: {
         importLoaders: 2,
         sourceMap: true,
-        modules: {
-          mode: isModule ? 'icss' : 'local',
-          localIdentName: isModule ? '[name]__[local]--[hash]' : undefined,
-        },
+        modules: isModule
+          ? {
+              mode: 'icss',
+              localIdentName: '[name]__[local]--[hash]',
+            }
+          : {
+              mode: 'local',
+            },
       },
     },
     {

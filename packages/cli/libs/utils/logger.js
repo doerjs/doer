@@ -7,15 +7,15 @@ function log(message) {
 }
 
 function warn(message) {
-  console.log(`👣 ${chalk.yellowBright('[!]')} ${message}`)
+  console.log(`👣 ${chalk.yellow('[!]')} ${message}`)
 }
 
 function success(message) {
-  console.log(`👣 ${chalk.greenBright('[√]')} ${message}`)
+  console.log(`👣 ${chalk.green('[√]')} ${message}`)
 }
 
 function fail(message) {
-  console.log(`👣 ${chalk.redBright('[X]')} ${message}`)
+  console.log(`👣 ${chalk.red('[X]')} ${message}`)
 }
 
 module.exports = {
