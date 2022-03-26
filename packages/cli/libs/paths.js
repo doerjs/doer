@@ -1,8 +1,7 @@
 'use strict'
 
 const path = require('path')
-
-const file = require('./utils/file')
+const resolve = require('resolve/sync')
 
 const cliRuntimePath = process.cwd()
 const cliRootPath = path.resolve(__dirname, '../')
@@ -41,17 +40,16 @@ const appPaths = {
   nodeModulesPath: path.resolve(cliPaths.runtimePath, 'node_modules'),
 }
 
-// 获取app配置信息
-function getAppConfig() {
-  if (!file.isExist(appPaths.configPath)) {
-    return {}
+function resolveScripts(filePath) {
+  try {
+    return resolve(filePath, { basedir: cliPaths.runtimePath, extensions: ['.js', '.jsx'] })
+  } catch (error) {
+    // no action
   }
-
-  return require(appPaths.configPath)
 }
 
 module.exports = {
   cliPaths,
   appPaths,
-  getAppConfig,
+  resolveScripts,
 }

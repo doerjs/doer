@@ -10,7 +10,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin')
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
-const ProgressWebpackPlugin = require('webpackbar')
 // const ExternalRemotesPlugin = require('external-remotes-plugin')
 
 const ReplaceHtmlEnvWebpackPlugin = require('./plugins/ReplaceHtmlEnvWebpackPlugin')
@@ -78,8 +77,8 @@ function createConfig(appConfig) {
 
   return {
     mode: isProduction ? 'production' : 'development',
-    // 当编译出现出现错误时，立刻停止编译，而不是继续打包
-    bail: true,
+    // 生产环境下当编译出现出现错误时，立刻停止编译，而不是继续打包
+    bail: isProduction,
     entry: path.resolve(getComplierTempPath(), 'index.js'),
     devtool: isProduction ? 'source-map' : 'cheap-module-source-map',
 
@@ -246,20 +245,16 @@ function createConfig(appConfig) {
       // 项目共享支持动态域名
       // new ExternalRemotesPlugin(),
 
+      // 自动注入，生成路由系统
       new DoerWebpackPlugin({
+        appConfig,
         outputPath: getComplierTempPath(),
         pageRootPath: path.resolve(paths.appPaths.srcPath, 'pages'),
         layoutRootPath: path.resolve(paths.appPaths.srcPath, 'layouts'),
       }),
 
-      // 自定义日志显示
+      // 自定义编译进度显示和日志打印
       new LogWebpackPlugin(),
-
-      // 显示编译进度
-      new ProgressWebpackPlugin({
-        name: 'Doer',
-        color: '#08979c',
-      }),
 
       // 开启gzip压缩
       isEnableGzip && new CompressionWebpackPlugin(),

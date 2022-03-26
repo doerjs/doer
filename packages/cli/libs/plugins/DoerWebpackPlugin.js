@@ -17,7 +17,7 @@ const bootstrapTemplate = `
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import App from './app'
+import App from './App'
 
 ReactDOM.render(
   <App />,
@@ -25,20 +25,27 @@ ReactDOM.render(
 )
 `
 
-// app.jsx
+// App.jsx
 const appTemplate = `
 import React, { Suspense } from 'react'
 import { HashRouter } from 'react-router-dom'
 
-import Layout from './layout'
-import Router from './router'
+import Layout from './Layout'
+import Router from './Router'
+
+<% if (loading.page) { %>
+import PageLoading from '<%= loading.page %>'
+<% } %>
+<% if (loading.layout) { %>
+import LayoutLoading from '<%= loading.layout %>'
+<% } %>
 
 export default function App() {
   return (
-    <Suspense fallback={<div>loading</div>}>
+    <Suspense fallback={<% if (loading.page) { %><PageLoading /><% } else { %><div>loading</div><% } %>}>
       <HashRouter>
         <Layout>
-          <Suspense fallback={<div>loading</div>}>
+          <Suspense fallback={<% if (loading.page) { %><LayoutLoading /><% } else { %><div>loading</div><% } %>}>
             <Router />
           </Suspense>
         </Layout>
@@ -48,7 +55,7 @@ export default function App() {
 }
 `
 
-// layout.jsx
+// Layout.jsx
 const layoutTemplate = `
 import React from 'react'
 
@@ -66,7 +73,7 @@ export default function NotFound() {
 }
 `
 
-// router.jsx
+// Router.jsx
 const routerTemplate = `
 import React, { lazy } from 'react'
 import { Routes, Route } from 'react-router-dom'
@@ -192,37 +199,56 @@ function readPages(options) {
   return pageFiles.map((pageFile) => resolvePage(pageFile, options))
 }
 
-/**
- * pageRootPath
- * layoutRootPath
- * outputPath
- */
 class TravelerWebpackPlugin {
+  /**
+   * options
+   *  appConfig 应用配置信息
+   *  pageRootPath 页面根目录
+   *  layoutRootPath 布局根目录
+   *  outputPath 目标文件输出路径
+   */
   constructor(options) {
     this.options = options
   }
 
   apply(compiler) {
-    compiler.hooks.initialize.tap('initialize', (params, callback) => {
+    compiler.hooks.initialize.tap('TravelerWebpackPlugin', () => {
       shell.execSync(`rm -rf ${this.options.outputPath}`)
       shell.execSync(`mkdir ${this.options.outputPath}`)
 
-      this.write('index.js', indexTemplate)
       this.write('bootstrap.js', bootstrapTemplate)
-      this.write('app.jsx', appTemplate)
-      this.write('layout.jsx', layoutTemplate)
-
-      this.createRouter()
+      this.write('Layout.jsx', layoutTemplate)
+      this.writeApp()
+      this.writeRouter()
+      this.write('index.js', indexTemplate)
     })
   }
 
+  writeApp() {
+    const appFileName = 'App.jsx'
+
+    // 获取注册的loading组件相对于app.jsx文件的路径
+    const resolveLoadingPath = (loadingPath) => {
+      if (!loadingPath) return ''
+      return util.formatToPosixPath(path.resolve(this.options.outputPath, appFileName), loadingPath)
+    }
+
+    const { loading = {} } = this.options.appConfig
+    const appData = { loading: {} }
+    appData.loading.page = resolveLoadingPath(loading.page)
+    appData.loading.layout = resolveLoadingPath(loading.layout)
+
+    this.write(appFileName, appTemplate, appData)
+  }
+
   // 初始化项目路由
-  createRouter() {
+  writeRouter() {
     shell.execSync(`mkdir ${this.options.outputPath}/pages`)
 
     this.write('pages/NotFound.jsx', notFoundTemplate)
 
     const pages = readPages(this.options)
+
     // 输出页面的动态引入文件
     pages.forEach((page) => {
       // 获取相对路径并格式化为webpack识别的路径
@@ -248,12 +274,15 @@ class TravelerWebpackPlugin {
       },
       { pages: [], notFoundPage: null },
     )
-    this.write('router.jsx', routerTemplate, routerData)
+    // 写入路由注册文件
+    this.write('Router.jsx', routerTemplate, routerData)
   }
 
   write(fileName, content, data = {}) {
     const code = ejs.render(content, data)
-    file.writeFileContent(path.resolve(this.options.outputPath, fileName), code)
+    const filePath = path.resolve(this.options.outputPath, fileName)
+
+    file.writeFileContent(filePath, code)
   }
 }
 
