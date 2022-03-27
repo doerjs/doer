@@ -87,7 +87,7 @@ function createConfig(appConfig) {
       path: paths.appPaths.buildPath,
       pathinfo: !isProduction,
       // 主包模块的打包命名规则
-      filename: isProduction ? 'static/js/[name].[contenthash:8].js' : 'static/js/bundle.js',
+      filename: isProduction ? 'static/js/[name].[contenthash:8].js' : 'static/js/main.js',
       // 分包模块的打包命名规则
       chunkFilename: isProduction ? 'static/js/[name].[contenthash:8].chunk.js' : 'static/js/[name].chunk.js',
       // 资源模块的打包命名规则，如字体图标、图片等
@@ -126,6 +126,36 @@ function createConfig(appConfig) {
         // 压缩css样式
         new CssMinimizerWebpackPlugin(),
       ],
+      splitChunks: {
+        chunks: 'async',
+        minSize: 20000,
+        minRemainingSize: 0,
+        minChunks: 1,
+        maxAsyncRequests: 30,
+        maxInitialRequests: 30,
+        enforceSizeThreshold: 50000,
+        cacheGroups: {
+          framework: {
+            test: (module) => {
+              return /react|react-router-dom|react-dom/.test(module.context)
+            },
+            name: 'framework',
+            enforce: true,
+            reuseExistingChunk: true,
+          },
+          vendors: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            priority: -10,
+            reuseExistingChunk: true,
+          },
+          default: {
+            minChunks: 2,
+            priority: -20,
+            reuseExistingChunk: true,
+          },
+        },
+      },
     },
 
     resolve: {

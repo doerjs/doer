@@ -2,6 +2,8 @@
 
 const path = require('path')
 const WebpackDevServer = require('webpack-dev-server')
+const address = require('address')
+const chalk = require('chalk')
 
 const paths = require('./paths')
 const file = require('./utils/file')
@@ -46,9 +48,9 @@ function createConfig(appConfig) {
       publicPath: paths.appPaths.publicUrlPath,
     },
     client: {
-      logging: 'warn',
+      logging: 'none',
       overlay: false,
-      progress: true,
+      progress: false,
     },
     open: false,
     hot: false,
@@ -62,8 +64,21 @@ function createConfig(appConfig) {
   }
 }
 
+function formatUrl(devServerConfig) {
+  const protocol = devServerConfig.https ? 'https://' : 'http://'
+  const localhost =
+    devServerConfig.host === '127.0.0.1' || devServerConfig.host === '0.0.0.0' ? 'localhost' : devServerConfig.host
+
+  return {
+    localUrl: `${protocol}${localhost}:${devServerConfig.port}${devServerConfig.static.publicPath}`,
+    realUrl: `${protocol}${address.ip()}:${devServerConfig.port}${devServerConfig.static.publicPath}`,
+  }
+}
+
 module.exports = function createDevServer({ webpackConfig, compiler, appConfig }) {
-  const server = new WebpackDevServer(createConfig(appConfig), compiler)
+  const devServerConfig = createConfig(appConfig)
+  const url = formatUrl(devServerConfig)
+  const server = new WebpackDevServer(devServerConfig, compiler)
 
   // 注册结束信号监听
   const closeSigns = ['SIGINT', 'SIGTERM']
@@ -80,10 +95,21 @@ module.exports = function createDevServer({ webpackConfig, compiler, appConfig }
   })
 
   server.startCallback(() => {
-    // 服务器启动成功
+    compiler.hooks.done.tap('done', () => {
+      setTimeout(() => {
+        console.log(`👣 ${chalk.cyan('服务器启动成功')}`)
+        console.log()
+        console.log(`👣 ${chalk.cyan(url.localUrl)}`)
+        console.log(`👣 ${chalk.cyan(url.realUrl)}`)
+
+        import('clipboardy').then(({ default: clipboard }) => {
+          clipboard.writeSync(url.localUrl)
+          console.log()
+          console.log(`👣 访问地址已经复制到剪贴板，粘贴到浏览器查看吧`)
+        })
+      }, 0)
+    })
   })
 
-  server.stopCallback(() => {
-    // 服务器停止成功
-  })
+  server.stopCallback(() => {})
 }

@@ -45,7 +45,7 @@ class LoggerWebpackPlugin {
           console.log(
             `👣 ${chalk.red(statsJSONData.errors.length)} 个错误，${chalk.yellow(
               statsJSONData.warnings.length,
-            )} 个警告，`,
+            )} 个警告`,
           )
           console.log()
           this.printAssets(statsJSONData)
@@ -59,7 +59,7 @@ class LoggerWebpackPlugin {
           console.log(
             `👣 ${chalk.red(statsJSONData.errors.length)} 个错误，${chalk.yellow(
               statsJSONData.warnings.length,
-            )} 个警告，`,
+            )} 个警告`,
           )
           console.log()
         }

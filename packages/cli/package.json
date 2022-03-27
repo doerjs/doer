@@ -9,6 +9,7 @@
     "doer": "bin/doer.js"
   },
   "dependencies": {
+    "@babel/cli": "^7.17.6",
     "@babel/core": "^7.17.5",
     "@babel/plugin-transform-runtime": "^7.17.0",
     "@babel/preset-env": "^7.16.11",
@@ -17,9 +18,12 @@
     "@doerjs/prettier-config": "^0.0.2-alpha.4",
     "@doerjs/utils": "^0.0.2-alpha.4",
     "@svgr/webpack": "^6.2.1",
+    "address": "^1.1.2",
     "babel-loader": "^8.2.3",
     "chalk": "4.1.2",
+    "clipboardy": "^3.0.0",
     "compression-webpack-plugin": "^9.2.0",
+    "copy-paste": "^1.3.0",
     "css-loader": "^6.6.0",
     "css-minimizer-webpack-plugin": "^3.4.1",
     "dayjs": "^1.11.0",
@@ -34,6 +38,7 @@
     "inquirer": "^8.2.0",
     "less": "^4.1.2",
     "less-loader": "^10.2.0",
+    "loader-utils": "^3.2.0",
     "mini-css-extract-plugin": "^2.5.3",
     "minimist": "^1.2.5",
     "org": "^0.2.0",

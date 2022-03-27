@@ -199,7 +199,7 @@ function readPages(options) {
   return pageFiles.map((pageFile) => resolvePage(pageFile, options))
 }
 
-class TravelerWebpackPlugin {
+class DoerWebpackPlugin {
   /**
    * options
    *  appConfig 应用配置信息
@@ -212,7 +212,7 @@ class TravelerWebpackPlugin {
   }
 
   apply(compiler) {
-    compiler.hooks.initialize.tap('TravelerWebpackPlugin', () => {
+    compiler.hooks.initialize.tap('DoerWebpackPlugin', () => {
       shell.execSync(`rm -rf ${this.options.outputPath}`)
       shell.execSync(`mkdir ${this.options.outputPath}`)
 
@@ -230,7 +230,9 @@ class TravelerWebpackPlugin {
     // 获取注册的loading组件相对于app.jsx文件的路径
     const resolveLoadingPath = (loadingPath) => {
       if (!loadingPath) return ''
-      return util.formatToPosixPath(path.resolve(this.options.outputPath, appFileName), loadingPath)
+      return util.formatToPosixPath(
+        path.relative(path.dirname(path.resolve(this.options.outputPath, appFileName)), loadingPath),
+      )
     }
 
     const { loading = {} } = this.options.appConfig
@@ -286,4 +288,4 @@ class TravelerWebpackPlugin {
   }
 }
 
-module.exports = TravelerWebpackPlugin
+module.exports = DoerWebpackPlugin
