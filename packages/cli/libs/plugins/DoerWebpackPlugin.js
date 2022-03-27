@@ -2,6 +2,7 @@
 
 const path = require('path')
 const ejs = require('ejs')
+const chokidar = require('chokidar')
 
 const file = require('../utils/file')
 const shell = require('../utils/shell')
@@ -117,7 +118,7 @@ const pageRegex = /\.page\.(js|jsx)$/
  * {
  *  routePath: 'a/:b/c/:d/e', 路由地址
  *  pageName: '', 页面组件名称，以驼峰形式
- *  isIndex: false, 是否是根路由
+ *  isEmpty: false, 文件是否为空
  *  dynamicPageFilePath: '', 页面文件生成的动态导入页面地址
  *  rawPageFilePath: '', 页面文件原始地址
  * }
@@ -167,6 +168,7 @@ function resolvePage(pageFile, options) {
   return {
     routePath,
     pageName,
+    isEmpty: file.isEmptyFile(pageFile),
     dynamicPageFilePath: path.resolve(options.outputPath, `pages/${pageName}.js`),
     rawPageFilePath: pageFile,
   }
@@ -179,7 +181,7 @@ function readPages(options) {
   const readPageFiles = file.reduceReaddirFactory((result, filePath) => {
     if (file.isFile(filePath)) return result
 
-    const files = file.readFiles(filePath)
+    const files = file.readFiles(filePath, [])
 
     // 查找页面文件 eg: index.page.jsx
     const pageFile = files.find((item) => {
@@ -194,9 +196,16 @@ function readPages(options) {
     return result
   })
 
-  const pageFiles = readPageFiles(options.pageRootPath)
+  const pageFiles = readPageFiles(options.pageRootPath, [])
 
   return pageFiles.map((pageFile) => resolvePage(pageFile, options))
+}
+
+function isPageFile(file, options) {
+  const dirname = path.dirname(path.dirname(file))
+  const basename = path.basename(file)
+
+  return dirname === options.pageRootPath && pageRegex.test(basename)
 }
 
 class DoerWebpackPlugin {
@@ -209,6 +218,7 @@ class DoerWebpackPlugin {
    */
   constructor(options) {
     this.options = options
+    this.pages = []
   }
 
   apply(compiler) {
@@ -219,8 +229,17 @@ class DoerWebpackPlugin {
       this.write('bootstrap.js', bootstrapTemplate)
       this.write('Layout.jsx', layoutTemplate)
       this.writeApp()
+      this.writePages()
       this.writeRouter()
       this.write('index.js', indexTemplate)
+
+      const watcher = chokidar.watch([this.options.pageRootPath], { ignoreInitial: true })
+
+      watcher
+        .on('change', this.onChange.bind(this))
+        .on('add', this.onAdd.bind(this))
+        .on('unlink', this.onRemove.bind(this))
+        .on('error', this.onError.bind(this))
     })
   }
 
@@ -244,28 +263,39 @@ class DoerWebpackPlugin {
   }
 
   // 初始化项目路由
-  writeRouter() {
+  writePages() {
     shell.execSync(`mkdir ${this.options.outputPath}/pages`)
 
     this.write('pages/NotFound.jsx', notFoundTemplate)
 
-    const pages = readPages(this.options)
+    this.pages = readPages(this.options)
 
     // 输出页面的动态引入文件
-    pages.forEach((page) => {
-      // 获取相对路径并格式化为webpack识别的路径
-      const relativeRawPageFilePath = util.formatToPosixPath(
-        path.relative(path.dirname(page.dynamicPageFilePath), page.rawPageFilePath),
-      )
-
-      this.write(page.dynamicPageFilePath, dynamicPageTemplate, {
-        ...page,
-        relativeRawPageFilePath,
-      })
+    this.pages.forEach((page) => {
+      this.writePage(page)
     })
+  }
 
-    const routerData = pages.reduce(
+  writePage(page) {
+    // 获取相对路径并格式化为webpack识别的路径
+    const relativeRawPageFilePath = util.formatToPosixPath(
+      path.relative(path.dirname(page.dynamicPageFilePath), page.rawPageFilePath),
+    )
+
+    this.write(page.dynamicPageFilePath, dynamicPageTemplate, {
+      ...page,
+      relativeRawPageFilePath,
+    })
+  }
+
+  // 写入路由文件
+  writeRouter() {
+    const routerData = this.pages.reduce(
       (result, page) => {
+        if (page.isEmpty) {
+          return result
+        }
+
         if (page.pageName === 'P404') {
           result.notFoundPage = page
         } else {
@@ -286,6 +316,55 @@ class DoerWebpackPlugin {
 
     file.writeFileContent(filePath, code)
   }
+
+  remove(file) {
+    shell.execSync(`rm ${file}`)
+  }
+
+  onChange(file) {
+    if (isPageFile(file, this.options)) {
+      const page = resolvePage(file, this.options)
+
+      const prePage = this.pages.find((item) => item.pageName === page.pageName)
+      this.pages = this.pages.map((item) => {
+        if (item.pageName === page.pageName) {
+          return page
+        }
+
+        return item
+      })
+
+      if (prePage.isEmpty !== page.isEmpty) {
+        this.writeRouter()
+      }
+    }
+  }
+
+  onAdd(file) {
+    if (isPageFile(file, this.options)) {
+      const page = resolvePage(file, this.options)
+
+      this.pages.push(page)
+      this.writePage(page)
+
+      if (page.isEmpty) {
+        return
+      }
+
+      this.writeRouter()
+    }
+  }
+
+  onRemove(file) {
+    if (isPageFile(file, this.options)) {
+      const page = resolvePage(file, this.options)
+      this.pages = this.pages.filter((item) => item.pageName !== page.pageName)
+      this.writeRouter()
+      this.remove(page.dynamicPageFilePath)
+    }
+  }
+
+  onError() {}
 }
 
 module.exports = DoerWebpackPlugin

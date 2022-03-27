@@ -95,18 +95,23 @@ module.exports = function createDevServer({ webpackConfig, compiler, appConfig }
   })
 
   server.startCallback(() => {
+    let isFirstStart = true
+
     compiler.hooks.done.tap('done', () => {
       setTimeout(() => {
         console.log(`👣 ${chalk.cyan('服务器启动成功')}`)
         console.log()
         console.log(`👣 ${chalk.cyan(url.localUrl)}`)
         console.log(`👣 ${chalk.cyan(url.realUrl)}`)
+        console.log()
 
-        import('clipboardy').then(({ default: clipboard }) => {
-          clipboard.writeSync(url.localUrl)
-          console.log()
-          console.log(`👣 访问地址已经复制到剪贴板，粘贴到浏览器查看吧`)
-        })
+        if (isFirstStart) {
+          isFirstStart = false
+          import('clipboardy').then(({ default: clipboard }) => {
+            clipboard.writeSync(url.localUrl)
+            console.log(`👣 访问地址已经复制到剪贴板，粘贴到浏览器查看吧`)
+          })
+        }
       }, 0)
     })
   })

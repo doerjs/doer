@@ -77,8 +77,6 @@ function createConfig(appConfig) {
   const assetModuleFilename = isProduction ? 'static/media/[name].[contenthash:8].[ext]' : 'static/media/[name].[ext]'
   // const appPackageJson = require(paths.appPaths.packageJsonPath)
 
-  console.log(isEnableGzip)
-
   return {
     mode: isProduction ? 'production' : 'development',
     // 生产环境下当编译出现出现错误时，立刻停止编译，而不是继续打包

@@ -53,9 +53,9 @@ function readTemplates(templatePath) {
 
       const readChildTemplates = file.reduceReaddirFactory((res, item) => {
         return resolveTemplate(res, item)
-      }, result)
+      })
 
-      return readChildTemplates(filePath)
+      return readChildTemplates(filePath, result)
     }
 
     const isEjs = ext === '.ejs'
@@ -76,7 +76,7 @@ function readTemplates(templatePath) {
   spinning.text = '[获取模版] 基础应用模版'
   spinning.start()
   try {
-    const templates = read(templatePath)
+    const templates = read(templatePath, [])
     spinning.succeed()
     return templates
   } catch (error) {

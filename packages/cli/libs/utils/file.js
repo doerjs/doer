@@ -15,6 +15,10 @@ function isFile(filePath) {
   return fs.statSync(filePath).isFile()
 }
 
+function isEmptyFile(filePath) {
+  return !isExist(filePath) || !fs.readFileSync(filePath).toString()
+}
+
 function readFileContent(filePath) {
   return fs.readFileSync(filePath).toString()
 }
@@ -23,8 +27,8 @@ function writeFileContent(filePath, content) {
   fs.writeFileSync(filePath, content)
 }
 
-function reduceReaddirFactory(reducer, result = []) {
-  return function (filePath) {
+function reduceReaddirFactory(reducer) {
+  return function (filePath, result) {
     const files = fs.readdirSync(filePath)
     return files.reduce((target, fileName, index) => {
       const currFilePath = path.resolve(filePath, fileName)
@@ -51,6 +55,7 @@ module.exports = {
   isExist,
   isDirectory,
   isFile,
+  isEmptyFile,
 
   readFileContent,
   writeFileContent,
