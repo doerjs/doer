@@ -15,28 +15,22 @@ const cliPaths = {
 }
 
 function getAppPublicUrlPath() {
-  let publicPath = process.env.PUBLIC_URL || '/'
-
-  publicPath = publicPath.endsWith('/') ? publicPath : publicPath + '/'
-
   if (process.env.NODE_ENV === 'development') {
-    const publicUrl = new URL(publicPath, 'https://doer.cli.com')
+    const publicUrl = new URL(process.env.PUBLIC_URL, 'https://doer.cli.com')
     return publicUrl.pathname
   }
 
-  return publicPath
+  return process.env.PUBLIC_URL
 }
 
 const appPaths = {
-  // 环境变量路径
-  env: path.resolve(cliPaths.runtimePath, './env'),
+  env: path.resolve(cliPaths.runtimePath, './.env'),
   // app配置文件路径
   configPath: path.resolve(cliPaths.runtimePath, '.doerrc.js'),
   srcPath: path.resolve(cliPaths.runtimePath, 'src'),
   buildPath: path.resolve(cliPaths.runtimePath, 'dist'),
   packageJsonPath: path.resolve(cliPaths.runtimePath, 'package.json'),
   publicDirectory: path.resolve(cliPaths.runtimePath, './public'),
-  publicUrlPath: getAppPublicUrlPath(),
   nodeModulesPath: path.resolve(cliPaths.runtimePath, 'node_modules'),
 }
 
@@ -52,4 +46,5 @@ module.exports = {
   cliPaths,
   appPaths,
   resolveScripts,
+  getAppPublicUrlPath,
 }

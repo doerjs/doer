@@ -6,9 +6,6 @@ const chalk = require('chalk')
 const logger = require('../libs/utils/logger')
 const print = require('../libs/print')
 
-const create = require('../scripts/create')
-const dev = require('../scripts/dev')
-
 print.logo()
 print.version()
 
@@ -44,11 +41,12 @@ if (!isValidCommand) {
 
 switch (command) {
   case 'create':
-    create({ name })
+    require('../scripts/create')({ name })
     break
   case 'dev':
-    dev()
+    require('../scripts/dev')()
     break
   case 'build':
+    require('../scripts/build')()
     break
 }

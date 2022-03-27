@@ -3,32 +3,50 @@
 const dotenv = require('dotenv')
 const dotenvExpand = require('dotenv-expand')
 
-const paths = require('./paths')
 const file = require('./utils/file')
+const paths = require('./paths')
 
-const env = process.env.ENV || 'prod'
+if (!process.env.ENV) {
+  process.env.ENV = 'prod'
+}
 
 const envFiles = [
   // 当前环境生效的本地环境变量
-  `${paths.appPaths.env}.${env}.local`,
+  `${paths.appPaths.env}.${process.env.ENV}.local`,
+  // 当前环境生效的环境变量
+  `${paths.appPaths.env}.${process.env.ENV}`,
   // 所有环境生效的本地环境变量
   `${paths.appPaths.env}.local`,
-  // 当前环境生效的环境变量
-  `${paths.appPaths.env}.${env}`,
   // 所有环境生效的环境变量
   paths.appPaths.env,
 ]
 
 envFiles.forEach((envFile) => {
-  if (file.isExist(envFiles)) {
+  if (file.isExist(envFile)) {
     dotenvExpand(dotenv.config({ path: envFile }))
   }
 })
 
+if (!process.env.PUBLIC_URL) {
+  process.env.PUBLIC_URL = '/'
+} else if (!process.env.PUBLIC_URL.endsWith('/')) {
+  process.env.PUBLIC_URL = process.env.PUBLIC_URL + '/'
+}
+
+if (!process.env.IMAGE_INLINE_LIMIT_SIZE) {
+  process.env.IMAGE_INLINE_LIMIT_SIZE = 10000
+}
+
+if (!process.env.HOST) {
+  process.env.HOST = '0.0.0.0'
+}
+
+if (!process.env.PORT) {
+  process.env.PORT = '3000'
+}
+
 // 获取项目中可以直接获取的环境变量
 function getAppEnv() {
-  const cliPackage = require(paths.cliPaths.packageJsonPath)
-
   const IS_APP_ENV = /^APP_/i
 
   const raw = Object.keys(process.env)
@@ -42,11 +60,7 @@ function getAppEnv() {
         NODE_ENV: process.env.NODE_ENV,
         // app环境
         ENV: process.env.ENV,
-        // app版本号
-        VERSION: cliPackage.version,
-        // app名称
-        NAME: cliPackage.name,
-        PUBLIC_URL: process.env.PUBLIC_URL || '/',
+        PUBLIC_URL: process.env.PUBLIC_URL,
       },
     )
 

@@ -181,6 +181,11 @@ async function createApplication(appPath, answers) {
     console.error(error)
   })
 
+  const { stderr } = shell.execSync(`cd ${appPath} && git init && npm run setup`)
+  if (stderr) {
+    console.error(stderr.toString())
+  }
+
   console.log()
   console.log('👣 应用创建成功，感谢使用Doer')
   console.log()

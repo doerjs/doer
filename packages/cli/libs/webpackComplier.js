@@ -73,9 +73,11 @@ function createConfig(appConfig) {
   const isEnableProfiler = isProduction && process.env.ENABLE_PROFILER === 'true'
   const isEnableGzip = isProduction && process.env.GZIP === 'true'
   const isEnableAnalyzer = isProduction && process.env.ENABLE_ANALYZER === 'true'
-  const imageInlineLimitSize = parseInt(process.env.IMAGE_INLINE_LIMIT_SIZE) || 10000
+  const imageInlineLimitSize = parseInt(process.env.IMAGE_INLINE_LIMIT_SIZE)
   const assetModuleFilename = isProduction ? 'static/media/[name].[contenthash:8].[ext]' : 'static/media/[name].[ext]'
   // const appPackageJson = require(paths.appPaths.packageJsonPath)
+
+  console.log(isEnableGzip)
 
   return {
     mode: isProduction ? 'production' : 'development',
@@ -94,7 +96,7 @@ function createConfig(appConfig) {
       chunkFilename: isProduction ? 'static/js/[name].[contenthash:8].chunk.js' : 'static/js/[name].chunk.js',
       // 资源模块的打包命名规则，如字体图标、图片等
       assetModuleFilename,
-      publicPath: paths.appPaths.publicUrlPath,
+      publicPath: paths.getAppPublicUrlPath(),
     },
 
     // 设置webpack缓存到文件系统中
@@ -246,7 +248,7 @@ function createConfig(appConfig) {
       // 提取公共资源路径，用于服务端生成html或者微前端资源注入读取
       new WebpackManifestPlugin({
         fileName: 'asset-manifest.json',
-        publicPath: paths.appPaths.publicUrlPath,
+        publicPath: paths.getAppPublicUrlPath(),
         generate: (seed, files, entryPoints) => {
           const manifestFiles = files.reduce((manifest, file) => {
             manifest[file.name] = file.path

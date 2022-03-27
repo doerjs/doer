@@ -35,8 +35,8 @@ function getHttpsConfig() {
 function createConfig(appConfig) {
   return {
     allowedHosts: 'all',
-    host: process.env.HOST || '0.0.0.0',
-    port: process.env.PORT || '3000',
+    host: process.env.HOST,
+    port: process.env.PORT,
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': '*',
@@ -45,7 +45,7 @@ function createConfig(appConfig) {
     compress: true,
     static: {
       directory: paths.appPaths.publicDirectory,
-      publicPath: paths.appPaths.publicUrlPath,
+      publicPath: paths.getAppPublicUrlPath(),
     },
     client: {
       logging: 'none',
@@ -56,7 +56,7 @@ function createConfig(appConfig) {
     hot: false,
     liveReload: true,
     devMiddleware: {
-      publicPath: paths.appPaths.publicUrlPath.slice(0, -1),
+      publicPath: paths.getAppPublicUrlPath().slice(0, -1),
     },
     https: getHttpsConfig(),
     // TODO
