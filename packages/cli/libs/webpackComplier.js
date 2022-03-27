@@ -10,6 +10,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin')
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 // const ExternalRemotesPlugin = require('external-remotes-plugin')
 
 const ReplaceHtmlEnvWebpackPlugin = require('./plugins/ReplaceHtmlEnvWebpackPlugin')
@@ -71,6 +72,7 @@ function createConfig(appConfig) {
   const isProduction = process.env.NODE_ENV === 'production'
   const isEnableProfiler = isProduction && process.env.ENABLE_PROFILER === 'true'
   const isEnableGzip = isProduction && process.env.GZIP === 'true'
+  const isEnableAnalyzer = isProduction && process.env.ENABLE_ANALYZER === 'true'
   const imageInlineLimitSize = parseInt(process.env.IMAGE_INLINE_LIMIT_SIZE) || 10000
   const assetModuleFilename = isProduction ? 'static/media/[name].[contenthash:8].[ext]' : 'static/media/[name].[ext]'
   // const appPackageJson = require(paths.appPaths.packageJsonPath)
@@ -288,6 +290,9 @@ function createConfig(appConfig) {
 
       // 开启gzip压缩
       isEnableGzip && new CompressionWebpackPlugin(),
+
+      // 开启打包大小分析工具
+      isEnableAnalyzer && new BundleAnalyzerPlugin(),
     ].filter(Boolean),
 
     // 通过自定义日志输出插件输出日志
