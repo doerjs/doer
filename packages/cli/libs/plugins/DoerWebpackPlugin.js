@@ -26,10 +26,56 @@ ReactDOM.render(
 )
 `
 
+// hook.js
+const hookTemplate = `
+import { useRef, useCallback, useEffect, useMemo } from 'react'
+
+import { getLayoutName } from './helper'
+
+export function useGlobalEvent(eventName, eventHandler, options) {
+  const handler = useRef(eventHandler)
+
+  useEffect(() => {
+    function callback(event) {
+      if (typeof handler.current === 'function') {
+        handler.current(event)
+      }
+    }
+
+    if (eventName) {
+      window.addEventListener(eventName, callback, options)
+    }
+
+    return () => {
+      if (eventName) {
+        window.removeEventListener(eventName, callback, options)
+      }
+    }
+  }, [eventName, options])
+}
+
+export function useLayoutName() {
+  return useMemo(() => {
+    return getLayoutName()
+  }, [window.location.hash])
+}
+`
+
+// helper.js
+const helperTemplate = `
+export function getLayoutName() {
+  const [layoutName = ''] = window.location.hash.replace('#', '').split('/').filter(item => item)
+  return layoutName
+}
+`
+
 // App.jsx
 const appTemplate = `
 import React, { Suspense } from 'react'
 import { HashRouter } from 'react-router-dom'
+
+import { useLayoutName, useGlobalEvent } from './hook'
+import { getLayoutName } from './helper'
 
 import Layout from './Layout'
 import Router from './Router'
@@ -42,9 +88,18 @@ import LayoutLoading from '<%= loading.layout %>'
 <% } %>
 
 export default function App() {
+  const layoutName = useLayoutName()
+
+  useGlobalEvent('hashchange', () => {
+    const currLayoutName = getLayoutName()
+    if (currLayoutName !== layoutName) {
+      window.location.reload()
+    }
+  })
+
   return (
     <Suspense fallback={<% if (loading.page) { %><PageLoading /><% } else { %><div>loading</div><% } %>}>
-      <HashRouter>
+      <HashRouter basename={layoutName}>
         <Layout>
           <Suspense fallback={<% if (loading.page) { %><LayoutLoading /><% } else { %><div>loading</div><% } %>}>
             <Router />
@@ -228,6 +283,8 @@ class DoerWebpackPlugin {
 
       this.write('bootstrap.js', bootstrapTemplate)
       this.write('Layout.jsx', layoutTemplate)
+      this.write('hook.js', hookTemplate)
+      this.write('helper.js', helperTemplate)
       this.writeApp()
       this.writePages()
       this.writeRouter()
@@ -322,6 +379,7 @@ class DoerWebpackPlugin {
   }
 
   onChange(file) {
+    // TODO 这里存在问题，当文件清空后重新写入文件时，会报错，需要再更新一下文件才行
     if (isPageFile(file, this.options)) {
       const page = resolvePage(file, this.options)
 

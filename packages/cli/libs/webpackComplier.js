@@ -245,7 +245,7 @@ function createConfig(appConfig) {
 
       // 提取公共资源路径，用于服务端生成html或者微前端资源注入读取
       new WebpackManifestPlugin({
-        fileName: 'asset-manifest.json',
+        fileName: 'manifest.json',
         publicPath: paths.getAppPublicUrlPath(),
         generate: (seed, files, entryPoints) => {
           const manifestFiles = files.reduce((manifest, file) => {
