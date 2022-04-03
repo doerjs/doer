@@ -8,162 +8,75 @@ const file = require('../utils/file')
 const shell = require('../utils/shell')
 const util = require('../utils/util')
 
-// index.js
-const indexTemplate = `
-import(/* webpackChunkName: "bootstrap" */'./bootstrap')
-`
+const indexTemplate = require('../templates/index.ejs')
+const bootstrapTemplate = require('../templates/bootstrap.ejs')
+const hookTemplate = require('../templates/hook.ejs')
+const helperTemplate = require('../templates/helper.ejs')
+const appTemplate = require('../templates/App.ejs')
+const layoutTemplate = require('../templates/Layout.ejs')
+const dynamicLayoutTemplate = require('../templates/dynamicLayout.ejs')
+const dynamicPageTemplate = require('../templates/dynamicPage.ejs')
+const notFoundTemplate = require('../templates/NotFound.ejs')
+const routerTemplate = require('../templates/Router.ejs')
 
-// bootstrap.js
-const bootstrapTemplate = `
-import React from 'react'
-import ReactDOM from 'react-dom'
+const layoutRegex = /\.layout\.(js|jsx)$/
 
-import App from './App'
+/**
+ * {
+ *  layoutName: '', 布局组件名称
+ *  isEmpty: false, 文件是否为空
+ *  dynamicLayoutFilePath: '', 布局文件生成的动态导入页面地址
+ *  rawLayoutFilePath: '', 布局文件原始地址
+ * }
+ */
+function resolveLayout(layoutFile, options) {
+  const layoutPath = path.dirname(layoutFile)
+  const basename = path.basename(layoutPath).toLocaleLowerCase()
 
-ReactDOM.render(
-  <App />,
-  document.getElementById('root'),
-)
-`
-
-// hook.js
-const hookTemplate = `
-import { useRef, useCallback, useEffect, useMemo } from 'react'
-
-import { getLayoutName } from './helper'
-
-export function useGlobalEvent(eventName, eventHandler, options) {
-  const handler = useRef(eventHandler)
-
-  useEffect(() => {
-    function callback(event) {
-      if (typeof handler.current === 'function') {
-        handler.current(event)
-      }
-    }
-
-    if (eventName) {
-      window.addEventListener(eventName, callback, options)
-    }
-
-    return () => {
-      if (eventName) {
-        window.removeEventListener(eventName, callback, options)
-      }
-    }
-  }, [eventName, options])
+  const layoutName = 'L' + util.firstCharToUpperCase(basename)
+  return {
+    layoutName,
+    isEmpty: file.isEmptyFile(layoutFile),
+    dynamicLayoutFilePath: path.resolve(options.outputPath, `layouts/${layoutName}.js`),
+    rawLayoutFilePath: layoutFile,
+  }
 }
 
-export function useLayoutName() {
-  return useMemo(() => {
-    return getLayoutName()
-  }, [window.location.hash])
-}
-`
+// 读取所有的布局
+function readLayouts(options) {
+  if (!file.isExist(options.layoutRootPath) || !file.isDirectory(options.layoutRootPath)) return []
 
-// helper.js
-const helperTemplate = `
-export function getLayoutName() {
-  const [layoutName = ''] = window.location.hash.replace('#', '').split('/').filter(item => item)
-  return layoutName
-}
-`
+  const readLayoutFiles = file.reduceReaddirFactory((result, filePath) => {
+    if (file.isFile(filePath)) return result
 
-// App.jsx
-const appTemplate = `
-import React, { Suspense } from 'react'
-import { HashRouter } from 'react-router-dom'
+    const files = file.readFiles(filePath, [])
 
-import { useLayoutName, useGlobalEvent } from './hook'
-import { getLayoutName } from './helper'
+    // 查找布局文件 eg: full.layout.jsx
+    const layoutFile = files.find((item) => {
+      const basename = path.basename(item)
+      return layoutRegex.test(basename)
+    })
 
-import Layout from './Layout'
-import Router from './Router'
-
-<% if (loading.page) { %>
-import PageLoading from '<%= loading.page %>'
-<% } %>
-<% if (loading.layout) { %>
-import LayoutLoading from '<%= loading.layout %>'
-<% } %>
-
-export default function App() {
-  const layoutName = useLayoutName()
-
-  useGlobalEvent('hashchange', () => {
-    const currLayoutName = getLayoutName()
-    if (currLayoutName !== layoutName) {
-      window.location.reload()
+    if (layoutFile) {
+      result.push(layoutFile)
     }
+
+    return result
   })
 
-  return (
-    <Suspense fallback={<% if (loading.page) { %><PageLoading /><% } else { %><div>loading</div><% } %>}>
-      <HashRouter basename={layoutName}>
-        <Layout>
-          <Suspense fallback={<% if (loading.page) { %><LayoutLoading /><% } else { %><div>loading</div><% } %>}>
-            <Router />
-          </Suspense>
-        </Layout>
-      </HashRouter>
-    </Suspense>
-  )
+  const layoutFiles = readLayoutFiles(options.layoutRootPath, [])
+
+  return layoutFiles.map((layoutFile) => resolveLayout(layoutFile, options))
 }
-`
 
-// Layout.jsx
-const layoutTemplate = `
-import React from 'react'
+function isLayoutFile(file, options) {
+  const dirname = path.dirname(path.dirname(file))
+  const basename = path.basename(file)
 
-export default function Layout({ children }) {
-  return children
+  return dirname === options.layoutRootPath && layoutRegex.test(basename)
 }
-`
-
-// pages/NotFound.jsx
-const notFoundTemplate = `
-import React from 'react'
-
-export default function NotFound() {
-  return <div>404</div>
-}
-`
-
-// Router.jsx
-const routerTemplate = `
-import React, { lazy } from 'react'
-import { Routes, Route } from 'react-router-dom'
-<% pages.forEach(function(page) { %>
-import <%= page.pageName %> from './pages/<%= page.pageName %>'
-<% }) %>
-<% if (notFoundPage) { %>
-import NotFound from './pages/<%= notFoundPage.pageName %>'
-<% } else { %>
-import NotFound from './pages/NotFound'
-<% } %>
-
-export default function Router() {
-  return (
-    <Routes>
-      <% pages.forEach(function(page) { %>
-      <Route path="<%= page.routePath %>" element={<<%= page.pageName %> />} />
-      <% }) %>
-      <Route path="*" element={<NotFound />} />
-    </Routes>
-  )
-}
-`
-
-const dynamicPageTemplate = `
-import { lazy } from 'react'
-
-export default lazy(() => {
-  return import(/* webpackChunkName: "page~<%= pageName %>" */'<%= relativeRawPageFilePath %>')
-})
-`
 
 const pageRegex = /\.page\.(js|jsx)$/
-// const layoutRegex = /\.layout\.(js|jsx)$/
 
 /**
  * a.b.c.d.e -> a/b/c/d/e
@@ -180,13 +93,11 @@ const pageRegex = /\.page\.(js|jsx)$/
  */
 function resolvePage(pageFile, options) {
   const pagePath = path.dirname(pageFile)
-
   const basename = path.basename(pagePath)
-
-  const [suffix] = basename.match(pageRegex) || []
-  const routeString = basename.replace(suffix, '')
-
-  const routeParts = routeString.split('.').filter((item) => item)
+  const routeParts = basename
+    .split('.')
+    .filter((name) => name)
+    .map((name) => name.toLocaleLowerCase())
 
   // 根据目录文件名解析路由地址
   const routePath = routeParts
@@ -274,6 +185,7 @@ class DoerWebpackPlugin {
   constructor(options) {
     this.options = options
     this.pages = []
+    this.layouts = []
   }
 
   apply(compiler) {
@@ -282,15 +194,16 @@ class DoerWebpackPlugin {
       shell.execSync(`mkdir ${this.options.outputPath}`)
 
       this.write('bootstrap.js', bootstrapTemplate)
-      this.write('Layout.jsx', layoutTemplate)
       this.write('hook.js', hookTemplate)
       this.write('helper.js', helperTemplate)
+      this.writeLayouts()
+      this.writeLayoutContainer()
       this.writeApp()
       this.writePages()
       this.writeRouter()
       this.write('index.js', indexTemplate)
 
-      const watcher = chokidar.watch([this.options.pageRootPath], { ignoreInitial: true })
+      const watcher = chokidar.watch([this.options.pageRootPath, this.options.layoutRootPath], { ignoreInitial: true })
 
       watcher
         .on('change', this.onChange.bind(this))
@@ -317,6 +230,35 @@ class DoerWebpackPlugin {
     appData.loading.layout = resolveLoadingPath(loading.layout)
 
     this.write(appFileName, appTemplate, appData)
+  }
+
+  // 初始化项目路由布局
+  writeLayouts() {
+    shell.execSync(`mkdir ${this.options.outputPath}/layouts`)
+
+    this.layouts = readLayouts(this.options)
+
+    // 输出布局的动态引入文件
+    this.layouts.forEach((layout) => {
+      this.writeLayout(layout)
+    })
+  }
+
+  writeLayout(layout) {
+    // 获取相对路径并格式化为webpack识别的路径
+    const relativeRawLayoutFilePath = util.formatToPosixPath(
+      path.relative(path.dirname(layout.dynamicLayoutFilePath), layout.rawLayoutFilePath),
+    )
+
+    this.write(layout.dynamicLayoutFilePath, dynamicLayoutTemplate, {
+      ...layout,
+      relativeRawLayoutFilePath,
+    })
+  }
+
+  writeLayoutContainer() {
+    const layouts = this.layouts.filter((layout) => !layout.isEmpty)
+    this.write('Layout.jsx', layoutTemplate, { layouts })
   }
 
   // 初始化项目路由
@@ -378,47 +320,134 @@ class DoerWebpackPlugin {
     shell.execSync(`rm ${file}`)
   }
 
+  /**
+   * 页面文件改变时，检测文件是否存在空状态变化
+   * 由空转为非空状态或者由非空转换成空状态时，这时候出现了注册页面路由的增减
+   * 需要重新写人路由注入文件，告知webpack
+   */
+  changePage(file) {
+    const page = resolvePage(file, this.options)
+
+    const prePage = this.pages.find((item) => item.pageName === page.pageName)
+    this.pages = this.pages.map((item) => {
+      if (item.pageName === page.pageName) {
+        return page
+      }
+
+      return item
+    })
+
+    if (prePage.isEmpty !== page.isEmpty) {
+      this.writeRouter()
+    }
+  }
+
+  /**
+   * 新增页面文件时，不管是否为空都需要生成动态导入入口
+   * 如果页面不为空时，同时需要重写路由注入文件，告知webpack
+   */
+  addPage(file) {
+    const page = resolvePage(file, this.options)
+
+    this.pages.push(page)
+    this.writePage(page)
+
+    if (page.isEmpty) {
+      return
+    }
+
+    this.writeRouter()
+  }
+
+  /**
+   * 页面移除时需要移除动态导入文件，
+   * 同时重写路由注入文件，告知webpack
+   */
+  removePage(file) {
+    const page = resolvePage(file, this.options)
+    this.pages = this.pages.filter((item) => item.pageName !== page.pageName)
+    this.writeRouter()
+    this.remove(page.dynamicPageFilePath)
+  }
+
+  /**
+   * 布局文件改变时，检测文件是否存在空状态变化
+   * 由空转为非空状态或者由非空转换成空状态时，这时候出现了注册布局的增减
+   * 需要重新写人布局注入文件，告知webpack
+   */
+  changeLayout(file) {
+    const layout = resolveLayout(file, this.options)
+
+    const preLayout = this.layouts.find((item) => item.layoutName === layout.layoutName)
+    this.layouts = this.layouts.map((item) => {
+      if (item.layoutName === layout.layoutName) {
+        return layout
+      }
+
+      return item
+    })
+
+    if (preLayout.isEmpty !== layout.isEmpty) {
+      this.writeLayoutContainer()
+    }
+  }
+
+  /**
+   * 新增布局文件时，不管是否为空都需要生成动态导入入口
+   * 如果布局不为空时，同时需要重写布局注入文件，告知webpack
+   */
+  addLayout(file) {
+    const layout = resolveLayout(file, this.options)
+
+    this.layouts.push(layout)
+    this.writeLayout(layout)
+
+    if (layout.isEmpty) {
+      return
+    }
+
+    this.writeLayoutContainer()
+  }
+
+  /**
+   * 布局移除时需要移除动态导入文件，
+   * 同时重写布局注入文件，告知webpack
+   */
+  removeLayout(file) {
+    const layout = resolveLayout(file, this.options)
+    this.layouts = this.layouts.filter((item) => item.layoutName !== layout.layoutName)
+    this.writeLayoutContainer()
+    this.remove(layout.dynamicLayoutFilePath)
+  }
+
   onChange(file) {
     // TODO 这里存在问题，当文件清空后重新写入文件时，会报错，需要再更新一下文件才行
     if (isPageFile(file, this.options)) {
-      const page = resolvePage(file, this.options)
+      this.changePage(file)
+    }
 
-      const prePage = this.pages.find((item) => item.pageName === page.pageName)
-      this.pages = this.pages.map((item) => {
-        if (item.pageName === page.pageName) {
-          return page
-        }
-
-        return item
-      })
-
-      if (prePage.isEmpty !== page.isEmpty) {
-        this.writeRouter()
-      }
+    if (isLayoutFile(file, this.options)) {
+      this.changeLayout(file)
     }
   }
 
   onAdd(file) {
     if (isPageFile(file, this.options)) {
-      const page = resolvePage(file, this.options)
+      this.addPage(file)
+    }
 
-      this.pages.push(page)
-      this.writePage(page)
-
-      if (page.isEmpty) {
-        return
-      }
-
-      this.writeRouter()
+    if (isLayoutFile(file, this.options)) {
+      this.addLayout(file)
     }
   }
 
   onRemove(file) {
     if (isPageFile(file, this.options)) {
-      const page = resolvePage(file, this.options)
-      this.pages = this.pages.filter((item) => item.pageName !== page.pageName)
-      this.writeRouter()
-      this.remove(page.dynamicPageFilePath)
+      this.removePage(file)
+    }
+
+    if (isLayoutFile(file, this.options)) {
+      this.removeLayout(file)
     }
   }
 
