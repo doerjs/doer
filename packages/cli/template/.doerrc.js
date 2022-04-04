@@ -1,8 +1,6 @@
 const themes = require('./.themerc')
 
 module.exports = {
-  // 代理配置 TODO暂时不支持
-  // proxy: '',
   // 设置别名
   alias: {},
   // doer默认会排除所有node_modules编译

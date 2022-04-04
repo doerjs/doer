@@ -8,6 +8,7 @@ const chalk = require('chalk')
 const paths = require('./paths')
 const file = require('./utils/file')
 const util = require('./utils/util')
+const mock = require('./mock')
 
 function getHttpsConfig() {
   const { HTTPS_KEY, HTTPS_CERT, HTTPS } = process.env
@@ -59,8 +60,11 @@ function createConfig(appConfig) {
       publicPath: paths.getAppPublicUrlPath().slice(0, -1),
     },
     https: getHttpsConfig(),
-    // TODO
-    // proxy: appConfig.proxy,
+    onBeforeSetupMiddleware(devServer) {
+      if (process.env.MOCK === 'true') {
+        mock(devServer.app)
+      }
+    },
   }
 }
 

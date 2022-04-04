@@ -29,8 +29,15 @@ function firstCharToUpperCase(str) {
   return str.replace(/^\S/, (c) => c.toUpperCase())
 }
 
+function delay(time) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, time)
+  })
+}
+
 module.exports = {
   assert,
+  delay,
   formatToPosixPath,
   firstCharToUpperCase,
 }

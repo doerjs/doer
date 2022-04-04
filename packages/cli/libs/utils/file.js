@@ -19,6 +19,10 @@ function isEmptyFile(filePath) {
   return !isExist(filePath) || !fs.readFileSync(filePath).toString()
 }
 
+function isScript(filePath) {
+  return path.extname(filePath) === '.js'
+}
+
 function readFileContent(filePath) {
   return fs.readFileSync(filePath).toString()
 }
@@ -56,6 +60,7 @@ module.exports = {
   isDirectory,
   isFile,
   isEmptyFile,
+  isScript,
 
   readFileContent,
   writeFileContent,

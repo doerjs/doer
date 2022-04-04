@@ -10,7 +10,7 @@ import { isFunction } from './helper'
 function render(Node) {
   ReactDOM.render(
     Node,
-    document.getElementById(process.env.APP_ROOT_ID || 'root'),
+    document.getElementById(process.env.ROOT_ELEMENT_ID || 'root'),
   )
 }
 

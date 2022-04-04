@@ -28,6 +28,7 @@ const appPaths = {
   // app配置文件路径
   configPath: path.resolve(cliPaths.runtimePath, '.doerrc.js'),
   srcPath: path.resolve(cliPaths.runtimePath, 'src'),
+  mockPath: path.resolve(cliPaths.runtimePath, 'mocks'),
   buildPath: path.resolve(cliPaths.runtimePath, 'dist'),
   packageJsonPath: path.resolve(cliPaths.runtimePath, 'package.json'),
   publicDirectory: path.resolve(cliPaths.runtimePath, './public'),

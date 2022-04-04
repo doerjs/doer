@@ -34,7 +34,7 @@ if (!process.env.PUBLIC_URL) {
 }
 
 if (!process.env.IMAGE_INLINE_LIMIT_SIZE) {
-  process.env.IMAGE_INLINE_LIMIT_SIZE = 10000
+  process.env.IMAGE_INLINE_LIMIT_SIZE = '10000'
 }
 
 if (!process.env.HOST) {
@@ -43,6 +43,18 @@ if (!process.env.HOST) {
 
 if (!process.env.PORT) {
   process.env.PORT = '3000'
+}
+
+if (!process.env.MOCK_DELAY) {
+  process.env.MOCK_DELAY = '0'
+}
+
+if (!process.env.ROOT_ELEMENT_ID) {
+  process.env.ROOT_ELEMENT_ID = 'root'
+}
+
+if (!process.env.MOCK_SERVER_PREFIX) {
+  process.env.MOCK_SERVER_PREFIX = '/mock'
 }
 
 // 获取项目中可以直接获取的环境变量
@@ -61,6 +73,8 @@ function getAppEnv() {
         // app环境
         ENV: process.env.ENV,
         PUBLIC_URL: process.env.PUBLIC_URL,
+        ROOT_ELEMENT_ID: process.env.ROOT_ELEMENT_ID,
+        MOCK_SERVER_PREFIX: process.env.MOCK_SERVER_PREFIX,
       },
     )
 

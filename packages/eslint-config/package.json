@@ -8,16 +8,18 @@
   "files": [
     "eslint.config.js"
   ],
-  "peerDependencies": {
-    "@babel/core": ">= 7.2.0",
-    "@babel/eslint-parser": ">= 7.2.0",
-    "eslint": ">= 8",
-    "eslint-plugin-import": ">= 2.25.4",
-    "eslint-plugin-node": ">= 11.1.0",
-    "eslint-plugin-promise": ">= 6"
-  },
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "84610b5b79ac4fde04b62128b8ac0a79f9e61445"
+  "gitHead": "84610b5b79ac4fde04b62128b8ac0a79f9e61445",
+  "dependencies": {
+    "@rushstack/eslint-patch": "^1.1.1",
+    "eslint": ">= 8",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": ">= 2.25.4",
+    "eslint-plugin-n": ">= 15.0.1",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-promise": ">= 6",
+    "prettier": "^2.6.2"
+  }
 }
