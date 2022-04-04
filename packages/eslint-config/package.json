@@ -6,6 +6,7 @@
   "license": "MIT",
   "main": "eslint.config.js",
   "files": [
+    "base.config.js",
     "eslint.config.js"
   ],
   "publishConfig": {
