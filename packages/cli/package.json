@@ -1,6 +1,6 @@
 {
   "name": "@doerjs/cli",
-  "version": "0.0.2-alpha.6",
+  "version": "0.0.2-alpha.7",
   "description": "",
   "author": "FaureWu <502556093@qq.com>",
   "license": "MIT",
@@ -14,7 +14,7 @@
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
     "@babel/register": "^7.17.7",
-    "@doerjs/eslint-config": "^0.0.2-alpha.6",
+    "@doerjs/eslint-config": "^0.0.2-alpha.7",
     "@doerjs/prettier-config": "^0.0.2-alpha.6",
     "@doerjs/utils": "^0.0.2-alpha.4",
     "@svgr/webpack": "^6.2.1",
