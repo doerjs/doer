@@ -10,7 +10,7 @@ process.on('unhandledRejection', (err) => {
   throw err
 })
 
-module.exports = function dev() {
+module.exports = function build() {
   const appConfig = config()
 
   const compiler = createCompiler({

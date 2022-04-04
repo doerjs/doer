@@ -1,5 +1,5 @@
 module.exports = `
-import React, { lazy } from 'react'
+import React, { useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
 <% pages.forEach(function(page) { %>
 import <%= page.pageName %> from './pages/<%= page.pageName %>'

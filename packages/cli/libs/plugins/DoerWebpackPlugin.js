@@ -3,14 +3,17 @@
 const path = require('path')
 const ejs = require('ejs')
 const chokidar = require('chokidar')
+const babelParser = require('@babel/parser')
 
 const file = require('../utils/file')
 const shell = require('../utils/shell')
 const util = require('../utils/util')
+const ast = require('../utils/ast')
 
 const indexTemplate = require('../templates/index.ejs')
 const bootstrapTemplate = require('../templates/bootstrap.ejs')
-const hookTemplate = require('../templates/hook.ejs')
+const globalTemplate = require('../templates/global.ejs')
+const historyTemplate = require('../templates/history.ejs')
 const helperTemplate = require('../templates/helper.ejs')
 const appTemplate = require('../templates/App.ejs')
 const layoutTemplate = require('../templates/Layout.ejs')
@@ -73,7 +76,7 @@ function isLayoutFile(file, options) {
   const dirname = path.dirname(path.dirname(file))
   const basename = path.basename(file)
 
-  return dirname === options.layoutRootPath && layoutRegex.test(basename)
+  return options.layoutRootPath && dirname === options.layoutRootPath && layoutRegex.test(basename)
 }
 
 const pageRegex = /\.page\.(js|jsx)$/
@@ -104,8 +107,10 @@ function resolvePage(pageFile, options) {
     .reduce((result, name, index) => {
       if (name.startsWith('$')) {
         result.push(`:${name.replace('$', '')}`)
+        return result
       } else if (name.endsWith('$')) {
         result.push(`*${name.replace('$', '')}`)
+        return result
       }
 
       // 最后一个名称为index时，省略
@@ -171,7 +176,7 @@ function isPageFile(file, options) {
   const dirname = path.dirname(path.dirname(file))
   const basename = path.basename(file)
 
-  return dirname === options.pageRootPath && pageRegex.test(basename)
+  return options.pageRootPath && dirname === options.pageRootPath && pageRegex.test(basename)
 }
 
 class DoerWebpackPlugin {
@@ -180,6 +185,8 @@ class DoerWebpackPlugin {
    *  appConfig 应用配置信息
    *  pageRootPath 页面根目录
    *  layoutRootPath 布局根目录
+   *  globalScriptPath 全局脚本文件
+   *  globalStylePath 全局样式文件
    *  outputPath 目标文件输出路径
    */
   constructor(options) {
@@ -193,8 +200,9 @@ class DoerWebpackPlugin {
       shell.execSync(`rm -rf ${this.options.outputPath}`)
       shell.execSync(`mkdir ${this.options.outputPath}`)
 
+      this.writeGlobal()
       this.write('bootstrap.js', bootstrapTemplate)
-      this.write('hook.js', hookTemplate)
+      this.write('history.js', historyTemplate)
       this.write('helper.js', helperTemplate)
       this.writeLayouts()
       this.writeLayoutContainer()
@@ -203,31 +211,74 @@ class DoerWebpackPlugin {
       this.writeRouter()
       this.write('index.js', indexTemplate)
 
-      const watcher = chokidar.watch([this.options.pageRootPath, this.options.layoutRootPath], { ignoreInitial: true })
+      if (process.env.NODE_ENV === 'development') {
+        const watcher = chokidar.watch(
+          [
+            this.options.pageRootPath,
+            this.options.layoutRootPath,
+            this.options.globalScriptPath,
+            this.options.globalStylePath,
+          ],
+          {
+            ignoreInitial: true,
+          },
+        )
 
-      watcher
-        .on('change', this.onChange.bind(this))
-        .on('add', this.onAdd.bind(this))
-        .on('unlink', this.onRemove.bind(this))
-        .on('error', this.onError.bind(this))
+        watcher
+          .on('change', this.onChange.bind(this))
+          .on('add', this.onAdd.bind(this))
+          .on('unlink', this.onRemove.bind(this))
+          .on('error', this.onError.bind(this))
+      }
     })
+  }
+
+  // 获取相对文件路径的webpack导入路径
+  getRelativeWebpackPath(baseFilePath, filePath) {
+    return util.formatToPosixPath(path.relative(path.dirname(baseFilePath), filePath))
+  }
+
+  writeGlobal() {
+    const globalFileName = 'global.js'
+
+    const isExist = file.isExist(this.options.globalScriptPath)
+    const globalData = {
+      relativeGlobalScriptPath: isExist
+        ? this.getRelativeWebpackPath(
+            path.resolve(this.options.outputPath, globalFileName),
+            this.options.globalScriptPath,
+          )
+        : '',
+      exports: {},
+    }
+
+    if (isExist) {
+      // 解析文件内容，收集用户自定义的勾子函数
+      const code = file.readFileContent(this.options.globalScriptPath)
+      const astTree = babelParser.parse(code, {
+        sourceType: 'module',
+        plugins: ['jsx'],
+      })
+      globalData.exports = ast.parseExports(astTree)
+    }
+    this.write(globalFileName, globalTemplate, globalData)
   }
 
   writeApp() {
     const appFileName = 'App.jsx'
 
-    // 获取注册的loading组件相对于app.jsx文件的路径
-    const resolveLoadingPath = (loadingPath) => {
-      if (!loadingPath) return ''
-      return util.formatToPosixPath(
-        path.relative(path.dirname(path.resolve(this.options.outputPath, appFileName)), loadingPath),
-      )
-    }
-
+    const appFilePath = path.resolve(this.options.outputPath, appFileName)
     const { loading = {} } = this.options.appConfig
     const appData = { loading: {} }
-    appData.loading.page = resolveLoadingPath(loading.page)
-    appData.loading.layout = resolveLoadingPath(loading.layout)
+    appData.loading.page = file.isExist(loading.page) ? this.getRelativeWebpackPath(appFilePath, loading.page) : ''
+    appData.loading.layout = file.isExist(loading.layout)
+      ? this.getRelativeWebpackPath(appFilePath, loading.layout)
+      : ''
+
+    // 检测全局样式文件是否存在
+    appData.relativeGlobalStylePath = file.isExist(this.options.globalStylePath)
+      ? this.getRelativeWebpackPath(appFilePath, this.options.globalStylePath)
+      : ''
 
     this.write(appFileName, appTemplate, appData)
   }
@@ -245,11 +296,10 @@ class DoerWebpackPlugin {
   }
 
   writeLayout(layout) {
-    // 获取相对路径并格式化为webpack识别的路径
-    const relativeRawLayoutFilePath = util.formatToPosixPath(
-      path.relative(path.dirname(layout.dynamicLayoutFilePath), layout.rawLayoutFilePath),
+    const relativeRawLayoutFilePath = this.getRelativeWebpackPath(
+      layout.dynamicLayoutFilePath,
+      layout.rawLayoutFilePath,
     )
-
     this.write(layout.dynamicLayoutFilePath, dynamicLayoutTemplate, {
       ...layout,
       relativeRawLayoutFilePath,
@@ -276,11 +326,7 @@ class DoerWebpackPlugin {
   }
 
   writePage(page) {
-    // 获取相对路径并格式化为webpack识别的路径
-    const relativeRawPageFilePath = util.formatToPosixPath(
-      path.relative(path.dirname(page.dynamicPageFilePath), page.rawPageFilePath),
-    )
-
+    const relativeRawPageFilePath = this.getRelativeWebpackPath(page.dynamicPageFilePath, page.rawPageFilePath)
     this.write(page.dynamicPageFilePath, dynamicPageTemplate, {
       ...page,
       relativeRawPageFilePath,
@@ -429,6 +475,10 @@ class DoerWebpackPlugin {
     if (isLayoutFile(file, this.options)) {
       this.changeLayout(file)
     }
+
+    if (file === this.options.globalScriptPath) {
+      this.writeGlobal()
+    }
   }
 
   onAdd(file) {
@@ -439,6 +489,14 @@ class DoerWebpackPlugin {
     if (isLayoutFile(file, this.options)) {
       this.addLayout(file)
     }
+
+    if (file === this.options.globalStylePath) {
+      this.writeApp()
+    }
+
+    if (file === this.options.globalScriptPath) {
+      this.writeGlobal()
+    }
   }
 
   onRemove(file) {
@@ -448,6 +506,14 @@ class DoerWebpackPlugin {
 
     if (isLayoutFile(file, this.options)) {
       this.removeLayout(file)
+    }
+
+    if (file === this.options.globalStylePath) {
+      this.writeApp()
+    }
+
+    if (file === this.options.globalScriptPath) {
+      this.writeGlobal()
     }
   }
 

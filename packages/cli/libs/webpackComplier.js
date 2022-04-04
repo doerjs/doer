@@ -11,6 +11,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin')
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 // const ExternalRemotesPlugin = require('external-remotes-plugin')
 
 const ReplaceHtmlEnvWebpackPlugin = require('./plugins/ReplaceHtmlEnvWebpackPlugin')
@@ -169,6 +170,8 @@ function createConfig(appConfig) {
         }),
         // 设置应用程序别名
         ...appConfig.alias,
+        '@': paths.appPaths.srcPath,
+        '@doerjs/router': path.resolve(getComplierTempPath(), './history.js'),
       },
       symlinks: true,
       modules: [paths.appPaths.nodeModulesPath, paths.cliPaths.nodeModulesPath],
@@ -283,6 +286,8 @@ function createConfig(appConfig) {
         outputPath: getComplierTempPath(),
         pageRootPath: path.resolve(paths.appPaths.srcPath, 'pages'),
         layoutRootPath: path.resolve(paths.appPaths.srcPath, 'layouts'),
+        globalScriptPath: path.resolve(paths.appPaths.srcPath, 'app.js'),
+        globalStylePath: path.resolve(paths.appPaths.srcPath, 'app.less'),
       }),
 
       // 自定义编译进度显示和日志打印
@@ -293,6 +298,8 @@ function createConfig(appConfig) {
 
       // 开启打包大小分析工具
       isEnableAnalyzer && new BundleAnalyzerPlugin(),
+
+      isProduction && new CleanWebpackPlugin(),
     ].filter(Boolean),
 
     // 通过自定义日志输出插件输出日志

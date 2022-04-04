@@ -1,5 +1,5 @@
 {
-  "cSpell.words": ["clipboardy", "doerrc"],
+  "cSpell.words": ["clipboardy", "doerrc", "webpackbar"],
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": false

@@ -1,21 +1,29 @@
 module.exports = `
-import React from 'react'
+import React, { useMemo } from 'react'
 <% layouts.forEach(function(layout) { %>
 import <%= layout.layoutName %> from './layouts/<%= layout.layoutName %>'
 <% }) %>
-import { useLayoutName } from './hook'
-import { firstCharToUpperCase } from './helper'
+import { firstCharToUpperCase, getLayoutName } from './helper'
+
+const LayoutComponents = {
+  <% layouts.forEach(function(layout) { %>
+  <%= layout.layoutName %>: <%= layout.layoutName %>,
+  <% }) %>
+}
 
 function getLayoutComponent(layoutName = '') {
-  const LayoutComponents = {
-    <% layouts.forEach(function(layout) { %>
-    <%= layout.layoutName %>: <%= layout.layoutName %>,
-    <% }) %>
-  }
-
   const LayoutComponent = LayoutComponents['L' + firstCharToUpperCase(layoutName)]
 
   return LayoutComponent || null
+}
+
+export function useLayoutName() {
+  return useMemo(() => {
+    const layoutName = getLayoutName()
+    const LayoutComponent = getLayoutComponent(layoutName)
+
+    return LayoutComponent ? layoutName : ''
+  }, [window.location.hash])
 }
 
 export default function Layout({ children }) {
