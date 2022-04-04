@@ -4,10 +4,11 @@
   "description": "",
   "author": "FaureWu <502556093@qq.com>",
   "license": "MIT",
-  "main": "eslint.config.js",
+  "main": "react.config.js",
   "files": [
-    "base.config.js",
-    "eslint.config.js"
+    "cli.config.js",
+    "eslint.config.js",
+    "react.config.js"
   ],
   "publishConfig": {
     "access": "public"
@@ -18,9 +19,12 @@
     "eslint": ">= 8",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": ">= 2.25.4",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
     "eslint-plugin-n": ">= 15.0.1",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-promise": ">= 6",
+    "eslint-plugin-react": "^7.29.4",
+    "eslint-plugin-react-hooks": "^4.4.0",
     "prettier": "^2.6.2"
   }
 }
