@@ -5,12 +5,15 @@ const ejs = require('ejs')
 const chokidar = require('chokidar')
 const babelParser = require('@babel/parser')
 
+const constant = require('../constant')
 const file = require('../utils/file')
 const shell = require('../utils/shell')
 const util = require('../utils/util')
 const ast = require('../utils/ast')
 
 const indexTemplate = require('../template/index.ejs')
+const loaderTemplate = require('../template/loader.ejs')
+const publicPathTemplate = require('../template/publicPath.ejs')
 const bootstrapTemplate = require('../template/bootstrap.ejs')
 const globalTemplate = require('../template/global.ejs')
 const historyTemplate = require('../template/history.ejs')
@@ -201,6 +204,10 @@ class DoerWebpackPlugin {
       shell.execSync(`mkdir ${this.options.outputPath}`)
 
       this.writeGlobal()
+      this.write('publicPath.js', publicPathTemplate)
+      this.write('loader.js', loaderTemplate, {
+        remoteScriptName: constant.REMOTE_SCRIPT_NAME,
+      })
       this.write('bootstrap.js', bootstrapTemplate)
       this.write('history.js', historyTemplate)
       this.write('helper.js', helperTemplate)

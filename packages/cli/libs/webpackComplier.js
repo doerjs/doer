@@ -12,7 +12,6 @@ const { WebpackManifestPlugin } = require('webpack-manifest-plugin')
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
-// const ExternalRemotesPlugin = require('external-remotes-plugin')
 
 const ReplaceHtmlEnvWebpackPlugin = require('./plugins/ReplaceHtmlEnvWebpackPlugin')
 const DoerWebpackPlugin = require('./plugins/DoerWebpackPlugin')
@@ -20,12 +19,13 @@ const LogWebpackPlugin = require('./plugins/LogWebpackPlugin')
 
 const paths = require('./paths')
 const env = require('./env')
+const constant = require('./constant')
 
 const scriptLoader = require('./loaders/script')
 const styleLoader = require('./loaders/style')
 const svgLoader = require('./loaders/svg')
 
-// const { ModuleFederationPlugin } = webpack.container
+const { ModuleFederationPlugin } = webpack.container
 
 // 创建webpack缓存版本号
 function createWebpackCacheVersion() {
@@ -35,39 +35,39 @@ function createWebpackCacheVersion() {
   return hash.digest('hex')
 }
 
-// 编译临时目录
-function getComplierTempPath() {
+function getComplierTempPathName() {
   const isProduction = process.env.NODE_ENV === 'production'
 
-  if (isProduction) {
-    return path.resolve(paths.cliPaths.runtimePath, 'src/.doer.prod')
-  }
+  return isProduction ? '.doer.prod' : '.doer'
+}
 
-  return path.resolve(paths.cliPaths.runtimePath, 'src/.doer')
+// 编译临时目录
+function getComplierTempPath() {
+  return path.resolve(paths.cliPaths.runtimePath, `src/${getComplierTempPathName()}`)
 }
 
 // 获取模块共享配置
-// function getModuleFederationConfig({ appConfig, appPackageJson }) {
-//   const { exposes = {}, remotes = {}, shared = [] } = appConfig.moduleFederation || {}
+function getModuleFederationConfig({ appConfig, appPackageJson }) {
+  // const { exposes = {}, remotes = {}, shared = [] } = appConfig.moduleFederation || {}
 
-//   return {
-//     name: appPackageJson.name,
-//     filename: 'remote.js',
-//     exposes,
-//     remotes,
-//     shared: shared.reduce(
-//       (result, item) => {
-//         result[item] = { singleton: true }
-//         return result
-//       },
-//       {
-//         'react': { singleton: true },
-//         'react-dom': { singleton: true },
-//         'react-router-dom': { singleton: true },
-//       },
-//     ),
-//   }
-// }
+  const compilerTempPathName = getComplierTempPathName()
+
+  return {
+    name: appPackageJson.name,
+    filename: constant.REMOTE_SCRIPT_NAME,
+    exposes: {
+      './$$Router': `./src/${compilerTempPathName}/Router`,
+    },
+    // TODO
+    shared: ['react', 'react-dom', 'react-router-dom'],
+    // exposes,
+    // remotes,
+    // shared: shared.reduce((result, item) => {
+    //   result[item] = { singleton: true }
+    //   return result
+    // }, {}),
+  }
+}
 
 function createConfig(appConfig) {
   const isProduction = process.env.NODE_ENV === 'production'
@@ -76,13 +76,18 @@ function createConfig(appConfig) {
   const isEnableAnalyzer = isProduction && process.env.ENABLE_ANALYZER === 'true'
   const imageInlineLimitSize = parseInt(process.env.IMAGE_INLINE_LIMIT_SIZE)
   const assetModuleFilename = isProduction ? 'static/media/[name].[contenthash:8].[ext]' : 'static/media/[name].[ext]'
-  // const appPackageJson = require(paths.appPaths.packageJsonPath)
+  const appPackageJson = require(paths.appPaths.packageJsonPath)
+
+  const compilerTempPath = getComplierTempPath()
 
   return {
     mode: isProduction ? 'production' : 'development',
     // 生产环境下当编译出现出现错误时，立刻停止编译，而不是继续打包
     bail: isProduction,
-    entry: path.resolve(getComplierTempPath(), 'index.js'),
+    entry: {
+      main: path.resolve(compilerTempPath, 'index.js'),
+      [appPackageJson.name]: path.resolve(compilerTempPath, 'publicPath.js'),
+    },
     devtool: isProduction ? 'source-map' : 'cheap-module-source-map',
 
     // 打包输出相关配置
@@ -96,6 +101,7 @@ function createConfig(appConfig) {
       // 资源模块的打包命名规则，如字体图标、图片等
       assetModuleFilename,
       publicPath: paths.getAppPublicUrlPath(),
+      uniqueName: appPackageJson.name,
     },
 
     // 设置webpack缓存到文件系统中
@@ -271,14 +277,12 @@ function createConfig(appConfig) {
       }),
 
       // 项目之间实现资源共享
-      // new ModuleFederationPlugin(
-      //   getModuleFederationConfig({
-      //     appConfig,
-      //     appPackageJson,
-      //   }),
-      // ),
-      // 项目共享支持动态域名
-      // new ExternalRemotesPlugin(),
+      new ModuleFederationPlugin(
+        getModuleFederationConfig({
+          appConfig,
+          appPackageJson,
+        }),
+      ),
 
       // 自动注入，生成路由系统
       new DoerWebpackPlugin({

@@ -9,6 +9,7 @@ const history = createHashHistory()
 
 export function useHistoryChange(handler) {
   const listener = useRef(handler)
+  listener.current = handler
 
   useEffect(() => {
     function callback(params) {

@@ -3,7 +3,7 @@ import React, { useMemo } from 'react'
 <% layouts.forEach(function(layout) { %>
 import <%= layout.layoutName %> from './layouts/<%= layout.layoutName %>'
 <% }) %>
-import { firstCharToUpperCase, getLayoutName } from './helper'
+import { firstCharToUpperCase } from './helper'
 
 const LayoutComponents = {
   <% layouts.forEach(function(layout) { %>
@@ -17,12 +17,17 @@ function getLayoutComponent(layoutName = '') {
   return LayoutComponent || null
 }
 
-export function useLayoutName() {
-  return useMemo(() => {
-    const layoutName = getLayoutName()
-    const LayoutComponent = getLayoutComponent(layoutName)
+export function getLayoutName() {
+  const [layoutName = ''] = window.location.hash.replace('#', '').split('/').filter(item => item)
 
-    return LayoutComponent ? layoutName : ''
+  const LayoutComponent = getLayoutComponent(layoutName)
+
+  return LayoutComponent ? layoutName : ''
+}
+
+function useLayoutName() {
+  return useMemo(() => {
+    return getLayoutName()
   }, [window.location.hash])
 }
 

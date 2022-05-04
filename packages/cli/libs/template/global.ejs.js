@@ -6,6 +6,11 @@ export { default } from '<%= relativeGlobalScriptPath %>'
 <% } %>
 <% } %>
 
+<% if (!exports.remoteUrls) { %>
+export function remoteUrls() {
+  return {}
+}
+<% } %>
 <% if (!exports.onRouteChange) { %>
 export function onRouteChange() {}
 <% } %>

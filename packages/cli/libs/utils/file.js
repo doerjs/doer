@@ -20,7 +20,8 @@ function isEmptyFile(filePath) {
 }
 
 function isScript(filePath) {
-  return path.extname(filePath) === '.js'
+  const ext = path.extname(filePath)
+  return ['.js', '.jsx'].includes(ext)
 }
 
 function readFileContent(filePath) {

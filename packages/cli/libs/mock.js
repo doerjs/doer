@@ -3,7 +3,7 @@ require('@babel/register')({
 })
 
 const is = require('@doerjs/utils/is')
-const bodyParser = require('body-parser')
+const express = require('express')
 
 const paths = require('./paths')
 const util = require('./utils/util')
@@ -47,8 +47,8 @@ function router(req, res, next) {
 
 module.exports = function mock(app) {
   // application/json
-  app.use(bodyParser.json())
+  app.use(express.json())
   // application/x-www-form-urlencoded
-  app.use(bodyParser.urlencoded())
+  app.use(express.urlencoded({ extended: true }))
   app.use(process.env.MOCK_SERVER_PREFIX, router)
 }

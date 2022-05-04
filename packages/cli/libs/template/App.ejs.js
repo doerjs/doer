@@ -1,12 +1,12 @@
 module.exports = `
-import React, { Suspense } from 'react'
+import React, { Suspense, useState, useEffect } from 'react'
 import { unstable_HistoryRouter as HistoryRouter } from 'react-router-dom'
 
-import { getLayoutName } from './helper'
 import history, { useHistoryChange } from './history'
 import { onRouteChange } from './global'
+import { loadScopeModule } from './loader'
 
-import Layout, { useLayoutName } from './Layout'
+import Layout, { getLayoutName } from './Layout'
 import Router from './Router'
 
 <% if (loading.layout) { %>
@@ -19,29 +19,78 @@ import PageLoading from '<%= loading.page %>'
 import '<%= relativeGlobalStylePath %>'
 <% } %>
 
-export default function App({ location }) {
-  const layoutName = useLayoutName()
+function getAppName(hasLayout) {
+  const [layoutName, appName = ''] = window.location.hash.replace('#', '').split('/').filter(item => item)
+  const name = hasLayout ? appName : layoutName
 
-  // TODO 这里需要做优化，看是否有其他方式解决
-  // 当布局切换时，浏览器不会刷新，这个时候Router中记录的basename还是上一次的
-  // 导致找不到布局，因此这里才主动调用浏览器刷新
+  if (name.startsWith('@')) {
+    return name.substr(1)
+  }
+}
+
+// 加载子应用的路由
+function useScopeRouter() {
+  const [state, setState] = useState({ basename: '', status: 'loading', ScopeRouter: null })
+
+  async function loadScopeRouter() {
+    const layoutName = getLayoutName()
+    const appName = getAppName(!!layoutName)
+
+    const currState = {
+      status: 'loading',
+      basename: '',
+      ScopeRouter: null,
+    }
+    setState({ ...currState })
+    if (appName) {
+      try {
+        const Component = await loadScopeModule(appName, './$$Router')
+        currState.ScopeRouter = Component
+        currState.status = 'succeed'
+      } catch (error) {
+        currState.ScopeRouter = null
+        currState.status = 'failed'
+      }
+    } else {
+      currState.ScopeRouter = null
+      currState.status = 'failed'
+    }
+
+    if (currState.status === 'succeed') {
+      currState.basename = [layoutName, appName ? '@' + appName : ''].filter(Boolean).join('/')
+    } else {
+      currState.basename = layoutName
+    }
+
+    setState(currState)
+  }
+
+  useEffect(() => {
+    loadScopeRouter()
+  }, [])
+
+  return [state, loadScopeRouter]
+}
+
+export default function App({ location }) {
+  const [{ basename, status, ScopeRouter }, loadScopeRouter] = useScopeRouter()
+
   useHistoryChange((params) => {
     onRouteChange(params)
-    const currLayoutName = getLayoutName()
-    if (currLayoutName !== layoutName) {
-      window.location.reload()
-    }
+    loadScopeRouter()
   })
 
   return (
     <Suspense fallback={<% if (loading.layout) { %><LayoutLoading /><% } else { %><div>loading</div><% } %>}>
-      <HistoryRouter basename={layoutName} history={history}>
-        <Layout>
-          <Suspense fallback={<% if (loading.page) { %><PageLoading /><% } else { %><div>loading</div><% } %>}>
-            <Router />
-          </Suspense>
-        </Layout>
-      </HistoryRouter>
+      <Layout>
+        {status === 'loading' ? <% if (loading.page) { %><PageLoading /><% } else { %><div>loading</div><% } %> : (
+          <HistoryRouter basename={basename} history={history}>
+            <Suspense fallback={<% if (loading.page) { %><PageLoading /><% } else { %><div>loading</div><% } %>}>
+              {ScopeRouter ? <ScopeRouter /> : <Router />}
+            </Suspense>
+          </HistoryRouter>
+        )}
+      </Layout>
     </Suspense>
   )
 }

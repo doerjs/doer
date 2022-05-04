@@ -60,10 +60,12 @@ function createConfig(appConfig) {
       publicPath: paths.getAppPublicUrlPath().slice(0, -1),
     },
     https: getHttpsConfig(),
-    onBeforeSetupMiddleware(devServer) {
+    setupMiddlewares(middlewares, devServer) {
       if (process.env.MOCK === 'true') {
         mock(devServer.app)
       }
+
+      return middlewares
     },
   }
 }
