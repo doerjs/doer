@@ -53,7 +53,7 @@ function useScopeRouter() {
       }
     } else {
       currState.ScopeRouter = null
-      currState.status = 'failed'
+      currState.status = 'succeed'
     }
 
     if (currState.status === 'succeed') {
@@ -72,6 +72,7 @@ function useScopeRouter() {
   return [state, loadScopeRouter]
 }
 
+// TODO 渲染应用加载失败的样式, 页面组件加载失败时候的样式
 export default function App({ location }) {
   const [{ basename, status, ScopeRouter }, loadScopeRouter] = useScopeRouter()
 
