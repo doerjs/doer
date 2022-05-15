@@ -48,9 +48,17 @@ function getComplierTempPath() {
 
 // 获取模块共享配置
 function getModuleFederationConfig({ appConfig, appPackageJson }) {
-  // const { exposes = {}, remotes = {}, shared = [] } = appConfig.moduleFederation || {}
+  const cliPackageJson = require(paths.cliPaths.packageJsonPath)
 
   const compilerTempPathName = getComplierTempPathName()
+
+  function getInnerSharedInfo(packageName) {
+    return {
+      requiredVersion: cliPackageJson.dependencies[packageName],
+      singleton: true,
+      strictVersion: true,
+    }
+  }
 
   return {
     name: appPackageJson.name,
@@ -58,14 +66,11 @@ function getModuleFederationConfig({ appConfig, appPackageJson }) {
     exposes: {
       './$$Router': `./src/${compilerTempPathName}/Router`,
     },
-    // TODO
-    shared: ['react', 'react-dom', 'react-router-dom'],
-    // exposes,
-    // remotes,
-    // shared: shared.reduce((result, item) => {
-    //   result[item] = { singleton: true }
-    //   return result
-    // }, {}),
+    shared: {
+      'react': getInnerSharedInfo('react'),
+      'react-dom': getInnerSharedInfo('react-dom'),
+      'react-router-dom': getInnerSharedInfo('react-router-dom'),
+    },
   }
 }
 
@@ -176,11 +181,10 @@ function createConfig(appConfig) {
         }),
         // 设置应用程序别名
         ...appConfig.alias,
-        '@': paths.appPaths.srcPath,
         '@doerjs/router': path.resolve(getComplierTempPath(), './history.js'),
       },
       symlinks: true,
-      modules: [paths.appPaths.nodeModulesPath, paths.cliPaths.nodeModulesPath],
+      modules: [paths.cliPaths.nodeModulesPath, paths.appPaths.nodeModulesPath],
       // 自动解析的扩展名
       extensions: ['.js', '.jsx', '.json'],
     },

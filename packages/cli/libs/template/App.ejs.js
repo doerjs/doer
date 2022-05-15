@@ -20,7 +20,7 @@ import '<%= relativeGlobalStylePath %>'
 <% } %>
 
 function getAppName(hasLayout) {
-  const [layoutName, appName = ''] = window.location.hash.replace('#', '').split('/').filter(item => item)
+  const [layoutName = '', appName = ''] = window.location.hash.replace('#', '').split('/').filter(item => item)
   const name = hasLayout ? appName : layoutName
 
   if (name.startsWith('@')) {
