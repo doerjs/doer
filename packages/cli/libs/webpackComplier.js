@@ -20,6 +20,7 @@ const LogWebpackPlugin = require('./plugins/LogWebpackPlugin')
 const paths = require('./paths')
 const env = require('./env')
 const constant = require('./constant')
+const shared = require('./shared')
 
 const scriptLoader = require('./loaders/script')
 const styleLoader = require('./loaders/style')
@@ -48,17 +49,7 @@ function getComplierTempPath() {
 
 // 获取模块共享配置
 function getModuleFederationConfig({ appConfig, appPackageJson }) {
-  const cliPackageJson = require(paths.cliPaths.packageJsonPath)
-
   const compilerTempPathName = getComplierTempPathName()
-
-  function getInnerSharedInfo(packageName) {
-    return {
-      requiredVersion: cliPackageJson.dependencies[packageName],
-      singleton: true,
-      strictVersion: true,
-    }
-  }
 
   return {
     name: appPackageJson.name,
@@ -66,11 +57,7 @@ function getModuleFederationConfig({ appConfig, appPackageJson }) {
     exposes: {
       './$$Router': `./src/${compilerTempPathName}/Router`,
     },
-    shared: {
-      'react': getInnerSharedInfo('react'),
-      'react-dom': getInnerSharedInfo('react-dom'),
-      'react-router-dom': getInnerSharedInfo('react-router-dom'),
-    },
+    shared,
   }
 }
 

@@ -81,6 +81,11 @@ async function loadScopeScript(scope) {
 // 加载应用模块
 export async function loadScopeModule(scope, module) {
   await loadScopeScript(scope)
-  return lazy(loadModule(scope, module))
+  return loadModule(scope, module)
+}
+
+// 加载应用组件
+export function loadScopeComponent(scope, module) {
+  return lazy(loadScopeModule(scope, module))
 }
 `

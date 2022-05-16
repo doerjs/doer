@@ -44,3 +44,9 @@ export function onRender(render) {
   // 否则页面无法渲染出来
   render()
 }
+
+export function bootstrap() {}
+
+export function mount() {}
+
+export function unmount() {}

@@ -4,7 +4,7 @@ import { unstable_HistoryRouter as HistoryRouter } from 'react-router-dom'
 
 import history, { useHistoryChange } from './history'
 import { onRouteChange } from './global'
-import { loadScopeModule } from './loader'
+import { loadScopeComponent } from './loader'
 
 import Layout, { getLayoutName } from './Layout'
 import Router from './Router'
@@ -44,7 +44,7 @@ function useScopeRouter() {
     setState({ ...currState })
     if (appName) {
       try {
-        const Component = await loadScopeModule(appName, './$$Router')
+        const Component = await loadScopeComponent(appName, './$$Router')
         currState.ScopeRouter = Component
         currState.status = 'succeed'
       } catch (error) {
