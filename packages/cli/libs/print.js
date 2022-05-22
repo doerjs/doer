@@ -1,4 +1,5 @@
 const figlet = require('figlet')
+const chalk = require('chalk')
 
 const constant = require('./constant')
 const paths = require('./paths')
@@ -10,13 +11,21 @@ function logo() {
 function version() {
   const version = require(paths.cliPaths.packageJsonPath).version
 
-  console.log()
   if (version) {
     console.log(`👣 Doer v${version}`)
   } else {
     console.log('👣 Doer Unknown Version')
   }
   console.log()
+}
+
+function name() {
+  const name = require(paths.appPaths.packageJsonPath).name
+
+  if (name) {
+    console.log(`👣 应用名称：${chalk.blue(chalk.bold(name))}`)
+    console.log()
+  }
 }
 
 function help() {
@@ -37,4 +46,5 @@ module.exports = {
   logo,
   version,
   help,
+  name,
 }

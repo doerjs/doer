@@ -26,6 +26,7 @@ class LoggerWebpackPlugin {
           clearConsole()
           print.logo()
           print.version()
+          print.name()
         },
       },
     })
