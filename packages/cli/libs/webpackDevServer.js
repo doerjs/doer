@@ -33,7 +33,7 @@ function getHttpsConfig() {
   return isHttps
 }
 
-function createConfig(appConfig) {
+function createConfig() {
   return {
     allowedHosts: 'all',
     host: process.env.HOST,
@@ -70,20 +70,24 @@ function createConfig(appConfig) {
   }
 }
 
-function formatUrl(devServerConfig) {
-  const protocol = devServerConfig.https ? 'https://' : 'http://'
-  const localhost =
-    devServerConfig.host === '127.0.0.1' || devServerConfig.host === '0.0.0.0' ? 'localhost' : devServerConfig.host
+function resolveServerUrl() {
+  const isHttps = process.env.HTTPS === 'true'
+  const host = process.env.HOST
+  const port = process.env.PORT
+  const publicPath = paths.getAppPublicUrlPath()
+
+  const protocol = isHttps ? 'https://' : 'http://'
+  const localhost = host === '127.0.0.1' || host === '0.0.0.0' ? 'localhost' : host
 
   return {
-    localUrl: `${protocol}${localhost}:${devServerConfig.port}${devServerConfig.static.publicPath}`,
-    realUrl: `${protocol}${address.ip()}:${devServerConfig.port}${devServerConfig.static.publicPath}`,
+    localUrl: `${protocol}${localhost}:${port}${publicPath}`,
+    realUrl: `${protocol}${address.ip()}:${port}${publicPath}`,
   }
 }
 
-module.exports = function createDevServer({ webpackConfig, compiler, appConfig }) {
+function createDevServer({ webpackConfig, compiler, appConfig }) {
   const devServerConfig = createConfig(appConfig)
-  const url = formatUrl(devServerConfig)
+  const url = resolveServerUrl()
   const server = new WebpackDevServer(devServerConfig, compiler)
 
   // 注册结束信号监听
@@ -101,7 +105,7 @@ module.exports = function createDevServer({ webpackConfig, compiler, appConfig }
   })
 
   server.startCallback(() => {
-    let isFirstStart = true
+    let isFirstComplierDone = true
 
     compiler.hooks.done.tap('done', () => {
       setTimeout(() => {
@@ -111,8 +115,8 @@ module.exports = function createDevServer({ webpackConfig, compiler, appConfig }
         console.log(`👣 ${chalk.cyan(url.realUrl)}`)
         console.log()
 
-        if (isFirstStart) {
-          isFirstStart = false
+        if (isFirstComplierDone) {
+          isFirstComplierDone = false
           import('clipboardy').then(({ default: clipboard }) => {
             clipboard.writeSync(url.localUrl)
             console.log(`👣 访问地址已经复制到剪贴板，粘贴到浏览器查看吧`)
@@ -123,4 +127,8 @@ module.exports = function createDevServer({ webpackConfig, compiler, appConfig }
   })
 
   server.stopCallback(() => {})
+}
+
+module.exports = {
+  createDevServer,
 }

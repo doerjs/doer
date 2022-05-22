@@ -204,7 +204,7 @@ class DoerWebpackPlugin {
       shell.execSync(`mkdir ${this.options.outputPath}`)
 
       this.writeGlobal()
-      this.write('publicPath.js', publicPathTemplate)
+      this.writePublicPath()
       this.write('loader.js', loaderTemplate, {
         remoteScriptName: constant.REMOTE_SCRIPT_NAME,
       })
@@ -269,6 +269,10 @@ class DoerWebpackPlugin {
       globalData.exports = ast.parseExports(astTree)
     }
     this.write(globalFileName, globalTemplate, globalData)
+  }
+
+  writePublicPath() {
+    this.write('publicPath.js', publicPathTemplate, { publicPath: this.options.publicPath })
   }
 
   writeApp() {

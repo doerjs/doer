@@ -283,6 +283,7 @@ function createConfig(appConfig) {
         layoutRootPath: path.resolve(paths.appPaths.srcPath, 'layouts'),
         globalScriptPath: path.resolve(paths.appPaths.srcPath, 'app.js'),
         globalStylePath: path.resolve(paths.appPaths.srcPath, 'app.less'),
+        publicPath: paths.getRemotePublicUrlPath(),
       }),
 
       // 自定义编译进度显示和日志打印
@@ -305,7 +306,7 @@ function createConfig(appConfig) {
   }
 }
 
-module.exports = function createCompiler({ appConfig }) {
+function createCompiler({ appConfig }) {
   const compiler = webpack(createConfig(appConfig))
 
   compiler.hooks.done.tap('done', async (stats) => {
@@ -313,4 +314,8 @@ module.exports = function createCompiler({ appConfig }) {
   })
 
   return compiler
+}
+
+module.exports = {
+  createCompiler,
 }

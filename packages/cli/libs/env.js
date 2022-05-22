@@ -72,7 +72,7 @@ function getAppEnv() {
         NODE_ENV: process.env.NODE_ENV,
         // app环境
         ENV: process.env.ENV,
-        PUBLIC_URL: process.env.PUBLIC_URL,
+        PUBLIC_URL: paths.getAppPublicUrlPath(),
         ROOT_ELEMENT_ID: process.env.ROOT_ELEMENT_ID,
         MOCK_SERVER_PREFIX: process.env.MOCK_SERVER_PREFIX,
       },
