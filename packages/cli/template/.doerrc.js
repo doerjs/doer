@@ -18,13 +18,7 @@ module.exports = {
   //   page: './src/components/loading',
   // },
 
-  // 项目共享配置
-  moduleFederation: {
-    // 想要导出给他人用的资源
-    exposes: {},
-    // 引用的其他项目资源
-    remotes: {},
-    // 共享的第三方库
-    shared: [],
-  },
+  // 项目导出的共享资源
+  exposes: {},
+  shared: {},
 }

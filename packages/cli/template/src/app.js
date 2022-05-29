@@ -8,7 +8,7 @@
  * 也可以通过服务端动态获取应用的远程资源地址
  * @return <Object> 应用的远程地址注册表
  */
-export function remoteUrls() {
+export function remotes() {
   return {}
 }
 

@@ -6,8 +6,8 @@ export { default } from '<%= relativeGlobalScriptPath %>'
 <% } %>
 <% } %>
 
-<% if (!exports.remoteUrls) { %>
-export function remoteUrls() {
+<% if (!exports.remotes) { %>
+export function remotes() {
   return {}
 }
 <% } %>

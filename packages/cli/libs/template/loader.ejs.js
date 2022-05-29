@@ -2,7 +2,6 @@ module.exports = `
 import React, { lazy } from 'react'
 
 import { isUndefined, isFunction } from './helper'
-import { remoteUrls } from './global'
 
 export function loadModule(scope, module) {
   return async () => {
@@ -46,30 +45,10 @@ function loadScript(url) {
   })
 }
 
-// 初始化多应用的远程地址
-const remoteUrlsPromise = (async function() {
-  const urls = await remoteUrls()
-  return urls || {}
-})()
-
-// 获取应用远程资源地址
-function getScopeRemoteUrl(scope) {
-  if (!scope) return
-
-  return remoteUrlsPromise.then((remoteUrls) => {
-    const remoteUrl = remoteUrls[scope]
-    if (remoteUrl) {
-      return remoteUrl.endsWith('/') ? remoteUrl + '<%= remoteScriptName %>' : remoteUrl + '/' + '<%= remoteScriptName %>'
-    }
-
-    throw new Error('Scope remote url not found')
-  })
-}
-
 // 加载应用远程入口地址
 const scriptCache = new Set()
 async function loadScopeScript(scope) {
-  const scopeRemoteUrl = await getScopeRemoteUrl(scope)
+  const scopeRemoteUrl = window.__doer_remotes__[scope]
   if (!scopeRemoteUrl) return
 
   if (scriptCache.has(scopeRemoteUrl)) return

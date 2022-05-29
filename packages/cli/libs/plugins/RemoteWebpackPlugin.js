@@ -1,55 +1,89 @@
-const is = require('@doerjs/utils/is')
+'use strict'
+
+const RuntimeGlobals = require('webpack/lib/RuntimeGlobals')
+const ExternalModule = require('webpack/lib/ExternalModule')
+const FallbackDependency = require('webpack/lib/container/FallbackDependency')
+const FallbackItemDependency = require('webpack/lib/container/FallbackItemDependency')
+const FallbackModuleFactory = require('webpack/lib/container/FallbackModuleFactory')
+const RemoteModule = require('webpack/lib/container/RemoteModule')
+const RemoteRuntimeModule = require('webpack/lib/container/RemoteRuntimeModule')
+const RemoteToExternalDependency = require('webpack/lib/container/RemoteToExternalDependency')
 
 class RemoteWebpackPlugin {
-  /**
-   * options
-   *  include 包含的目录
-   *  exclude 排除的目录
-   */
-  constructor(options) {
-    this.options = options
+  constructor(options = {}) {
+    this.remoteFileName = options.fileName || 'remote.js'
+    this.key = 'remote:'
+    this.type = 'script'
+    this.referencePath = 'webpack/container/reference/'
   }
 
   apply(compiler) {
-    compiler.hooks.make.tap('RemoteWebpackPlugin', (compilation) => {
-      compilation.hooks.succeedModule.tap('RemoteWebpackPlugin', (module) => {
-        if (!this.isInclude(module) || this.isExclude(module)) {
-          // TODO
-        }
+    compiler.hooks.compilation.tap('RemoteWebpackPlugin', (compilation, { normalModuleFactory }) => {
+      compilation.dependencyFactories.set(RemoteToExternalDependency, normalModuleFactory)
+
+      compilation.dependencyFactories.set(FallbackItemDependency, normalModuleFactory)
+
+      compilation.dependencyFactories.set(FallbackDependency, new FallbackModuleFactory())
+
+      normalModuleFactory.hooks.factorize.tap('RemoteWebpackPlugin', (data) => {
+        if (!this.isRemote(data.request)) return
+
+        const remote = this.getRemote(data.request)
+        return new RemoteModule(remote.request, remote.externalRequests, remote.internalRequest, remote.shareScope)
       })
+
+      normalModuleFactory.hooks.factorize.tapAsync('RemoteWebpackPlugin', (data, callback) => {
+        const dependency = data.dependencies[0]
+
+        if (!this.isRemoteExternal(dependency.request)) {
+          return callback()
+        }
+
+        const remoteName = this.getRemoteName(dependency.request)
+
+        const externalModule = new ExternalModule(
+          `${remoteName}@[__doer_remotes__.${remoteName}]/${this.remoteFileName}`,
+          this.type,
+          dependency.request,
+        )
+        callback(null, externalModule)
+      })
+
+      compilation.hooks.runtimeRequirementInTree
+        .for(RuntimeGlobals.ensureChunkHandlers)
+        .tap('RemoteWebpackPlugin', (chunk, set) => {
+          set.add(RuntimeGlobals.module)
+          set.add(RuntimeGlobals.moduleFactoriesAddOnly)
+          set.add(RuntimeGlobals.hasOwnProperty)
+          set.add(RuntimeGlobals.initializeSharing)
+          set.add(RuntimeGlobals.shareScopeMap)
+          compilation.addRuntimeModule(chunk, new RemoteRuntimeModule())
+        })
     })
   }
 
-  isInclude(module) {
-    if (!module.userRequest) return false
-
-    if (is.isString(this.options.include)) {
-      return module.userRequest.indexOf(this.options.include) === 0
-    }
-
-    if (is.isArray(this.options.include)) {
-      return this.options.include.some((include) => {
-        return module.userRequest.indexOf(this.options.include) === 0
-      })
-    }
-
-    return false
+  isRemote(request) {
+    if (request.includes('!')) return
+    return request.startsWith(this.key)
   }
 
-  isExclude(module) {
-    if (!module.userRequest) return false
+  getRemote(request) {
+    const [remoteName, ...rest] = request.slice(this.key.length).split('/')
 
-    if (is.isString(this.options.exclude)) {
-      return module.userRequest.indexOf(this.options.include) === 0
+    return {
+      request: `${remoteName}/${rest.join('/')}`,
+      externalRequests: [this.referencePath + remoteName],
+      internalRequest: `./${rest.join('/')}`,
+      shareScope: 'default',
     }
+  }
 
-    if (is.isArray(this.options.exclude)) {
-      return this.options.exclude.some((exclude) => {
-        return module.userRequest.indexOf(this.options.exclude) === 0
-      })
-    }
+  isRemoteExternal(request) {
+    return request.startsWith(this.referencePath)
+  }
 
-    return false
+  getRemoteName(request) {
+    return request.slice(this.referencePath.length)
   }
 }
 

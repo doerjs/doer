@@ -12,10 +12,12 @@ const { WebpackManifestPlugin } = require('webpack-manifest-plugin')
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const ExternalRemotesWebpackPlugin = require('external-remotes-plugin')
 
 const ReplaceHtmlEnvWebpackPlugin = require('./plugins/ReplaceHtmlEnvWebpackPlugin')
 const DoerWebpackPlugin = require('./plugins/DoerWebpackPlugin')
 const LogWebpackPlugin = require('./plugins/LogWebpackPlugin')
+const RemoteWebpackPlugin = require('./plugins/RemoteWebpackPlugin')
 
 const paths = require('./paths')
 const env = require('./env')
@@ -55,9 +57,13 @@ function getModuleFederationConfig({ appConfig, appPackageJson }) {
     name: appPackageJson.name,
     filename: constant.REMOTE_SCRIPT_NAME,
     exposes: {
+      ...appConfig.exposes,
       './$$Router': `./src/${compilerTempPathName}/Router`,
     },
-    shared,
+    shared: {
+      ...appConfig.shared,
+      ...shared,
+    },
   }
 }
 
@@ -274,6 +280,7 @@ function createConfig(appConfig) {
           appPackageJson,
         }),
       ),
+      new ExternalRemotesWebpackPlugin(),
 
       // 自动注入，生成路由系统
       new DoerWebpackPlugin({
@@ -284,6 +291,10 @@ function createConfig(appConfig) {
         globalScriptPath: path.resolve(paths.appPaths.srcPath, 'app.js'),
         globalStylePath: path.resolve(paths.appPaths.srcPath, 'app.less'),
         publicPath: paths.getRemotePublicUrlPath(),
+      }),
+      // 支持直接引入远程应用模块
+      new RemoteWebpackPlugin({
+        fileName: constant.REMOTE_SCRIPT_NAME,
       }),
 
       // 自定义编译进度显示和日志打印
