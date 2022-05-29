@@ -1,6 +1,6 @@
 {
   "name": "@doerjs/prettier-config",
-  "version": "0.0.3-alpha.0",
+  "version": "0.0.3-alpha.1",
   "description": "",
   "author": "FaureWu <502556093@qq.com>",
   "license": "MIT",
@@ -14,5 +14,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "84610b5b79ac4fde04b62128b8ac0a79f9e61445"
+  "gitHead": "a6e855666cc17c4982c247f2295d142a48345439"
 }
