@@ -1,0 +1,16 @@
+{
+  "private": true,
+  "name": "app2",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "ENV=dev doer dev",
+    "mock": "ENV=mock doer dev",
+    "build": "ENV=dev doer build"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/runtime": "^7.16.7",
+    "@babel/runtime-corejs3": "^7.16.7",
+    "@doerjs/cli": "0.0.3-alpha.1"
+  }
+}
