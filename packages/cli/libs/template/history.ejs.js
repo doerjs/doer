@@ -26,5 +26,7 @@ export function useHistoryChange(handler) {
   }, [])
 }
 
+window.doer.history = history
+
 export default history
 `

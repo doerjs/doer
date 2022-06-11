@@ -1,10 +1,11 @@
 module.exports = `
-import React, { Suspense, useState, useEffect } from 'react'
+import React, { Suspense, useState, useEffect, useRef } from 'react'
 import { unstable_HistoryRouter as HistoryRouter } from 'react-router-dom'
 
 import history, { useHistoryChange } from './history'
-import { onRouteChange } from './global'
-import { loadScopeComponent } from './loader'
+import { loadScopeComponent, loadScopeModule } from './loader'
+import { isFunction, isUndefined } from './helper'
+import { enter, leave } from './global'
 
 import Layout, { getLayoutName } from './Layout'
 import Router from './Router'
@@ -28,57 +29,91 @@ function getAppName(hasLayout) {
   }
 }
 
-// 加载子应用的路由
-function useScopeRouter() {
-  const [state, setState] = useState({ basename: '', status: 'loading', ScopeRouter: null })
+async function loadAppRouter(appName) {
+  if (!appName) {
+    return Router
+  }
 
-  async function loadScopeRouter() {
+  const AppRouter = await loadScopeComponent(appName, './$$Router')
+  return AppRouter
+}
+
+async function loadAppLifeCycle(appName) {
+  if (!appName) {
+    return { enter, leave }
+  }
+
+  const lifeCycle = await loadScopeModule(appName, './$$app')
+  return lifeCycle
+}
+
+async function loadApp(appName) {
+  const lifeCycle = await loadAppLifeCycle(appName)
+  const AppRouter = await loadAppRouter(appName)
+
+  return { AppRouter, lifeCycle }
+}
+
+async function callLifeCycle(appName, name, params) {
+  const lifeCycle = await loadAppLifeCycle(appName)
+  if (!isFunction(lifeCycle[name])) return
+  lifeCycle[name](params)
+}
+
+let preAppName
+function useAppRouter() {
+  const [state, setState] = useState({ basename: '', status: 'loading', AppRouter: null })
+
+  async function load() {
     const layoutName = getLayoutName()
     const appName = getAppName(!!layoutName)
 
     const currState = {
       status: 'loading',
       basename: '',
-      ScopeRouter: null,
+      AppRouter: null,
     }
     setState({ ...currState })
-    if (appName) {
-      try {
-        const Component = await loadScopeComponent(appName, './$$Router')
-        currState.ScopeRouter = Component
-        currState.status = 'succeed'
-      } catch (error) {
-        currState.ScopeRouter = null
-        currState.status = 'failed'
-      }
-    } else {
-      currState.ScopeRouter = null
+
+    try {
+      const AppRouter = await loadAppRouter(appName)
+      currState.AppRouter = AppRouter
       currState.status = 'succeed'
+
+      if (preAppName !== appName) {
+        await callLifeCycle(preAppName, 'leave')
+        await callLifeCycle(appName, 'enter')
+      }
+
+      preAppName = appName
+    } catch (error) {
+      currState.AppRouter = null
+      currState.status = 'failed'
+      console.error(error)
     }
 
-    if (currState.status === 'succeed') {
-      currState.basename = [layoutName, appName ? '@' + appName : ''].filter(Boolean).join('/')
-    } else {
-      currState.basename = layoutName
-    }
+    currState.basename = [layoutName, appName ? '@' + appName : ''].filter(Boolean).join('/')
 
     setState(currState)
   }
 
   useEffect(() => {
-    loadScopeRouter()
+    load()
   }, [])
 
-  return [state, loadScopeRouter]
+  return [state, load]
 }
 
 // TODO 渲染应用加载失败的样式, 页面组件加载失败时候的样式
 export default function App({ location }) {
-  const [{ basename, status, ScopeRouter }, loadScopeRouter] = useScopeRouter()
+  const [{ basename, status, AppRouter }, load] = useAppRouter()
 
-  useHistoryChange((params) => {
-    onRouteChange(params)
-    loadScopeRouter()
+  useEffect(() => {
+    enter()
+  }, [])
+
+  useHistoryChange(() => {
+    load()
   })
 
   return (
@@ -87,7 +122,7 @@ export default function App({ location }) {
         {status === 'loading' ? <% if (loading.page) { %><PageLoading /><% } else { %><div>loading</div><% } %> : (
           <HistoryRouter basename={basename} history={history}>
             <Suspense fallback={<% if (loading.page) { %><PageLoading /><% } else { %><div>loading</div><% } %>}>
-              {ScopeRouter ? <ScopeRouter /> : <Router />}
+              <AppRouter />
             </Suspense>
           </HistoryRouter>
         )}

@@ -45,22 +45,32 @@ function loadScript(url) {
   })
 }
 
-// 加载应用远程入口地址
-const scriptCache = new Set()
-async function loadScopeScript(scope) {
-  const scopeRemoteUrl = window.__doer_remotes__[scope]
-  if (!scopeRemoteUrl) return
+function isScopeLoaded(scope) {
+  return window[scope] && isFunction(window[scope].init) && isFunction(window[scope].get)
+}
 
-  if (scriptCache.has(scopeRemoteUrl)) return
+// 加载应用远程入口地址
+async function loadScopeScript(scope) {
+  if (isScopeLoaded(scope)) return
+
+  let scopeRemoteUrl = window.__doer_remotes__[scope]
+  if (!scopeRemoteUrl) {
+    throw new Error(\`Application \${scope} not register\`)
+  }
+
+  if (scopeRemoteUrl.endsWith('/')) {
+    scopeRemoteUrl += '<%= remoteFileName %>'
+  } else {
+    scopeRemoteUrl += '/' + '<%= remoteFileName %>'
+  }
 
   await loadScript(scopeRemoteUrl)
-  scriptCache.add(scopeRemoteUrl)
 }
 
 // 加载应用模块
 export async function loadScopeModule(scope, module) {
   await loadScopeScript(scope)
-  return loadModule(scope, module)
+  return loadModule(scope, module)()
 }
 
 // 加载应用组件

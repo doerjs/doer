@@ -13,23 +13,17 @@ export function remotes() {
 }
 
 /**
- * 路由切换时的回调函数
- * @return
- */
-export function onRouteChange(params) {}
-
-/**
- * 页面渲染前的回调函数，可以控制页面的渲染
+ * 应用渲染前的回调函数，可以控制应用的渲染
  * 使用场景一：延迟渲染
- * function onRender(render) {
+ * function render(oldRender) {
  *  setTimeout(() => {
- *    render()
+ *    oldRender()
  *  }, 500)
  * }
  *
  * 使用场景二: 包裹其他Provider，比如国际化的Provider
- * function onRender(render) {
- *  render((children) => {
+ * function render(oldRender) {
+ *  oldRender((children) => {
  *    return (
  *      <LocaleProvider>
  *        {children}
@@ -39,14 +33,18 @@ export function onRouteChange(params) {}
  * }
  * @return
  */
-export function onRender(render) {
+export function render(oldRender) {
   // 注册渲染回调函数，在需要渲染时，一定要调用这个render
-  // 否则页面无法渲染出来
-  render()
+  // 否则应用无法渲染出来
+  oldRender()
 }
 
-export function bootstrap() {}
+/**
+ * 应用进入时触发
+ */
+export function enter() {}
 
-export function mount() {}
-
-export function unmount() {}
+/**
+ * 应用离开时触发
+ */
+export function leave() {}

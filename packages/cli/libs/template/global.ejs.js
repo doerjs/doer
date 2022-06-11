@@ -11,12 +11,15 @@ export function remotes() {
   return {}
 }
 <% } %>
-<% if (!exports.onRouteChange) { %>
-export function onRouteChange() {}
-<% } %>
-<% if (!exports.onRender) { %>
-export function onRender(oldRender) {
+<% if (!exports.render) { %>
+export function render(oldRender) {
   oldRender()
 }
+<% } %>
+<% if (!exports.enter) { %>
+export function enter() {}
+<% } %>
+<% if (!exports.leave) { %>
+export function leave() {}
 <% } %>
 `

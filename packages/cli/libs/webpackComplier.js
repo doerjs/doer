@@ -59,6 +59,7 @@ function getModuleFederationConfig({ appConfig, appPackageJson }) {
     exposes: {
       ...appConfig.exposes,
       './$$Router': `./src/${compilerTempPathName}/Router`,
+      './$$app': `./src/${compilerTempPathName}/global`,
     },
     shared: {
       ...appConfig.shared,
@@ -174,7 +175,6 @@ function createConfig(appConfig) {
         }),
         // 设置应用程序别名
         ...appConfig.alias,
-        '@doerjs/router': path.resolve(getComplierTempPath(), './history.js'),
       },
       symlinks: true,
       modules: [paths.cliPaths.nodeModulesPath, paths.appPaths.nodeModulesPath],
@@ -288,6 +288,7 @@ function createConfig(appConfig) {
         outputPath: getComplierTempPath(),
         srcPath: paths.appPaths.srcPath,
         publicPath: paths.appPaths.getRemotePublicUrlPath(),
+        remoteFileName: constant.REMOTE_SCRIPT_NAME,
       }),
       // 支持直接引入远程应用模块
       new RemoteWebpackPlugin({

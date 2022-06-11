@@ -5,7 +5,6 @@ const ejs = require('ejs')
 const chokidar = require('chokidar')
 const babelParser = require('@babel/parser')
 
-const constant = require('../constant')
 const file = require('../utils/file')
 const shell = require('../utils/shell')
 const util = require('../utils/util')
@@ -148,18 +147,18 @@ class DoerWebpackPlugin {
 
       this.writeGlobal()
       this.writePublicPath()
-      this.write('loader.js', loaderTemplate, {
-        remoteScriptName: constant.REMOTE_SCRIPT_NAME,
+      this.writeTemplate('loader.js', loaderTemplate, {
+        remoteFileName: this.options.remoteFileName,
       })
-      this.write('bootstrap.js', bootstrapTemplate)
-      this.write('history.js', historyTemplate)
-      this.write('helper.js', helperTemplate)
+      this.writeFile('bootstrap.js', bootstrapTemplate)
+      this.writeFile('history.js', historyTemplate)
+      this.writeFile('helper.js', helperTemplate)
       this.writeLayouts()
       this.writeLayoutContainer()
       this.writeApp()
       this.writePages()
       this.writeRouter()
-      this.write('index.js', indexTemplate)
+      this.writeFile('index.js', indexTemplate)
 
       if (process.env.NODE_ENV === 'development') {
         const watcher = chokidar.watch(this.options.srcPath, {
@@ -208,11 +207,11 @@ class DoerWebpackPlugin {
       })
       globalData.exports = ast.parseExports(astTree)
     }
-    this.write(globalFileName, globalTemplate, globalData)
+    this.writeTemplate(globalFileName, globalTemplate, globalData)
   }
 
   writePublicPath() {
-    this.write('publicPath.js', publicPathTemplate, { publicPath: this.options.publicPath })
+    this.writeTemplate('publicPath.js', publicPathTemplate, { publicPath: this.options.publicPath })
   }
 
   writeApp() {
@@ -230,7 +229,7 @@ class DoerWebpackPlugin {
       ? this.getRelativeWebpackPath(appFilePath, this.globalStylePath)
       : ''
 
-    this.write(appFileName, appTemplate, appData)
+    this.writeTemplate(appFileName, appTemplate, appData)
   }
 
   writeLayouts() {
@@ -245,7 +244,7 @@ class DoerWebpackPlugin {
       layout.dynamicLayoutFilePath,
       layout.rawLayoutFilePath,
     )
-    this.write(layout.dynamicLayoutFilePath, dynamicLayoutTemplate, {
+    this.writeTemplate(layout.dynamicLayoutFilePath, dynamicLayoutTemplate, {
       ...layout,
       relativeRawLayoutFilePath,
     })
@@ -253,12 +252,12 @@ class DoerWebpackPlugin {
 
   writeLayoutContainer() {
     const layouts = this.layouts.filter((layout) => !layout.isEmpty)
-    this.write('Layout.jsx', layoutTemplate, { layouts })
+    this.writeTemplate('Layout.jsx', layoutTemplate, { layouts })
   }
 
   writePages() {
     shell.execSync(`mkdir ${this.options.outputPath}/pages`)
-    this.write('pages/NotFound.jsx', notFoundTemplate)
+    this.writeTemplate('pages/NotFound.jsx', notFoundTemplate)
     this.pages.forEach((page) => {
       this.writePage(page)
     })
@@ -266,7 +265,7 @@ class DoerWebpackPlugin {
 
   writePage(page) {
     const relativeRawPageFilePath = this.getRelativeWebpackPath(page.dynamicPageFilePath, page.rawPageFilePath)
-    this.write(page.dynamicPageFilePath, dynamicPageTemplate, {
+    this.writeTemplate(page.dynamicPageFilePath, dynamicPageTemplate, {
       ...page,
       relativeRawPageFilePath,
     })
@@ -290,15 +289,17 @@ class DoerWebpackPlugin {
       },
       { pages: [], notFoundPage: null },
     )
-    // 写入路由注册文件
-    this.write('Router.jsx', routerTemplate, routerData)
+    this.writeTemplate('Router.jsx', routerTemplate, routerData)
   }
 
-  write(fileName, content, data = {}) {
+  writeTemplate(fileName, content, data = {}) {
     const code = ejs.render(content, data)
-    const filePath = path.resolve(this.options.outputPath, fileName)
+    this.writeFile(fileName, code)
+  }
 
-    file.writeFileContent(filePath, code)
+  writeFile(fileName, content) {
+    const filePath = path.resolve(this.options.outputPath, fileName)
+    file.writeFileContent(filePath, content)
   }
 
   remove(file) {

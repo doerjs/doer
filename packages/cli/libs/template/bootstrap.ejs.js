@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client'
 
 import App from './App'
 
-import { onRender } from './global'
+import { render as customRender } from './global'
 import { isFunction } from './helper'
 
 function render(Node) {
@@ -12,8 +12,8 @@ function render(Node) {
   root.render(Node);
 }
 
-if (isFunction(onRender)) {
-  onRender((Container) => {
+if (isFunction(customRender)) {
+  customRender((Container) => {
     if (isFunction(Container)) {
       return render(Container(<App />))
     }
