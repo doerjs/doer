@@ -46,7 +46,7 @@ function createConfig() {
     compress: true,
     static: {
       directory: paths.appPaths.publicDirectory,
-      publicPath: paths.getAppPublicUrlPath(),
+      publicPath: paths.appPaths.getPublicUrlPath(),
     },
     client: {
       logging: 'none',
@@ -57,7 +57,7 @@ function createConfig() {
     hot: false,
     liveReload: true,
     devMiddleware: {
-      publicPath: paths.getAppPublicUrlPath().slice(0, -1),
+      publicPath: paths.appPaths.getPublicUrlPath().slice(0, -1),
     },
     https: getHttpsConfig(),
     setupMiddlewares(middlewares, devServer) {
@@ -74,7 +74,7 @@ function resolveServerUrl() {
   const isHttps = process.env.HTTPS === 'true'
   const host = process.env.HOST
   const port = process.env.PORT
-  const publicPath = paths.getAppPublicUrlPath()
+  const publicPath = paths.appPaths.getPublicUrlPath()
 
   const protocol = isHttps ? 'https://' : 'http://'
   const localhost = host === '127.0.0.1' || host === '0.0.0.0' ? 'localhost' : host

@@ -42,6 +42,20 @@ function reduceReaddirFactory(reducer) {
   }
 }
 
+function eachFile(filePath, handle) {
+  const files = fs.readdirSync(filePath)
+  return files.forEach((fileName) => {
+    const currFilePath = path.resolve(filePath, fileName)
+
+    if (isFile(currFilePath)) {
+      handle(currFilePath)
+      return
+    }
+
+    eachFile(currFilePath, handle)
+  })
+}
+
 const readDirectories = reduceReaddirFactory((result, filePath) => {
   if (isDirectory(filePath)) {
     result.push(filePath)
@@ -70,4 +84,6 @@ module.exports = {
 
   readFiles,
   readDirectories,
+
+  eachFile,
 }

@@ -6,8 +6,12 @@ module.exports = {
   // doer默认会排除所有node_modules编译
   // 如果需要编译部分包，请在这里添加额外的需要编译的包名
   extraBabelCompileNodeModules: [],
-  // 定制antd主题包
+  // 定制主题变量
   themes: themes,
+
+  // 项目导出的共享资源
+  exposes: {},
+  shared: {},
 
   // 自定义<Suspense fallback={<Loading />}> loading组件
   // 布局加载和页面加载公用一个loading
@@ -17,8 +21,4 @@ module.exports = {
   //   layout: './src/layouts/loading',
   //   page: './src/components/loading',
   // },
-
-  // 项目导出的共享资源
-  exposes: {},
-  shared: {},
 }

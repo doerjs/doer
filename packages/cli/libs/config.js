@@ -5,99 +5,92 @@ const file = require('./utils/file')
 const logger = require('./utils/logger')
 const paths = require('./paths')
 
-/**
- * loading配置支持两种模式
- * 1. 页面和布局共用一个loading组件
- *    loading: './src/components/Loading'
- * 2. 页面和布局单独配置loading组件
- *    loading: {
- *      page: './src/components/Loading',
- *      layout: './src/layouts/Loading',
- *    }
- */
-function checkLoading(loading, errors) {
-  if (is.isUndefined(loading)) {
-    return
-  }
+const defaultConfig = {
+  alias: {},
+  extraBabelCompileNodeModules: [],
+  themes: {},
+  exposes: {},
+  shared: {},
+  loading: {},
+}
 
-  if ((!is.isString(loading) && !is.isObject(loading)) || !loading) {
-    errors.push('<loading> 配置格式错误')
-    return
-  }
+function createConfigFactory(rawConfig) {
+  return function (name, check) {
+    const value = rawConfig[name]
 
-  function check(loadingPath) {
-    const loadingFullPath = path.resolve(paths.cliPaths.runtimePath, loadingPath)
-    const realLoadingFullPath = paths.resolveScripts(loadingFullPath)
-    return !!realLoadingFullPath
-  }
+    if (is.isUndefined(value)) {
+      return defaultConfig[name]
+    }
 
-  if (is.isString(loading)) {
-    !check(loading) && errors.push('<loading> 配置的组件地址不存在')
-    return
-  }
+    if (!check(value)) {
+      logger.fail(`无效的配置项[ ${name} ]，请检查.doerrc.js文件中的配置`)
+      process.exit(-1)
+    }
 
-  // loading配置为第二种情况
-  const { page, layout } = loading
-  if (!page) {
-    errors.push('<loading.page> 配置格式错误')
-  }
-
-  if (!layout) {
-    errors.push('<loading.layout> 配置格式错误')
-  }
-
-  if (is.isString(page)) {
-    !check(page) && errors.push('<loading.page> 配置的组件地址不存在')
-  }
-
-  if (is.isString(layout)) {
-    !check(layout) && errors.push('<loading.layout> 配置的组件地址不存在')
+    return value
   }
 }
 
-function validate(rawConfig) {
-  const errors = []
+function resolvePath(filePath, alias) {
+  if (path.isAbsolute(filePath)) {
+    return filePath
+  }
 
-  checkLoading(rawConfig.loading, errors)
+  const aliasName = Object.keys(alias).find((name) => {
+    return filePath.startsWith(name)
+  })
+  let relativeFilePath
+  if (aliasName) {
+    relativeFilePath = filePath.replace(aliasName, '.')
+  }
 
-  return errors.filter(Boolean)
+  return path.resolve(paths.cliPaths.runtimePath, relativeFilePath)
 }
 
-function resolveConfig(rawConfig) {
-  const { loading, ...config } = rawConfig
-
-  if (is.isString(loading)) {
-    config.loading = {
-      page: path.resolve(paths.cliPaths.runtimePath, loading),
-      layout: path.resolve(paths.cliPaths.runtimePath, loading),
+function getLoading(rawConfig, config) {
+  if (is.isString(rawConfig.loading)) {
+    const loadingFilePath = resolvePath(rawConfig.loading, config.alias)
+    return {
+      page: loadingFilePath,
+      layout: loadingFilePath,
     }
   }
 
-  if (is.isObject(loading)) {
-    config.loading = {
-      page: loading.page ? path.resolve(paths.cliPaths.runtimePath, loading.page) : '',
-      layout: loading.layout ? path.resolve(paths.cliPaths.runtimePath, loading.layout) : '',
+  if (is.isObject(rawConfig.loading)) {
+    return {
+      page: is.isString(rawConfig.loading.page) ? resolvePath(rawConfig.loading.page, config.alias) : undefined,
+      layout: is.isString(rawConfig.loading.layout) ? resolvePath(rawConfig.loading.layout, config.alias) : undefined,
     }
   }
+
+  if (is.isUndefined(rawConfig.loading)) {
+    return defaultConfig.loading
+  }
+
+  logger.fail(`无效的配置项[ loading ]，请检查.doerrc.js文件中的配置`)
+  process.exit(-1)
+}
+
+function getConfig() {
+  const hasConfigFile = file.isExist(paths.appPaths.configPath)
+  if (!hasConfigFile) return defaultConfig
+
+  const rawConfig = require(paths.appPaths.configPath)
+  const getConfigValue = createConfigFactory(rawConfig)
+
+  const config = {}
+
+  config.alias = getConfigValue('alias', is.isObject)
+  config.extraBabelCompileNodeModules = getConfigValue('extraBabelCompileNodeModules', is.isArray)
+  config.themes = getConfigValue('themes', is.isObject)
+  config.exposes = getConfigValue('exposes', is.isObject)
+  config.shared = getConfigValue('shared', is.isObject)
+
+  config.loading = getLoading(rawConfig, config)
 
   return config
 }
 
-// 获取app配置信息
-module.exports = function getConfig() {
-  if (!file.isExist(paths.appPaths.configPath)) {
-    return {}
-  }
-
-  const rawConfig = require(paths.appPaths.configPath)
-
-  const errors = validate(rawConfig)
-  if (!errors.length) {
-    return resolveConfig(rawConfig)
-  }
-
-  errors.forEach((error) => {
-    logger.fail(error)
-    process.exit(-1)
-  })
+module.exports = {
+  getConfig,
 }

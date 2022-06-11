@@ -26,7 +26,6 @@ const notFoundTemplate = require('../template/NotFound.ejs')
 const routerTemplate = require('../template/Router.ejs')
 
 const layoutRegex = /\.layout\.(js|jsx)$/
-
 /**
  * {
  *  layoutName: '', 布局组件名称
@@ -48,42 +47,12 @@ function resolveLayout(layoutFile, options) {
   }
 }
 
-// 读取所有的布局
-function readLayouts(options) {
-  if (!file.isExist(options.layoutRootPath) || !file.isDirectory(options.layoutRootPath)) return []
-
-  const readLayoutFiles = file.reduceReaddirFactory((result, filePath) => {
-    if (file.isFile(filePath)) return result
-
-    const files = file.readFiles(filePath, [])
-
-    // 查找布局文件 eg: full.layout.jsx
-    const layoutFile = files.find((item) => {
-      const basename = path.basename(item)
-      return layoutRegex.test(basename)
-    })
-
-    if (layoutFile) {
-      result.push(layoutFile)
-    }
-
-    return result
-  })
-
-  const layoutFiles = readLayoutFiles(options.layoutRootPath, [])
-
-  return layoutFiles.map((layoutFile) => resolveLayout(layoutFile, options))
-}
-
-function isLayoutFile(file, options) {
-  const dirname = path.dirname(path.dirname(file))
+function isLayoutFile(file) {
   const basename = path.basename(file)
-
-  return options.layoutRootPath && dirname === options.layoutRootPath && layoutRegex.test(basename)
+  return layoutRegex.test(basename)
 }
 
 const pageRegex = /\.page\.(js|jsx)$/
-
 /**
  * a.b.c.d.e -> a/b/c/d/e
  * a.$b.c.$d.e -> a/:b/c/:d/e
@@ -148,52 +117,24 @@ function resolvePage(pageFile, options) {
   }
 }
 
-// 读取所有的页面
-function readPages(options) {
-  if (!file.isExist(options.pageRootPath) || !file.isDirectory(options.pageRootPath)) return []
-
-  const readPageFiles = file.reduceReaddirFactory((result, filePath) => {
-    if (file.isFile(filePath)) return result
-
-    const files = file.readFiles(filePath, [])
-
-    // 查找页面文件 eg: index.page.jsx
-    const pageFile = files.find((item) => {
-      const basename = path.basename(item)
-      return pageRegex.test(basename)
-    })
-
-    if (pageFile) {
-      result.push(pageFile)
-    }
-
-    return result
-  })
-
-  const pageFiles = readPageFiles(options.pageRootPath, [])
-
-  return pageFiles.map((pageFile) => resolvePage(pageFile, options))
-}
-
-function isPageFile(file, options) {
-  const dirname = path.dirname(path.dirname(file))
+function isPageFile(file) {
   const basename = path.basename(file)
-
-  return options.pageRootPath && dirname === options.pageRootPath && pageRegex.test(basename)
+  return pageRegex.test(basename)
 }
 
 class DoerWebpackPlugin {
   /**
    * options
    *  appConfig 应用配置信息
-   *  pageRootPath 页面根目录
-   *  layoutRootPath 布局根目录
-   *  globalScriptPath 全局脚本文件
-   *  globalStylePath 全局样式文件
+   *  srcPath 源码目录
    *  outputPath 目标文件输出路径
    */
   constructor(options) {
     this.options = options
+
+    this.globalScriptPath = path.resolve(this.options.srcPath, 'app.js')
+    this.globalStylePath = path.resolve(this.options.srcPath, 'app.less')
+
     this.pages = []
     this.layouts = []
   }
@@ -202,6 +143,8 @@ class DoerWebpackPlugin {
     compiler.hooks.initialize.tap('DoerWebpackPlugin', () => {
       shell.execSync(`rm -rf ${this.options.outputPath}`)
       shell.execSync(`mkdir ${this.options.outputPath}`)
+
+      file.eachFile(this.options.srcPath, (filePath) => this.getFile(filePath))
 
       this.writeGlobal()
       this.writePublicPath()
@@ -219,17 +162,9 @@ class DoerWebpackPlugin {
       this.write('index.js', indexTemplate)
 
       if (process.env.NODE_ENV === 'development') {
-        const watcher = chokidar.watch(
-          [
-            this.options.pageRootPath,
-            this.options.layoutRootPath,
-            this.options.globalScriptPath,
-            this.options.globalStylePath,
-          ],
-          {
-            ignoreInitial: true,
-          },
-        )
+        const watcher = chokidar.watch(this.options.srcPath, {
+          ignoreInitial: true,
+        })
 
         watcher
           .on('change', this.onChange.bind(this))
@@ -245,23 +180,28 @@ class DoerWebpackPlugin {
     return util.formatToPosixPath(path.relative(path.dirname(baseFilePath), filePath))
   }
 
+  getFile(filePath) {
+    if (isPageFile(filePath)) {
+      this.pages.push(resolvePage(filePath, this.options))
+    } else if (isLayoutFile(filePath)) {
+      this.layouts.push(resolveLayout(filePath, this.options))
+    }
+  }
+
   writeGlobal() {
     const globalFileName = 'global.js'
 
-    const isExist = file.isExist(this.options.globalScriptPath)
+    const isExist = file.isExist(this.globalScriptPath)
     const globalData = {
       relativeGlobalScriptPath: isExist
-        ? this.getRelativeWebpackPath(
-            path.resolve(this.options.outputPath, globalFileName),
-            this.options.globalScriptPath,
-          )
+        ? this.getRelativeWebpackPath(path.resolve(this.options.outputPath, globalFileName), this.globalScriptPath)
         : '',
       exports: {},
     }
 
     if (isExist) {
       // 解析文件内容，收集用户自定义的勾子函数
-      const code = file.readFileContent(this.options.globalScriptPath)
+      const code = file.readFileContent(this.globalScriptPath)
       const astTree = babelParser.parse(code, {
         sourceType: 'module',
         plugins: ['jsx'],
@@ -286,21 +226,15 @@ class DoerWebpackPlugin {
       ? this.getRelativeWebpackPath(appFilePath, loading.layout)
       : ''
 
-    // 检测全局样式文件是否存在
-    appData.relativeGlobalStylePath = file.isExist(this.options.globalStylePath)
-      ? this.getRelativeWebpackPath(appFilePath, this.options.globalStylePath)
+    appData.relativeGlobalStylePath = file.isExist(this.globalStylePath)
+      ? this.getRelativeWebpackPath(appFilePath, this.globalStylePath)
       : ''
 
     this.write(appFileName, appTemplate, appData)
   }
 
-  // 初始化项目路由布局
   writeLayouts() {
     shell.execSync(`mkdir ${this.options.outputPath}/layouts`)
-
-    this.layouts = readLayouts(this.options)
-
-    // 输出布局的动态引入文件
     this.layouts.forEach((layout) => {
       this.writeLayout(layout)
     })
@@ -322,15 +256,9 @@ class DoerWebpackPlugin {
     this.write('Layout.jsx', layoutTemplate, { layouts })
   }
 
-  // 初始化项目路由
   writePages() {
     shell.execSync(`mkdir ${this.options.outputPath}/pages`)
-
     this.write('pages/NotFound.jsx', notFoundTemplate)
-
-    this.pages = readPages(this.options)
-
-    // 输出页面的动态引入文件
     this.pages.forEach((page) => {
       this.writePage(page)
     })
@@ -479,51 +407,51 @@ class DoerWebpackPlugin {
 
   onChange(file) {
     // TODO 这里存在问题，当文件清空后重新写入文件时，会报错，需要再更新一下文件才行
-    if (isPageFile(file, this.options)) {
+    if (isPageFile(file)) {
       this.changePage(file)
     }
 
-    if (isLayoutFile(file, this.options)) {
+    if (isLayoutFile(file)) {
       this.changeLayout(file)
     }
 
-    if (file === this.options.globalScriptPath) {
+    if (file === this.globalScriptPath) {
       this.writeGlobal()
     }
   }
 
   onAdd(file) {
-    if (isPageFile(file, this.options)) {
+    if (isPageFile(file)) {
       this.addPage(file)
     }
 
-    if (isLayoutFile(file, this.options)) {
+    if (isLayoutFile(file)) {
       this.addLayout(file)
     }
 
-    if (file === this.options.globalStylePath) {
+    if (file === this.globalStylePath) {
       this.writeApp()
     }
 
-    if (file === this.options.globalScriptPath) {
+    if (file === this.globalScriptPath) {
       this.writeGlobal()
     }
   }
 
   onRemove(file) {
-    if (isPageFile(file, this.options)) {
+    if (isPageFile(file)) {
       this.removePage(file)
     }
 
-    if (isLayoutFile(file, this.options)) {
+    if (isLayoutFile(file)) {
       this.removeLayout(file)
     }
 
-    if (file === this.options.globalStylePath) {
+    if (file === this.globalStylePath) {
       this.writeApp()
     }
 
-    if (file === this.options.globalScriptPath) {
+    if (file === this.globalScriptPath) {
       this.writeGlobal()
     }
   }

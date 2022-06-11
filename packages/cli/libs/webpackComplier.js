@@ -20,7 +20,7 @@ const LogWebpackPlugin = require('./plugins/LogWebpackPlugin')
 const RemoteWebpackPlugin = require('./plugins/RemoteWebpackPlugin')
 
 const paths = require('./paths')
-const env = require('./env')
+const env = require('./env').getEnv(paths)
 const constant = require('./constant')
 const shared = require('./shared')
 
@@ -98,7 +98,7 @@ function createConfig(appConfig) {
       chunkFilename: isProduction ? 'static/js/[name].[contenthash:8].chunk.js' : 'static/js/[name].chunk.js',
       // 资源模块的打包命名规则，如字体图标、图片等
       assetModuleFilename,
-      publicPath: paths.getAppPublicUrlPath(),
+      publicPath: paths.appPaths.getPublicUrlPath(),
       uniqueName: appPackageJson.name,
     },
 
@@ -252,7 +252,7 @@ function createConfig(appConfig) {
       // 提取公共资源路径，用于服务端生成html或者微前端资源注入读取
       new WebpackManifestPlugin({
         fileName: 'manifest.json',
-        publicPath: paths.getAppPublicUrlPath(),
+        publicPath: paths.appPaths.getPublicUrlPath(),
         generate: (seed, files, entryPoints) => {
           const manifestFiles = files.reduce((manifest, file) => {
             manifest[file.name] = file.path
@@ -286,11 +286,8 @@ function createConfig(appConfig) {
       new DoerWebpackPlugin({
         appConfig,
         outputPath: getComplierTempPath(),
-        pageRootPath: path.resolve(paths.appPaths.srcPath, 'pages'),
-        layoutRootPath: path.resolve(paths.appPaths.srcPath, 'layouts'),
-        globalScriptPath: path.resolve(paths.appPaths.srcPath, 'app.js'),
-        globalStylePath: path.resolve(paths.appPaths.srcPath, 'app.less'),
-        publicPath: paths.getRemotePublicUrlPath(),
+        srcPath: paths.appPaths.srcPath,
+        publicPath: paths.appPaths.getRemotePublicUrlPath(),
       }),
       // 支持直接引入远程应用模块
       new RemoteWebpackPlugin({
@@ -319,11 +316,6 @@ function createConfig(appConfig) {
 
 function createCompiler({ appConfig }) {
   const compiler = webpack(createConfig(appConfig))
-
-  compiler.hooks.done.tap('done', async (stats) => {
-    // 编译完成后执行
-  })
-
   return compiler
 }
 
