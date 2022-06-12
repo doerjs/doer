@@ -18,6 +18,8 @@ const globalTemplate = require('../template/global.ejs')
 const historyTemplate = require('../template/history.ejs')
 const helperTemplate = require('../template/helper.ejs')
 const appTemplate = require('../template/App.ejs')
+const errorTemplate = require('../template/Error.ejs')
+const suspenseTemplate = require('../template/Suspense.ejs')
 const layoutTemplate = require('../template/Layout.ejs')
 const dynamicLayoutTemplate = require('../template/dynamicLayout.ejs')
 const dynamicPageTemplate = require('../template/dynamicPage.ejs')
@@ -147,6 +149,8 @@ class DoerWebpackPlugin {
 
       this.writeGlobal()
       this.writePublicPath()
+      this.writeError()
+      this.writeSuspense()
       this.writeTemplate('loader.js', loaderTemplate, {
         remoteFileName: this.options.remoteFileName,
       })
@@ -214,22 +218,43 @@ class DoerWebpackPlugin {
     this.writeTemplate('publicPath.js', publicPathTemplate, { publicPath: this.options.publicPath })
   }
 
+  writeSuspense() {
+    const suspenseFileName = 'Suspense.jsx'
+
+    const suspenseFilePath = path.resolve(this.options.outputPath, suspenseFileName)
+    const { loading = {} } = this.options.appConfig
+    const loadingData = { loading: {} }
+    loadingData.loading.page = file.isExist(loading.page)
+      ? this.getRelativeWebpackPath(suspenseFilePath, loading.page)
+      : ''
+    loadingData.loading.layout = file.isExist(loading.layout)
+      ? this.getRelativeWebpackPath(suspenseFilePath, loading.layout)
+      : ''
+
+    this.writeTemplate(suspenseFileName, suspenseTemplate, loadingData)
+  }
+
+  writeError() {
+    const errorFileName = 'Error.jsx'
+
+    const errorFilePath = path.resolve(this.options.outputPath, errorFileName)
+    const { error = {} } = this.options.appConfig
+    const errorData = { error: {} }
+    errorData.error.page = file.isExist(error.page) ? this.getRelativeWebpackPath(errorFilePath, error.page) : ''
+    errorData.error.layout = file.isExist(error.layout) ? this.getRelativeWebpackPath(errorFilePath, error.layout) : ''
+
+    this.writeTemplate(errorFileName, errorTemplate, errorData)
+  }
+
   writeApp() {
     const appFileName = 'App.jsx'
 
     const appFilePath = path.resolve(this.options.outputPath, appFileName)
-    const { loading = {} } = this.options.appConfig
-    const appData = { loading: {} }
-    appData.loading.page = file.isExist(loading.page) ? this.getRelativeWebpackPath(appFilePath, loading.page) : ''
-    appData.loading.layout = file.isExist(loading.layout)
-      ? this.getRelativeWebpackPath(appFilePath, loading.layout)
-      : ''
-
-    appData.relativeGlobalStylePath = file.isExist(this.globalStylePath)
+    const relativeGlobalStylePath = file.isExist(this.globalStylePath)
       ? this.getRelativeWebpackPath(appFilePath, this.globalStylePath)
       : ''
 
-    this.writeTemplate(appFileName, appTemplate, appData)
+    this.writeTemplate(appFileName, appTemplate, { relativeGlobalStylePath })
   }
 
   writeLayouts() {

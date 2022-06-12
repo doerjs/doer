@@ -21,4 +21,13 @@ module.exports = {
   //   layout: './src/layouts/loading',
   //   page: './src/components/loading',
   // },
+
+  // 自定义边界错误捕获组件
+  // 布局加载和页面加载公用一个error组件
+  // error: './src/components/error'
+  // 或者 分别指定error组件
+  // error: {
+  //   layout: './src/layouts/error',
+  //   page: './src/components/error',
+  // },
 }

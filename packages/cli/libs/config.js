@@ -12,6 +12,7 @@ const defaultConfig = {
   exposes: {},
   shared: {},
   loading: {},
+  error: {},
 }
 
 function createConfigFactory(rawConfig) {
@@ -71,6 +72,30 @@ function getLoading(rawConfig, config) {
   process.exit(-1)
 }
 
+function getError(rawConfig, config) {
+  if (is.isString(rawConfig.error)) {
+    const errorFilePath = resolvePath(rawConfig.error, config.alias)
+    return {
+      page: errorFilePath,
+      layout: errorFilePath,
+    }
+  }
+
+  if (is.isObject(rawConfig.error)) {
+    return {
+      page: is.isString(rawConfig.error.page) ? resolvePath(rawConfig.error.page, config.alias) : undefined,
+      layout: is.isString(rawConfig.error.layout) ? resolvePath(rawConfig.error.layout, config.alias) : undefined,
+    }
+  }
+
+  if (is.isUndefined(rawConfig.error)) {
+    return defaultConfig.error
+  }
+
+  logger.fail(`无效的配置项[ error ]，请检查.doerrc.js文件中的配置`)
+  process.exit(-1)
+}
+
 function getConfig() {
   const hasConfigFile = file.isExist(paths.appPaths.configPath)
   if (!hasConfigFile) return defaultConfig
@@ -87,6 +112,7 @@ function getConfig() {
   config.shared = getConfigValue('shared', is.isObject)
 
   config.loading = getLoading(rawConfig, config)
+  config.error = getError(rawConfig, config)
 
   return config
 }

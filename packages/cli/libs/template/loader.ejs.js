@@ -7,16 +7,16 @@ export function loadModule(scope, module) {
   return async () => {
     await __webpack_init_sharing__('default')
     if (isUndefined(window[scope]) || !isFunction(window[scope].init)) {
-      throw new Error(\`Module \${scope}.\${module} not found\`)
+      throw new Error(\`module \${scope}.\${module} not found\`)
     }
     await window[scope].init(__webpack_share_scopes__.default)
     if (!isFunction(window[scope].get)) {
-      throw new Error(\`Module \${scope}.\${module} not found\`)
+      throw new Error(\`module \${scope}.\${module} not found\`)
     }
     const Module = await window[scope].get(module)
 
     if (isUndefined(Module)) {
-      throw new Error(\`Module \${scope}.\${module} not found\`)
+      throw new Error(\`module \${scope}.\${module} not found\`)
     }
     return Module()
   }
@@ -55,7 +55,7 @@ async function loadScopeScript(scope) {
 
   let scopeRemoteUrl = window.__doer_remotes__[scope]
   if (!scopeRemoteUrl) {
-    throw new Error(\`Application \${scope} not register\`)
+    throw new Error(\`application \${scope} not register\`)
   }
 
   if (scopeRemoteUrl.endsWith('/')) {

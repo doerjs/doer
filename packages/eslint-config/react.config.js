@@ -11,6 +11,7 @@ module.exports = {
     'react/jsx-no-duplicate-props': 'warn',
     'react/jsx-no-target-blank': 'warn',
     'react/jsx-no-undef': 'error',
+    'react/no-multi-comp': 'error',
     'react/jsx-pascal-case': [
       'warn',
       {

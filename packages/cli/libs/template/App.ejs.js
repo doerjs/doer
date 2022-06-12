@@ -1,5 +1,5 @@
 module.exports = `
-import React, { Suspense, useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { unstable_HistoryRouter as HistoryRouter } from 'react-router-dom'
 
 import history, { useHistoryChange } from './history'
@@ -9,13 +9,9 @@ import { enter, leave } from './global'
 
 import Layout, { getLayoutName } from './Layout'
 import Router from './Router'
+import Error from './Error'
+import Suspense from './Suspense'
 
-<% if (loading.layout) { %>
-import LayoutLoading from '<%= loading.layout %>'
-<% } %>
-<% if (loading.page) { %>
-import PageLoading from '<%= loading.page %>'
-<% } %>
 <% if (relativeGlobalStylePath) { %>
 import '<%= relativeGlobalStylePath %>'
 <% } %>
@@ -45,13 +41,6 @@ async function loadAppLifeCycle(appName) {
 
   const lifeCycle = await loadScopeModule(appName, './$$app')
   return lifeCycle
-}
-
-async function loadApp(appName) {
-  const lifeCycle = await loadAppLifeCycle(appName)
-  const AppRouter = await loadAppRouter(appName)
-
-  return { AppRouter, lifeCycle }
 }
 
 async function callLifeCycle(appName, name, params) {
@@ -104,7 +93,6 @@ function useAppRouter() {
   return [state, load]
 }
 
-// TODO 渲染应用加载失败的样式, 页面组件加载失败时候的样式
 export default function App({ location }) {
   const [{ basename, status, AppRouter }, load] = useAppRouter()
 
@@ -117,17 +105,21 @@ export default function App({ location }) {
   })
 
   return (
-    <Suspense fallback={<% if (loading.layout) { %><LayoutLoading /><% } else { %><div>loading</div><% } %>}>
-      <Layout>
-        {status === 'loading' ? <% if (loading.page) { %><PageLoading /><% } else { %><div>loading</div><% } %> : (
-          <HistoryRouter basename={basename} history={history}>
-            <Suspense fallback={<% if (loading.page) { %><PageLoading /><% } else { %><div>loading</div><% } %>}>
-              <AppRouter />
+    <Error>
+      <Suspense>
+        <Layout>
+          <Error mode="page">
+            <Suspense mode="page">
+              {status === 'loading' ? AppRouter && <AppRouter /> : (
+                <HistoryRouter basename={basename} history={history}>
+                  {status === 'succeed' && AppRouter ? <AppRouter /> : <Router />}
+                </HistoryRouter>
+              )}
             </Suspense>
-          </HistoryRouter>
-        )}
-      </Layout>
-    </Suspense>
+          </Error>
+        </Layout>
+      </Suspense>
+    </Error>
   )
 }
 `
