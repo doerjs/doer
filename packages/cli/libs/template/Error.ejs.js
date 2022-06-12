@@ -8,10 +8,14 @@ import LayoutError from '<%= error.layout %>'
 import PageError from '<%= error.page %>'
 <% } %>
 
+function DefaultError({ error, errorInfo }) {
+  return <div>{error && error.toString()}</div>
+}
+
 export default class Error extends React.PureComponent {
   constructor(props) {
     super(props)
-    this.state = { error: false, errorInfo: null }
+    this.state = { error: null, errorInfo: null }
   }
 
   componentDidCatch(error, errorInfo) {
@@ -19,9 +23,9 @@ export default class Error extends React.PureComponent {
   }
 
   render() {
-    let error = <% if (error.layout) { %><LayoutError error={this.state.error} errorInfo={this.state.errorInfo} /><% } else { %><div>Error</div><% } %>
+    let error = <% if (error.layout) { %><LayoutError error={this.state.error} errorInfo={this.state.errorInfo} /><% } else { %><DefaultError error={this.state.error} errorInfo={this.state.errorInfo} /><% } %>
     if (this.props.mode === 'page') {
-      error = <% if (error.page) { %><PageError error={this.state.error} errorInfo={this.state.errorInfo} /><% } else { %><div>Error</div><% } %>
+      error = <% if (error.page) { %><PageError error={this.state.error} errorInfo={this.state.errorInfo} /><% } else { %><DefaultError error={this.state.error} errorInfo={this.state.errorInfo} /><% } %>
     }
 
     if (this.state.error) {
