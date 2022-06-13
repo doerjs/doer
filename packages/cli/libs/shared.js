@@ -10,6 +10,7 @@ module.exports = {
     strictVersion: true,
   },
   'react-router-dom': {
+    singleton: true,
     requiredVersion: '^6.3.0',
     strictVersion: true,
   },

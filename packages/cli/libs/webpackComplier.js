@@ -177,7 +177,7 @@ function createConfig(appConfig) {
         ...appConfig.alias,
       },
       symlinks: true,
-      modules: [paths.cliPaths.nodeModulesPath, paths.appPaths.nodeModulesPath],
+      modules: ['node_modules'],
       // 自动解析的扩展名
       extensions: ['.js', '.jsx', '.json'],
     },

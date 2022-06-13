@@ -1,3 +1,3 @@
 module.exports = {
-  extends: './packages/eslint-config/cli.config.js',
+  extends: ['@doerjs/eslint-config', 'plugin:prettier/recommended'],
 }
