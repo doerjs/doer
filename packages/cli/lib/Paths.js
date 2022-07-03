@@ -22,7 +22,6 @@ function getAppPaths(cliPaths) {
     entryPath: path.resolve(tempComplierPath, 'index.js'),
     configPath: path.resolve(cliPaths.runtimePath, '.doerrc.js'),
     srcPath,
-    mockPath: path.resolve(cliPaths.runtimePath, 'mocks'),
     buildPath: path.resolve(cliPaths.runtimePath, 'dist'),
     packageJsonPath: path.resolve(cliPaths.runtimePath, 'package.json'),
     publicDirectory,
@@ -46,11 +45,7 @@ Paths.prototype.parsePublicUrlPath = function () {
     publicUrlPath = process.env.PUBLIC_URL
   }
 
-  if (publicUrlPath) {
-    this.appPaths.publicUrlPath = publicUrlPath.endsWith('/') ? publicUrlPath : publicUrlPath + '/'
-  } else {
-    this.appPaths.publicUrlPath = '/'
-  }
+  this.appPaths.publicUrlPath = publicUrlPath.endsWith('/') ? publicUrlPath : publicUrlPath + '/'
 }
 
 Paths.prototype.resolveAliasRelativePath = function (filePath, alias) {

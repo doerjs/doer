@@ -6,7 +6,7 @@ const chalk = require('chalk')
 const WebpackDevServer = require('webpack-dev-server')
 
 function getHttpsConfig(option) {
-  if (!process.env.HTTPS) return false
+  if (process.env.HTTPS !== 'true') return false
 
   const { HTTPS_KEY, HTTPS_CERT } = process.env
   if (process.env.HTTPS_CERT && process.env.HTTPS_KEY) {

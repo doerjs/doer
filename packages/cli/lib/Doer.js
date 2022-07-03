@@ -17,21 +17,20 @@ function Doer() {
   this.server = null
 }
 
-Doer.prototype.run = async function () {
+Doer.prototype.init = async function () {
   this.env.parseFile()
-  this.plugin.hooks.env.call()
-
   // 环境变量解析依赖于publicUrlPath
   this.paths.parsePublicUrlPath()
   this.env.parseEnv()
-  this.plugin.hooks.afterEnv.call(this.env)
-
   this.config.parseFile()
-  this.plugin.hooks.config.call(this.config)
   this.config.parseConfig()
-  this.plugin.hooks.afterConfig.call(this.config)
 
   await this.runPlugins()
+
+  this.plugin.hooks.environment.call(this)
+}
+
+Doer.prototype.run = async function () {
   await this.runComplier()
 }
 

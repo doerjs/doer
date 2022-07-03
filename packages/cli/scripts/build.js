@@ -1,11 +1,14 @@
 'use strict'
 
 process.env.NODE_ENV = 'production'
-process.env.ENV = 'prod'
+if (!process.env.ENV) {
+  process.env.ENV = 'prod'
+}
 
 const Doer = require('../lib/Doer')
 
 module.exports = async function build() {
   const doer = new Doer()
+  await doer.init()
   await doer.run()
 }

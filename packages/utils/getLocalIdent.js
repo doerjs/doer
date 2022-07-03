@@ -1,3 +1,5 @@
+'use strict'
+
 const path = require('node:path')
 const loaderUtils = require('loader-utils')
 

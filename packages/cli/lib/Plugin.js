@@ -6,15 +6,12 @@ const createStyle = require('./style')
 
 function Plugin() {
   this.hooks = {
-    env: new SyncHook(),
-    afterEnv: new SyncHook(['env']),
-    config: new SyncHook(),
-    afterConfig: new SyncHook(['config']),
-
     plugins: new AsyncSeriesHook(['plugin']),
     plugin: new SyncHook(['option', 'plugin']),
     afterPlugin: new SyncHook(['option', 'plugin']),
     afterPlugins: new AsyncSeriesHook(['plugin']),
+
+    environment: new SyncHook(['doer']),
 
     complier: new SyncHook([]),
     afterComplier: new SyncHook(['complier']),
