@@ -3,15 +3,16 @@
 
 const minimist = require('minimist')
 const chalk = require('chalk')
-const logger = require('../libs/utils/logger')
-const print = require('../libs/print')
+const logger = require('@doerjs/utils/logger')
+
+const helper = require('../lib/helper')
 
 process.on('unhandledRejection', (err) => {
   throw err
 })
 
-print.logo()
-print.version()
+helper.logo()
+helper.version()
 
 const argv = minimist(process.argv.slice(2), {
   string: [],
@@ -31,7 +32,7 @@ if (!command) {
   if (argv.version) {
     // no action
   } else {
-    print.help()
+    helper.help()
   }
 
   process.exit(-1)

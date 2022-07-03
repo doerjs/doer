@@ -31,7 +31,6 @@ function Webpack(option) {
   this.paths = option.paths
   this.plugin = option.plugin
   this.config = option.config
-  this.helper = option.helper
 
   this.webpackComplier = null
 
@@ -189,7 +188,7 @@ Webpack.prototype.plugins = function ({ isProduction, isEnableGzip, isEnableAnal
     },
   ])
 
-  this.webpackChain.plugin('log').use(LogWebpackPlugin, [{ helper: this.helper }])
+  this.webpackChain.plugin('log').use(LogWebpackPlugin)
 
   isEnableGzip && this.webpackChain.plugin('compression').use(CompressionWebpackPlugin)
 

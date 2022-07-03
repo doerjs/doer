@@ -3,16 +3,14 @@
 const figlet = require('figlet')
 const chalk = require('chalk')
 
-function Helper(option) {
-  this.paths = option.paths
-}
+const cliBasePaths = require('./cliBasePaths')
 
-Helper.prototype.logo = function () {
+function logo() {
   console.log(figlet.textSync('Doer', 'Ghost'))
 }
 
-Helper.prototype.version = function () {
-  const packageInfo = require(this.paths.cliPaths.packageJsonPath)
+function version() {
+  const packageInfo = require(cliBasePaths.packageJsonPath)
 
   if (packageInfo.version) {
     console.log(`👣 Doer v${packageInfo.version}`)
@@ -23,8 +21,8 @@ Helper.prototype.version = function () {
   console.log()
 }
 
-Helper.prototype.name = function () {
-  const packageInfo = require(this.paths.appPaths.packageJsonPath)
+function name() {
+  const packageInfo = require(cliBasePaths.appPackageJsonPath)
 
   if (packageInfo.name) {
     console.log(`👣 应用名称：${chalk.blue(chalk.bold(packageInfo.name))}`)
@@ -32,7 +30,7 @@ Helper.prototype.name = function () {
   }
 }
 
-Helper.prototype.help = function () {
+function help() {
   console.log('👣 用法: doer <命令> [选项]')
   console.log()
   console.log('👣 选项:')
@@ -46,4 +44,9 @@ Helper.prototype.help = function () {
   console.log()
 }
 
-module.exports = Helper
+module.exports = {
+  logo,
+  version,
+  name,
+  help,
+}

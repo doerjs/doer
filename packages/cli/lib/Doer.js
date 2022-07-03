@@ -4,7 +4,6 @@ const Paths = require('./Paths')
 const Plugin = require('./Plugin')
 const Env = require('./Env')
 const Config = require('./Config')
-const Helper = require('./Helper')
 const Webpack = require('./Webpack')
 const WebpackServer = require('./WebpackServer')
 
@@ -13,7 +12,6 @@ function Doer() {
   this.paths = new Paths()
   this.env = new Env({ paths: this.paths })
   this.config = new Config({ paths: this.paths })
-  this.helper = new Helper({ paths: this.paths })
 
   this.complier = null
   this.server = null
@@ -61,7 +59,6 @@ Doer.prototype.runComplier = async function () {
     paths: this.paths,
     config: this.config,
     plugin: this.plugin,
-    helper: this.helper,
   })
 
   await this.complier.run()
@@ -75,7 +72,6 @@ Doer.prototype.runServer = async function () {
     paths: this.paths,
     config: this.config,
     plugin: this.plugin,
-    helper: this.helper,
     complier: this.complier,
   })
 

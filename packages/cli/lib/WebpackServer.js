@@ -39,7 +39,6 @@ function WebpackServer(option) {
   this.paths = option.paths
   this.plugin = option.plugin
   this.config = option.config
-  this.helper = option.helper
   this.complier = option.complier
 
   this.webpackServer = null

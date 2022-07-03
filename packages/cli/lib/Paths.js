@@ -3,17 +3,10 @@
 const path = require('node:path')
 const file = require('@doerjs/utils/file')
 
-function getCliPaths() {
-  const runtimePath = process.cwd()
-  const rootPath = path.resolve(__dirname, '../')
+const cliBasePaths = require('./cliBasePaths')
 
-  return {
-    runtimePath,
-    rootPath,
-    packageJsonPath: path.resolve(rootPath, 'package.json'),
-    templatePath: path.resolve(rootPath, 'template'),
-    nodeModulesPath: path.resolve(rootPath, 'node_modules'),
-  }
+function getCliPaths() {
+  return cliBasePaths
 }
 
 function getAppPaths(cliPaths) {

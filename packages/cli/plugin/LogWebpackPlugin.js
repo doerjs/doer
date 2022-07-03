@@ -5,13 +5,14 @@ const chalk = require('chalk')
 const ProgressWebpackPlugin = require('webpackbar')
 const logger = require('@doerjs/utils/logger')
 
+const helper = require('../lib/helper')
+
 function clearConsole() {
   process.stdout.write(process.platform === 'win32' ? '\x1B[2J\x1B[0f' : '\x1B[2J\x1B[3J\x1B[H')
 }
 
 class LoggerWebpackPlugin {
   constructor(option) {
-    this.helper = option.helper
     this.spinning = ora()
     this.progressWebpackPlugin = new ProgressWebpackPlugin({
       name: 'Doer',
@@ -22,9 +23,9 @@ class LoggerWebpackPlugin {
         },
         afterAllDone: () => {
           clearConsole()
-          this.helper.logo()
-          this.helper.version()
-          this.helper.name()
+          helper.logo()
+          helper.version()
+          helper.name()
         },
       },
     })
