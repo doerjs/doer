@@ -3,30 +3,28 @@
 const ora = require('ora')
 const chalk = require('chalk')
 const ProgressWebpackPlugin = require('webpackbar')
-
-const logger = require('../utils/logger')
-const print = require('../print')
-const constant = require('../constant')
+const logger = require('@doerjs/utils/logger')
 
 function clearConsole() {
   process.stdout.write(process.platform === 'win32' ? '\x1B[2J\x1B[0f' : '\x1B[2J\x1B[3J\x1B[H')
 }
 
 class LoggerWebpackPlugin {
-  constructor() {
+  constructor(option) {
+    this.helper = option.helper
     this.spinning = ora()
     this.progressWebpackPlugin = new ProgressWebpackPlugin({
-      name: constant.NAME,
-      color: constant.PRIMARY_COLOR,
+      name: 'Doer',
+      color: '#08979c',
       reporter: {
         start: () => {
           this.spinning.stop()
         },
         afterAllDone: () => {
           clearConsole()
-          print.logo()
-          print.version()
-          print.name()
+          this.helper.logo()
+          this.helper.version()
+          this.helper.name()
         },
       },
     })

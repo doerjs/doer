@@ -5,12 +5,13 @@
   "author": "FaureWu <502556093@qq.com>",
   "license": "MIT",
   "main": "index.js",
-  "files": [
-    "index.js",
-    "is.js"
-  ],
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "a6e855666cc17c4982c247f2295d142a48345439"
+  "gitHead": "a6e855666cc17c4982c247f2295d142a48345439",
+  "dependencies": {
+    "chalk": "4.1.2",
+    "dayjs": "^1.11.3",
+    "loader-utils": "^3.2.0"
+  }
 }

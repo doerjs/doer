@@ -5,6 +5,7 @@
     "bootstrap": "lerna bootstrap",
     "publish": "lerna publish --force-publish",
     "clean": "lerna clean",
+    "link": "lerna link --force-local",
     "lint": "eslint --ext .js,.jsx,.mjs ./"
   },
   "lint-staged": {

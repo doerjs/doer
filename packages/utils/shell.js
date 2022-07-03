@@ -1,7 +1,7 @@
 'use strict'
 
-const childProcess = require('child_process')
-const util = require('util')
+const childProcess = require('node:child_process')
+const util = require('node:util')
 
 module.exports = {
   execSync: childProcess.execSync,

@@ -6,6 +6,10 @@ const chalk = require('chalk')
 const logger = require('../libs/utils/logger')
 const print = require('../libs/print')
 
+process.on('unhandledRejection', (err) => {
+  throw err
+})
+
 print.logo()
 print.version()
 

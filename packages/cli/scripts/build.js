@@ -2,20 +2,10 @@
 
 process.env.NODE_ENV = 'production'
 process.env.ENV = 'prod'
-require('../libs/env').parseEnv()
 
-const { createCompiler } = require('../libs/webpackComplier')
-const { getConfig } = require('../libs/config')
+const Doer = require('../lib/Doer')
 
-process.on('unhandledRejection', (err) => {
-  throw err
-})
-
-module.exports = function build() {
-  const appConfig = getConfig()
-
-  const compiler = createCompiler({
-    appConfig,
-  })
-  compiler.run()
+module.exports = async function build() {
+  const doer = new Doer()
+  await doer.run()
 }

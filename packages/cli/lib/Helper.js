@@ -1,34 +1,38 @@
+'use strict'
+
 const figlet = require('figlet')
 const chalk = require('chalk')
 
-const constant = require('./constant')
-const paths = require('./paths')
-
-function logo() {
-  console.log(figlet.textSync(constant.NAME, 'Ghost'))
+function Helper(option) {
+  this.paths = option.paths
 }
 
-function version() {
-  const version = require(paths.cliPaths.packageJsonPath).version
+Helper.prototype.logo = function () {
+  console.log(figlet.textSync('Doer', 'Ghost'))
+}
 
-  if (version) {
-    console.log(`👣 Doer v${version}`)
+Helper.prototype.version = function () {
+  const packageInfo = require(this.paths.cliPaths.packageJsonPath)
+
+  if (packageInfo.version) {
+    console.log(`👣 Doer v${packageInfo.version}`)
   } else {
     console.log('👣 Doer Unknown Version')
   }
+
   console.log()
 }
 
-function name() {
-  const name = require(paths.appPaths.packageJsonPath).name
+Helper.prototype.name = function () {
+  const packageInfo = require(this.paths.appPaths.packageJsonPath)
 
-  if (name) {
-    console.log(`👣 应用名称：${chalk.blue(chalk.bold(name))}`)
+  if (packageInfo.name) {
+    console.log(`👣 应用名称：${chalk.blue(chalk.bold(packageInfo.name))}`)
     console.log()
   }
 }
 
-function help() {
+Helper.prototype.help = function () {
   console.log('👣 用法: doer <命令> [选项]')
   console.log()
   console.log('👣 选项:')
@@ -42,9 +46,4 @@ function help() {
   console.log()
 }
 
-module.exports = {
-  logo,
-  version,
-  help,
-  name,
-}
+module.exports = Helper

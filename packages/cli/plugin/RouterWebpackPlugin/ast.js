@@ -1,3 +1,5 @@
+'use strict'
+
 const is = require('@doerjs/utils/is')
 
 function parseSpecifier(node) {

@@ -11,16 +11,16 @@ function escapeStringRegexp(string) {
 }
 
 class ReplaceHtmlEnvWebpackPlugin {
-  constructor(htmlWebpackPlugin, replacements) {
-    this.htmlWebpackPlugin = htmlWebpackPlugin
-    this.replacements = replacements
+  constructor({ HtmlWebpackPlugin, env }) {
+    this.HtmlWebpackPlugin = HtmlWebpackPlugin
+    this.env = env
   }
 
   apply(compiler) {
     compiler.hooks.compilation.tap('ReplaceHtmlEnvWebpackPlugin', (compilation) => {
-      this.htmlWebpackPlugin.getHooks(compilation).afterTemplateExecution.tap('ReplaceHtmlEnvWebpackPlugin', (data) => {
-        Object.keys(this.replacements).forEach((key) => {
-          const value = this.replacements[key]
+      this.HtmlWebpackPlugin.getHooks(compilation).afterTemplateExecution.tap('ReplaceHtmlEnvWebpackPlugin', (data) => {
+        Object.keys(this.env).forEach((key) => {
+          const value = this.env[key]
           data.html = data.html.replace(new RegExp('%' + escapeStringRegexp(key) + '%', 'g'), value)
         })
       })

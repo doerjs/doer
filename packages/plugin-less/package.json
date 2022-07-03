@@ -1,0 +1,12 @@
+{
+  "name": "@doerjs/plugin-less",
+  "version": "0.0.3-alpha.1",
+  "description": "",
+  "author": "FaureWu <502556093@qq.com>",
+  "license": "MIT",
+  "main": "index.js",
+  "dependencies": {
+    "less": "^4.1.3",
+    "less-loader": "^11.0.0"
+  }
+}
