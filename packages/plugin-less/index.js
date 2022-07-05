@@ -1,29 +1,39 @@
 module.exports = function (plugin, option) {
   plugin.hooks.webpack.tap('Less', (webpackChain) => {
-    plugin.style(webpackChain, {
+    plugin.registerStyleLoader(webpackChain, {
       name: 'less',
       test: /\.less$/,
       exclude: [/\.module\.less$/],
-      loader: require.resolve('less-loader'),
-      options: {
-        sourceMap: true,
-        lessOptions: {
-          javascriptEnabled: true,
+      loaders: [
+        {
+          name: 'less',
+          loader: require.resolve('less-loader'),
+          options: {
+            sourceMap: true,
+            lessOptions: {
+              javascriptEnabled: true,
+            },
+          },
         },
-      },
+      ],
     })
 
-    plugin.style(webpackChain, {
+    plugin.registerStyleLoader(webpackChain, {
       name: 'lessModule',
       test: /\.module\.less$/,
-      loader: require.resolve('less-loader'),
       cssModule: true,
-      options: {
-        sourceMap: true,
-        lessOptions: {
-          javascriptEnabled: true,
+      loaders: [
+        {
+          name: 'less',
+          loader: require.resolve('less-loader'),
+          options: {
+            sourceMap: true,
+            lessOptions: {
+              javascriptEnabled: true,
+            },
+          },
         },
-      },
+      ],
     })
   })
 }

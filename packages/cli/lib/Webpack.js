@@ -82,15 +82,11 @@ Webpack.prototype.output = function ({ isProduction }) {
 }
 
 Webpack.prototype.resolve = function ({ isEnableProfiler }) {
-  this.webpackChain.resolve
-    .symlinks(true)
-    .modules.add('node_modules')
-    .end()
+  this.webpackChain.resolve.symlinks(true)
 
-    .extensions.add('.js')
-    .add('.jsx')
-    .add('.json')
-    .end()
+  this.webpackChain.resolve.modules.add('node_modules').end()
+
+  this.webpackChain.resolve.extensions.add('.js').add('.jsx').add('.json').end()
 
   this.webpackChain.when(isEnableProfiler, (config) => {
     config.resolve.alias
@@ -108,16 +104,13 @@ Webpack.prototype.module = function (option) {
   // 将缺失的导出提示成错误而不是警告
   this.webpackChain.module.strictExportPresence(true)
 
-  this.webpackChain.module
+  const sourceMapRule = this.webpackChain.module
     .rule('sourceMap')
     .test([/\.js$/, /\.jsx$/, /\.css$/])
     .enforce('pre')
-    .exclude.add(/@babel(?:\/|\\{1,2})runtime/)
-    .end()
-    .use('sourceMap')
-    .loader(require.resolve('source-map-loader'))
-    .end()
-    .end()
+  sourceMapRule.exclude.add(/@babel(?:\/|\\{1,2})runtime/).end()
+  sourceMapRule.use('sourceMap').loader(require.resolve('source-map-loader')).end()
+  sourceMapRule.end()
 
   this.webpackChain.module
     .rule('image')

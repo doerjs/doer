@@ -1,10 +1,9 @@
 'use strict'
 
 module.exports = function svgLoader(webpack, option) {
-  webpack.webpackChain.module
-    .rule('svg')
-    .test(/\.svg$/)
+  const svgRule = webpack.webpackChain.module.rule('svg').test(/\.svg$/)
 
+  svgRule
     .use('svgr')
     .loader(require.resolve('@svgr/webpack'))
     .options({
@@ -18,6 +17,7 @@ module.exports = function svgLoader(webpack, option) {
     })
     .end()
 
+  svgRule
     .use('resource')
     .loader(require.resolve('file-loader'))
     .options({
@@ -25,5 +25,5 @@ module.exports = function svgLoader(webpack, option) {
     })
     .end()
 
-    .end()
+  svgRule.end()
 }

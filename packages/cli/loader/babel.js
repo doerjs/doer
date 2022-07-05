@@ -1,13 +1,10 @@
 'use strict'
 
 module.exports = function jsLoader(webpack, option) {
-  webpack.webpackChain.module
-    .rule('babel')
-    .test([/\.js$/, /\.jsx$/])
-    .include.add(webpack.paths.appPaths.srcPath)
-    .merge(webpack.config.config.extraBabelCompileNodeModules)
-    .end()
+  const babelRule = webpack.webpackChain.module.rule('babel').test([/\.js$/, /\.jsx$/])
+  babelRule.include.add(webpack.paths.appPaths.srcPath).merge(webpack.config.config.extraBabelCompileNodeModules).end()
 
+  babelRule
     .use('babel')
     .loader(require.resolve('babel-loader'))
     .options({
@@ -41,5 +38,5 @@ module.exports = function jsLoader(webpack, option) {
     })
     .end()
 
-    .end()
+  babelRule.end()
 }

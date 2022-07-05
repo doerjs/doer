@@ -2,7 +2,7 @@
 
 const { SyncHook, /* AsyncParallelHook, */ AsyncSeriesHook } = require('tapable')
 
-const createStyle = require('./style')
+const registerStyleLoader = require('./style')
 
 function Plugin() {
   this.hooks = {
@@ -23,8 +23,8 @@ function Plugin() {
   }
 }
 
-Plugin.prototype.style = function (webpackChain, option) {
-  createStyle(webpackChain, option)
+Plugin.prototype.registerStyleLoader = function (webpackChain, option) {
+  registerStyleLoader(webpackChain, option)
 }
 
 module.exports = Plugin

@@ -2,26 +2,26 @@
 
 const MiniCssExtractWebpackPlugin = require('mini-css-extract-plugin')
 const getLocalIdent = require('@doerjs/utils/getLocalIdent')
+const is = require('@doerjs/utils/is')
 
 module.exports = function (webpackChain, option) {
-  const chain = webpackChain.module.rule(option.name).test(option.test)
+  const styleRule = webpackChain.module.rule(option.name).test(option.test).sideEffects(true)
 
   if (option.include) {
     option.include.forEach((data) => {
-      chain.include.add(data)
+      styleRule.include.add(data)
     })
-    chain.end()
+    styleRule.end()
   }
 
   if (option.exclude) {
     option.exclude.forEach((data) => {
-      chain.exclude.add(data)
+      styleRule.exclude.add(data)
     })
-    chain.end()
+    styleRule.end()
   }
 
-  chain.sideEffects(true)
-  chain.use('miniCssExtract').loader(MiniCssExtractWebpackPlugin.loader).end()
+  styleRule.use('miniCssExtract').loader(MiniCssExtractWebpackPlugin.loader).end()
 
   const cssOptions = {
     importLoaders: 2,
@@ -32,9 +32,9 @@ module.exports = function (webpackChain, option) {
       getLocalIdent,
     }
   }
-  chain.use('css').loader(require.resolve('css-loader')).options(cssOptions).end()
+  styleRule.use('css').loader(require.resolve('css-loader')).options(cssOptions).end()
 
-  chain
+  styleRule
     .use('postcss')
     .loader(require.resolve('postcss-loader'))
     .options({
@@ -59,7 +59,11 @@ module.exports = function (webpackChain, option) {
     })
     .end()
 
-  chain.use('pre').loader(option.loader).options(option.options)
+  if (is.isArray(option.loaders)) {
+    option.loaders.forEach((item) => {
+      styleRule.use(item.name).loader(item.loader).options(item.options).end()
+    })
+  }
 
-  chain.end()
+  styleRule.end()
 }
