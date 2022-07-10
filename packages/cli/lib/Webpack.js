@@ -193,6 +193,7 @@ Webpack.prototype.plugins = function ({ isProduction, isEnableGzip, isEnableAnal
   const remoteFileName = 'remote.js'
   this.webpackChain.plugin('router').use(RouterWebpackPlugin, [
     {
+      appPackage,
       appConfig: this.config.config,
       outputPath: this.paths.appPaths.tempComplierPath,
       srcPath: this.paths.appPaths.srcPath,

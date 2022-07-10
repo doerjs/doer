@@ -25,6 +25,8 @@ const dynamicLayoutTemplate = require('./template/dynamicLayout.ejs')
 const dynamicPageTemplate = require('./template/dynamicPage.ejs')
 const notFoundTemplate = require('./template/NotFound.ejs')
 const routerTemplate = require('./template/Router.ejs')
+const debugTemplate = require('./template/Debug.ejs')
+const debugStyleTemplate = require('./template/Debug.module.css')
 
 const layoutRegex = /\.layout\.(js|jsx)$/
 /**
@@ -157,12 +159,18 @@ class DoerWebpackPlugin {
       this.writeFile('bootstrap.js', bootstrapTemplate)
       this.writeFile('history.js', historyTemplate)
       this.writeFile('helper.js', helperTemplate)
+      this.writeTemplate('Debug.jsx', debugTemplate, {
+        appName: this.options.appPackage.name,
+      })
+      this.writeFile('Debug.module.css', debugStyleTemplate)
       this.writeLayouts()
       this.writeLayoutContainer()
       this.writeApp()
       this.writePages()
       this.writeRouter()
-      this.writeFile('index.js', indexTemplate)
+      this.writeTemplate('index.js', indexTemplate, {
+        appName: this.options.appPackage.name,
+      })
 
       if (process.env.NODE_ENV === 'development') {
         const watcher = chokidar.watch(this.options.srcPath, {

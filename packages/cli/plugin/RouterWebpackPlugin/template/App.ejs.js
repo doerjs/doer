@@ -4,13 +4,14 @@ import { unstable_HistoryRouter as HistoryRouter } from 'react-router-dom'
 
 import history, { useHistoryChange } from './history'
 import { loadScopeComponent, loadScopeModule } from './loader'
-import { isFunction, isUndefined } from './helper'
+import { isFunction, isUndefined, isDebug, isEnableEditDebug } from './helper'
 import { enter, leave } from './global'
 
 import Layout, { getLayoutName } from './Layout'
 import Router from './Router'
 import Error from './Error'
 import Suspense from './Suspense'
+import Debug from './Debug'
 
 <% if (relativeGlobalStylePath) { %>
 import '<%= relativeGlobalStylePath %>'
@@ -107,6 +108,7 @@ export default function App({ location }) {
   return (
     <Error>
       <Suspense>
+        {(isEnableEditDebug() || isDebug()) && <Debug />}
         <Layout>
           <Error mode="page">
             <Suspense mode="page">

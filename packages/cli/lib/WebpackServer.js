@@ -53,7 +53,7 @@ WebpackServer.prototype.run = async function () {
     port: process.env.PORT,
     open: false,
     hot: false,
-    liveReload: false,
+    liveReload: true,
     compress: true,
     headers: {
       'Access-Control-Allow-Origin': '*',
