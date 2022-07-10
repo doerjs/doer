@@ -1,0 +1,15 @@
+{
+  "name": "@doerjs/plugin-typescript",
+  "version": "0.0.4-alpha.4",
+  "description": "",
+  "author": "FaureWu <502556093@qq.com>",
+  "license": "MIT",
+  "main": "index.js",
+  "dependencies": {
+    "@babel/preset-typescript": "^7.18.6"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "48f866d2b60e7aaef55c97131fb21bec7a1bc308"
+}

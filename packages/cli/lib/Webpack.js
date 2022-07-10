@@ -69,6 +69,7 @@ Webpack.prototype.run = async function () {
     level: 'none',
   }
 
+  await this.plugin.hooks.webpackConfig.promise(webpackConfig)
   this.webpackComplier = webpack(webpackConfig)
 }
 
