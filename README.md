@@ -6,8 +6,6 @@
 TODO
 
 [ ] 支持browser history
-[ ] ts支持在创建的时候选择对应选项
-[ ] less支持创建的时候选择对应选项
 [ ] debug为空的场景
 
 ## 特点
