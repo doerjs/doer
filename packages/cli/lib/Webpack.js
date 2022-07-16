@@ -79,10 +79,12 @@ Webpack.prototype.output = function ({ isProduction }) {
     .pathinfo(isProduction)
     .filename(isProduction ? 'static/js/[name].[contenthash:8].js' : 'static/js/main.js')
     .chunkFilename(isProduction ? 'static/js/[name].[contenthash:8].chunk.js' : 'static/js/[name].chunk.js')
-    .publicPath(this.paths.appPaths.publicUrlPath)
+    .publicPath(process.env.PUBLIC_URL)
 }
 
 Webpack.prototype.resolve = function ({ isEnableProfiler }) {
+  this.webpackChain.context(this.paths.cliPaths.runtimePath)
+
   this.webpackChain.resolve.symlinks(true)
 
   this.webpackChain.resolve.modules.add('node_modules').end()
@@ -93,12 +95,15 @@ Webpack.prototype.resolve = function ({ isEnableProfiler }) {
     config.resolve.alias
       .set('react-dom$', 'react-dom/profiling')
       .set('scheduler/tracing', 'scheduler/tracing-profiling')
+      .end()
   })
 
   const alias = this.config.config.alias
+  const webpackAlias = this.webpackChain.resolve.alias
   Object.keys(alias).forEach((name) => {
-    this.webpackChain.resolve.alias.set(name, alias[name])
+    webpackAlias.set(name, path.resolve(this.paths.cliPaths.runtimePath, alias[name]))
   })
+  webpackAlias.end()
 }
 
 Webpack.prototype.module = function (option) {
@@ -199,6 +204,7 @@ Webpack.prototype.plugins = function ({ isProduction, isEnableGzip, isEnableAnal
       srcPath: this.paths.appPaths.srcPath,
       publicPath: this.paths.getRemotePublicUrlPath(),
       remoteFileName,
+      extensions: ['.js', '.jsx'],
     },
   ])
   this.webpackChain

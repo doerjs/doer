@@ -28,7 +28,6 @@ const routerTemplate = require('./template/Router.ejs')
 const debugTemplate = require('./template/Debug.ejs')
 const debugStyleTemplate = require('./template/Debug.module.css')
 
-const layoutRegex = /\.layout\.(js|jsx)$/
 /**
  * {
  *  layoutName: '', 布局组件名称
@@ -50,12 +49,14 @@ function resolveLayout(layoutFile, options) {
   }
 }
 
-function isLayoutFile(file) {
+function isLayoutFile(file, extensions) {
   const basename = path.basename(file)
+
+  const layoutRegex = new RegExp(`.layout.(${extensions.map((ext) => ext.slice(1)).join('|')})`)
+
   return layoutRegex.test(basename)
 }
 
-const pageRegex = /\.page\.(js|jsx)$/
 /**
  * a.b.c.d.e -> a/b/c/d/e
  * a.$b.c.$d.e -> a/:b/c/:d/e
@@ -120,8 +121,11 @@ function resolvePage(pageFile, options) {
   }
 }
 
-function isPageFile(file) {
+function isPageFile(file, extensions) {
   const basename = path.basename(file)
+
+  const pageRegex = new RegExp(`.page.(${extensions.map((ext) => ext.slice(1)).join('|')})`)
+
   return pageRegex.test(basename)
 }
 
@@ -135,8 +139,14 @@ class DoerWebpackPlugin {
   constructor(options) {
     this.options = options
 
-    this.globalScriptPath = path.resolve(this.options.srcPath, 'app.js')
-    this.globalStylePath = path.resolve(this.options.srcPath, 'app.less')
+    const globalScriptPath = path.resolve(this.options.srcPath, 'app')
+    let ext = this.options.extensions.find((ext) => {
+      return file.isExist(globalScriptPath + ext)
+    })
+    if (!ext) {
+      ext = '.js'
+    }
+    this.globalScriptPath = globalScriptPath + ext
 
     this.pages = []
     this.layouts = []
@@ -192,9 +202,9 @@ class DoerWebpackPlugin {
   }
 
   getFile(filePath) {
-    if (isPageFile(filePath)) {
+    if (isPageFile(filePath, this.options.extensions)) {
       this.pages.push(resolvePage(filePath, this.options))
-    } else if (isLayoutFile(filePath)) {
+    } else if (isLayoutFile(filePath, this.options.extensions)) {
       this.layouts.push(resolveLayout(filePath, this.options))
     }
   }
@@ -215,7 +225,7 @@ class DoerWebpackPlugin {
       const code = file.readFileContent(this.globalScriptPath)
       const astTree = babelParser.parse(code, {
         sourceType: 'module',
-        plugins: ['jsx'],
+        plugins: ['jsx', 'typescript'],
       })
       globalData.exports = ast.parseExports(astTree)
     }
@@ -232,12 +242,8 @@ class DoerWebpackPlugin {
     const suspenseFilePath = path.resolve(this.options.outputPath, suspenseFileName)
     const { loading = {} } = this.options.appConfig
     const loadingData = { loading: {} }
-    loadingData.loading.page = file.isExist(loading.page)
-      ? this.getRelativeWebpackPath(suspenseFilePath, loading.page)
-      : ''
-    loadingData.loading.layout = file.isExist(loading.layout)
-      ? this.getRelativeWebpackPath(suspenseFilePath, loading.layout)
-      : ''
+    loadingData.loading.page = loading.page ? this.getRelativeWebpackPath(suspenseFilePath, loading.page) : ''
+    loadingData.loading.layout = loading.layout ? this.getRelativeWebpackPath(suspenseFilePath, loading.layout) : ''
 
     this.writeTemplate(suspenseFileName, suspenseTemplate, loadingData)
   }
@@ -248,21 +254,15 @@ class DoerWebpackPlugin {
     const errorFilePath = path.resolve(this.options.outputPath, errorFileName)
     const { error = {} } = this.options.appConfig
     const errorData = { error: {} }
-    errorData.error.page = file.isExist(error.page) ? this.getRelativeWebpackPath(errorFilePath, error.page) : ''
-    errorData.error.layout = file.isExist(error.layout) ? this.getRelativeWebpackPath(errorFilePath, error.layout) : ''
+    errorData.error.page = error.page ? this.getRelativeWebpackPath(errorFilePath, error.page) : ''
+    errorData.error.layout = error.layout ? this.getRelativeWebpackPath(errorFilePath, error.layout) : ''
 
     this.writeTemplate(errorFileName, errorTemplate, errorData)
   }
 
   writeApp() {
     const appFileName = 'App.jsx'
-
-    const appFilePath = path.resolve(this.options.outputPath, appFileName)
-    const relativeGlobalStylePath = file.isExist(this.globalStylePath)
-      ? this.getRelativeWebpackPath(appFilePath, this.globalStylePath)
-      : ''
-
-    this.writeTemplate(appFileName, appTemplate, { relativeGlobalStylePath })
+    this.writeFile(appFileName, appTemplate)
   }
 
   writeLayouts() {
@@ -441,11 +441,11 @@ class DoerWebpackPlugin {
 
   onChange(file) {
     // TODO 这里存在问题，当文件清空后重新写入文件时，会报错，需要再更新一下文件才行
-    if (isPageFile(file)) {
+    if (isPageFile(file, this.options.extensions)) {
       this.changePage(file)
     }
 
-    if (isLayoutFile(file)) {
+    if (isLayoutFile(file, this.options.extensions)) {
       this.changeLayout(file)
     }
 
@@ -455,16 +455,12 @@ class DoerWebpackPlugin {
   }
 
   onAdd(file) {
-    if (isPageFile(file)) {
+    if (isPageFile(file, this.options.extensions)) {
       this.addPage(file)
     }
 
-    if (isLayoutFile(file)) {
+    if (isLayoutFile(file, this.options.extensions)) {
       this.addLayout(file)
-    }
-
-    if (file === this.globalStylePath) {
-      this.writeApp()
     }
 
     if (file === this.globalScriptPath) {
@@ -473,16 +469,12 @@ class DoerWebpackPlugin {
   }
 
   onRemove(file) {
-    if (isPageFile(file)) {
+    if (isPageFile(file, this.options.extensions)) {
       this.removePage(file)
     }
 
-    if (isLayoutFile(file)) {
+    if (isLayoutFile(file, this.options.extensions)) {
       this.removeLayout(file)
-    }
-
-    if (file === this.globalStylePath) {
-      this.writeApp()
     }
 
     if (file === this.globalScriptPath) {

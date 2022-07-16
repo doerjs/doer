@@ -8,6 +8,7 @@ module.exports = {
   rootPath,
   packageJsonPath: path.resolve(rootPath, 'package.json'),
   templatePath: path.resolve(rootPath, 'template'),
+  typescriptTemplatePath: path.resolve(rootPath, 'template-typescript'),
   nodeModulesPath: path.resolve(rootPath, 'node_modules'),
   appPackageJsonPath: path.resolve(runtimePath, 'package.json'),
 }

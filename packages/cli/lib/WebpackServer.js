@@ -23,7 +23,7 @@ function getHttpsConfig(option) {
 function resolveServerUrl(option) {
   const host = process.env.HOST
   const port = process.env.PORT
-  const publicPath = option.paths.appPaths.publicUrlPath
+  const publicPath = process.env.PUBLIC_URL
 
   const protocol = process.env.HTTPS === 'true' ? 'https://' : 'http://'
   const localhost = host === '127.0.0.1' || host === '0.0.0.0' ? 'localhost' : host
@@ -62,7 +62,7 @@ WebpackServer.prototype.run = async function () {
     },
     static: {
       directory: this.paths.appPaths.publicDirectory,
-      publicPath: this.paths.appPaths.publicUrlPath,
+      publicPath: process.env.PUBLIC_URL,
     },
     client: {
       logging: 'none',
@@ -70,7 +70,7 @@ WebpackServer.prototype.run = async function () {
       progress: false,
     },
     devMiddleware: {
-      publicPath: this.paths.appPaths.publicUrlPath,
+      publicPath: process.env.PUBLIC_URL,
     },
     https: getHttpsConfig(this),
   }

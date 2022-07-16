@@ -5,8 +5,10 @@
 
 TODO
 
-[ ] 添加ts插件支持
-[ ] 添加跨项目debug能力
+[ ] 支持browser history
+[ ] ts支持在创建的时候选择对应选项
+[ ] less支持创建的时候选择对应选项
+[ ] debug为空的场景
 
 ## 特点
 

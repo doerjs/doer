@@ -13,10 +13,6 @@ import Error from './Error'
 import Suspense from './Suspense'
 import Debug from './Debug'
 
-<% if (relativeGlobalStylePath) { %>
-import '<%= relativeGlobalStylePath %>'
-<% } %>
-
 function getAppName(hasLayout) {
   const [layoutName = '', appName = ''] = window.location.hash.replace('#', '').split('/').filter(item => item)
   const name = hasLayout ? appName : layoutName

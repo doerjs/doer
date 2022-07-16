@@ -7,10 +7,23 @@ module.exports = function (plugin, option) {
         name: 'typescript',
         test: [/\.ts$/, /\.tsx$/],
         include: [environment.paths.appPaths.srcPath],
+        exclude: [/\.d\.ts$/],
         presets: ['@babel/preset-typescript'],
       })
 
-      webpackChain.resolve.extensions.add('.ts').add('.tsx').end()
+      const extensions = ['.ts', '.tsx']
+      const webpackExtensions = webpackChain.resolve.extensions
+      extensions.forEach((ext) => {
+        webpackExtensions.add(ext)
+      })
+      webpackExtensions.end()
+
+      webpackChain.plugin('router').tap((args) => {
+        return args.map((arg) => {
+          arg.extensions = arg.extensions ? extensions.concat(arg.extensions) : extensions
+          return arg
+        })
+      })
     })
 
     plugin.hooks.webpackConfig.tap('Typescript', (webpackConfig) => {

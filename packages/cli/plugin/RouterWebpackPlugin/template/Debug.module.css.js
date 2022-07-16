@@ -2,15 +2,14 @@ module.exports = `
 .debug {
   position: fixed;
   top: 0;
-  right: 0;
+  right: 2px;
   z-index: 1000;
 }
 
 .debug .trigger {
-  background: white;
-  padding: 4px 8px;
+  height: 24px;
   font-size: 12px;
-  color: green;
+  box-sizing: border-box;
   cursor: pointer;
 }
 
@@ -82,6 +81,7 @@ module.exports = `
 .content .remotes .remote .value {
   width: 100%;
   font-size: 14px;
+  box-sizing: border-box;
 }
 
 .content .remotes .remote .tip {

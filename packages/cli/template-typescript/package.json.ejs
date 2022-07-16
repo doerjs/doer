@@ -21,9 +21,13 @@
     "<%= packages.cli.name %>": "<%= packages.cli.version %>",
     "<%= packages.eslint.name %>": "<%= packages.eslint.version %>",
     "<%= packages.prettier.name %>": "<%= packages.prettier.version %>",
+    "<%= packages.pluginTypescript.name %>": "<%= packages.pluginTypescript.version %>",
     <% if (answers.style === 'less') { %>
     "<%= packages.pluginLess.name %>": "<%= packages.pluginLess.version %>",
     <% } %>
+    "@types/react": "^18.0.15",
+    "@types/react-dom": "^18.0.6",
+    "@types/react-router-dom": "^5.3.3",
     "husky": "^7.0.4",
     "lint-staged": "^12.1.5"
   }

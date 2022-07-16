@@ -27,6 +27,14 @@ Env.prototype.parseFile = function () {
 
 Env.prototype.parseEnv = function () {
   env.setPath('PUBLIC_URL', '/')
+
+  if (process.env.NODE_ENV === 'development' && process.env.PUBLIC_URL.startsWith('http')) {
+    const publicUrl = new URL(process.env.PUBLIC_URL, 'https://doer.cli.com')
+    process.env.PUBLIC_URL = publicUrl.pathname
+  }
+
+  process.env.PUBLIC_URL = process.env.PUBLIC_URL.endsWith('/') ? process.env.PUBLIC_URL : process.env.PUBLIC_URL + '/'
+
   env.setNumber('IMAGE_INLINE_LIMIT_SIZE', 10000)
   env.setString('HOST', '0.0.0.0')
   env.setString('PORT', '3000')
@@ -47,7 +55,7 @@ Env.prototype.parseEnv = function () {
         NODE_ENV: process.env.NODE_ENV,
         ENV: process.env.ENV,
         ROOT_ELEMENT_ID: process.env.ROOT_ELEMENT_ID,
-        PUBLIC_URL: this.paths.appPaths.publicUrlPath,
+        PUBLIC_URL: process.env.PUBLIC_URL,
       },
     )
 }

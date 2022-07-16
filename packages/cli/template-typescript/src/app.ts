@@ -35,7 +35,7 @@ export function remotes() {
  * }
  * @return
  */
-export function render(oldRender) {
+export function render(oldRender: () => void) {
   // 注册渲染回调函数，在需要渲染时，一定要调用这个render
   // 否则应用无法渲染出来
   oldRender()

@@ -27,6 +27,19 @@ function qa(params) {
         return true
       },
     },
+    {
+      type: 'list',
+      name: 'style',
+      message: '请选择应用使用的样式处理器',
+      default: 'css',
+      choices: ['css', 'less'],
+    },
+    {
+      type: 'confirm',
+      name: 'typescript',
+      message: '是否使用typescript？',
+      default: false,
+    },
   ])
 }
 
@@ -87,24 +100,19 @@ function readTemplates(templatePath) {
 
 function getEJSRenderData(answers) {
   const cliPackage = require(cliBasePaths.packageJsonPath)
-  const eslintPackage = require('@doerjs/eslint-config/package.json')
-  const prettierPackage = require('@doerjs/prettier-config/package.json')
+  const eslintPackage = require('../../eslint-config/package.json')
+  const prettierPackage = require('../../prettier-config/package.json')
+  const pluginLessPackage = require('../../plugin-less/package.json')
+  const pluginTypescriptPackage = require('../../plugin-typescript/package.json')
 
   return {
     answers,
     packages: {
-      cli: {
-        version: cliPackage.version,
-        name: cliPackage.name,
-      },
-      eslint: {
-        version: eslintPackage.version,
-        name: eslintPackage.name,
-      },
-      prettier: {
-        version: prettierPackage.version,
-        name: prettierPackage.name,
-      },
+      cli: cliPackage,
+      eslint: eslintPackage,
+      prettier: prettierPackage,
+      pluginLess: pluginLessPackage,
+      pluginTypescript: pluginTypescriptPackage,
     },
   }
 }
@@ -157,14 +165,17 @@ async function createApplication(appPath, answers) {
   console.log(`👣 正在创建全新应用 ${chalk.greenBright(answers.name)}...`)
   console.log()
 
-  const templates = readTemplates(cliBasePaths.templatePath)
+  const templatePath = answers.typescript ? cliBasePaths.typescriptTemplatePath : cliBasePaths.templatePath
+  const templates = readTemplates(templatePath)
+
+  readTemplates(cliBasePaths.templatePath)
 
   createDirectory(appPath)
 
   // 获取模版渲染数据，并输出模版
   const data = getEJSRenderData(answers)
   templates.forEach((template) => {
-    const fileName = template.templateFilePath.replace(cliBasePaths.templatePath + path.sep, '')
+    const fileName = template.templateFilePath.replace(templatePath + path.sep, '')
     const filePath = path.resolve(appPath, fileName)
 
     if (template.isDirectory) {

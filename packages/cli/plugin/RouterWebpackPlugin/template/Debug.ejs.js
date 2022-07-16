@@ -123,7 +123,7 @@ export default function Debug() {
 
   return (
     <div className={styles.debug}>
-      <div className={styles.trigger} onClick={handleTriggerClick}>调试模式{isEnableEditDebug() ? '(未生效)' : ''}</div>
+      <button className={styles.trigger} onClick={handleTriggerClick}>调试模式{isEnableEditDebug() ? '(未生效)' : ''}</button>
       <Portal visible={visible}>
         <DebugContent onClose={handleClose} />
       </Portal>

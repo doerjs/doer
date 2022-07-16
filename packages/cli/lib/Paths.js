@@ -36,21 +36,9 @@ function Paths() {
   this.appPaths = getAppPaths(this.cliPaths)
 }
 
-Paths.prototype.parsePublicUrlPath = function () {
-  let publicUrlPath
-  if (process.env.NODE_ENV === 'development') {
-    const publicUrl = new URL(process.env.PUBLIC_URL, 'https://doer.cli.com')
-    publicUrlPath = publicUrl.pathname
-  } else {
-    publicUrlPath = process.env.PUBLIC_URL
-  }
-
-  this.appPaths.publicUrlPath = publicUrlPath.endsWith('/') ? publicUrlPath : publicUrlPath + '/'
-}
-
 Paths.prototype.resolveAliasRelativePath = function (filePath, alias) {
   const aliasName = Object.keys(alias).find((name) => {
-    return filePath.startsWith(name)
+    return filePath.startsWith(name + '/')
   })
 
   if (aliasName) {
@@ -91,10 +79,10 @@ Paths.prototype.getRemotePublicUrlPath = function () {
     const protocol = isHttps ? 'https://' : 'http://'
     const localhost = host === '127.0.0.1' || host === '0.0.0.0' ? 'localhost' : host
 
-    return `${protocol}${localhost}:${port}${this.appPaths.publicUrlPath}`
+    return `${protocol}${localhost}:${port}${process.env.PUBLIC_URL}`
   }
 
-  return this.appPaths.publicUrlPath
+  return process.env.PUBLIC_URL
 }
 
 module.exports = Paths

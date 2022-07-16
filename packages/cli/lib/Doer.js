@@ -19,8 +19,6 @@ function Doer() {
 
 Doer.prototype.init = async function () {
   this.env.parseFile()
-  // 环境变量解析依赖于publicUrlPath
-  this.paths.parsePublicUrlPath()
   this.env.parseEnv()
   this.config.parseFile()
   this.config.parseConfig()
