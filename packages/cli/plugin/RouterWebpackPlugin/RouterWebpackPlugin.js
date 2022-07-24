@@ -49,8 +49,8 @@ function resolveLayout(layoutFile, options) {
   }
 }
 
-function isLayoutFile(file, extensions) {
-  const basename = path.basename(file)
+function isLayoutFile(filePath, extensions) {
+  const basename = path.basename(filePath)
 
   const layoutRegex = new RegExp(`.layout.(${extensions.map((ext) => ext.slice(1)).join('|')})`)
 
@@ -121,8 +121,8 @@ function resolvePage(pageFile, options) {
   }
 }
 
-function isPageFile(file, extensions) {
-  const basename = path.basename(file)
+function isPageFile(filePath, extensions) {
+  const basename = path.basename(filePath)
 
   const pageRegex = new RegExp(`.page.(${extensions.map((ext) => ext.slice(1)).join('|')})`)
 
@@ -208,6 +208,13 @@ class DoerWebpackPlugin {
       ext = '.js'
     }
     return globalScriptPath + ext
+  }
+
+  isGlobalScript(filePath) {
+    const globalScriptPath = path.resolve(this.options.srcPath, 'app')
+    return this.options.extensions.some((ext) => {
+      return filePath === globalScriptPath + ext
+    })
   }
 
   writeGlobal() {
@@ -338,8 +345,8 @@ class DoerWebpackPlugin {
     file.writeFileContent(filePath, content)
   }
 
-  remove(file) {
-    shell.execSync(`rm ${file}`)
+  remove(filePath) {
+    shell.execSync(`rm ${filePath}`)
   }
 
   /**
@@ -347,8 +354,8 @@ class DoerWebpackPlugin {
    * 由空转为非空状态或者由非空转换成空状态时，这时候出现了注册页面路由的增减
    * 需要重新写人路由注入文件，告知webpack
    */
-  changePage(file) {
-    const page = resolvePage(file, this.options)
+  changePage(filePath) {
+    const page = resolvePage(filePath, this.options)
 
     const prePage = this.pages.find((item) => item.pageName === page.pageName)
     this.pages = this.pages.map((item) => {
@@ -368,8 +375,8 @@ class DoerWebpackPlugin {
    * 新增页面文件时，不管是否为空都需要生成动态导入入口
    * 如果页面不为空时，同时需要重写路由注入文件，告知webpack
    */
-  addPage(file) {
-    const page = resolvePage(file, this.options)
+  addPage(filePath) {
+    const page = resolvePage(filePath, this.options)
 
     this.pages.push(page)
     this.writePage(page)
@@ -385,8 +392,8 @@ class DoerWebpackPlugin {
    * 页面移除时需要移除动态导入文件，
    * 同时重写路由注入文件，告知webpack
    */
-  removePage(file) {
-    const page = resolvePage(file, this.options)
+  removePage(filePath) {
+    const page = resolvePage(filePath, this.options)
     this.pages = this.pages.filter((item) => item.pageName !== page.pageName)
     this.writeRouter()
     this.remove(page.dynamicPageFilePath)
@@ -397,8 +404,8 @@ class DoerWebpackPlugin {
    * 由空转为非空状态或者由非空转换成空状态时，这时候出现了注册布局的增减
    * 需要重新写人布局注入文件，告知webpack
    */
-  changeLayout(file) {
-    const layout = resolveLayout(file, this.options)
+  changeLayout(filePath) {
+    const layout = resolveLayout(filePath, this.options)
 
     const preLayout = this.layouts.find((item) => item.layoutName === layout.layoutName)
     this.layouts = this.layouts.map((item) => {
@@ -418,8 +425,8 @@ class DoerWebpackPlugin {
    * 新增布局文件时，不管是否为空都需要生成动态导入入口
    * 如果布局不为空时，同时需要重写布局注入文件，告知webpack
    */
-  addLayout(file) {
-    const layout = resolveLayout(file, this.options)
+  addLayout(filePath) {
+    const layout = resolveLayout(filePath, this.options)
 
     this.layouts.push(layout)
     this.writeLayout(layout)
@@ -435,52 +442,52 @@ class DoerWebpackPlugin {
    * 布局移除时需要移除动态导入文件，
    * 同时重写布局注入文件，告知webpack
    */
-  removeLayout(file) {
-    const layout = resolveLayout(file, this.options)
+  removeLayout(filePath) {
+    const layout = resolveLayout(filePath, this.options)
     this.layouts = this.layouts.filter((item) => item.layoutName !== layout.layoutName)
     this.writeLayoutContainer()
     this.remove(layout.dynamicLayoutFilePath)
   }
 
-  onChange(file) {
+  onChange(filePath) {
     // TODO 这里存在问题，当文件清空后重新写入文件时，会报错，需要再更新一下文件才行
-    if (isPageFile(file, this.options.extensions)) {
-      this.changePage(file)
+    if (isPageFile(filePath, this.options.extensions)) {
+      this.changePage(filePath)
     }
 
-    if (isLayoutFile(file, this.options.extensions)) {
-      this.changeLayout(file)
+    if (isLayoutFile(filePath, this.options.extensions)) {
+      this.changeLayout(filePath)
     }
 
-    if (file === this.getGlobalScriptPath()) {
+    if (this.isGlobalScript(filePath)) {
       this.writeGlobal()
     }
   }
 
-  onAdd(file) {
-    if (isPageFile(file, this.options.extensions)) {
-      this.addPage(file)
+  onAdd(filePath) {
+    if (isPageFile(filePath, this.options.extensions)) {
+      this.addPage(filePath)
     }
 
-    if (isLayoutFile(file, this.options.extensions)) {
-      this.addLayout(file)
+    if (isLayoutFile(filePath, this.options.extensions)) {
+      this.addLayout(filePath)
     }
 
-    if (file === this.getGlobalScriptPath()) {
+    if (this.isGlobalScript(filePath)) {
       this.writeGlobal()
     }
   }
 
-  onRemove(file) {
-    if (isPageFile(file, this.options.extensions)) {
-      this.removePage(file)
+  onRemove(filePath) {
+    if (isPageFile(filePath, this.options.extensions)) {
+      this.removePage(filePath)
     }
 
-    if (isLayoutFile(file, this.options.extensions)) {
-      this.removeLayout(file)
+    if (isLayoutFile(filePath, this.options.extensions)) {
+      this.removeLayout(filePath)
     }
 
-    if (file === this.getGlobalScriptPath()) {
+    if (this.isGlobalScript(filePath)) {
       this.writeGlobal()
     }
   }
