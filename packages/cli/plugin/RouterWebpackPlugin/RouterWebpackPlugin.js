@@ -138,16 +138,6 @@ class DoerWebpackPlugin {
    */
   constructor(options) {
     this.options = options
-
-    const globalScriptPath = path.resolve(this.options.srcPath, 'app')
-    let ext = this.options.extensions.find((ext) => {
-      return file.isExist(globalScriptPath + ext)
-    })
-    if (!ext) {
-      ext = '.js'
-    }
-    this.globalScriptPath = globalScriptPath + ext
-
     this.pages = []
     this.layouts = []
   }
@@ -209,20 +199,33 @@ class DoerWebpackPlugin {
     }
   }
 
+  getGlobalScriptPath() {
+    const globalScriptPath = path.resolve(this.options.srcPath, 'app')
+    let ext = this.options.extensions.find((ext) => {
+      return file.isExist(globalScriptPath + ext)
+    })
+    if (!ext) {
+      ext = '.js'
+    }
+    return globalScriptPath + ext
+  }
+
   writeGlobal() {
     const globalFileName = 'global.js'
 
-    const isExist = file.isExist(this.globalScriptPath)
+    const globalScriptPath = this.getGlobalScriptPath()
+
+    const isExist = file.isExist(globalScriptPath)
     const globalData = {
       relativeGlobalScriptPath: isExist
-        ? this.getRelativeWebpackPath(path.resolve(this.options.outputPath, globalFileName), this.globalScriptPath)
+        ? this.getRelativeWebpackPath(path.resolve(this.options.outputPath, globalFileName), globalScriptPath)
         : '',
       exports: {},
     }
 
     if (isExist) {
       // 解析文件内容，收集用户自定义的勾子函数
-      const code = file.readFileContent(this.globalScriptPath)
+      const code = file.readFileContent(globalScriptPath)
       const astTree = babelParser.parse(code, {
         sourceType: 'module',
         plugins: ['jsx', 'typescript'],
@@ -449,7 +452,7 @@ class DoerWebpackPlugin {
       this.changeLayout(file)
     }
 
-    if (file === this.globalScriptPath) {
+    if (file === this.getGlobalScriptPath()) {
       this.writeGlobal()
     }
   }
@@ -463,7 +466,7 @@ class DoerWebpackPlugin {
       this.addLayout(file)
     }
 
-    if (file === this.globalScriptPath) {
+    if (file === this.getGlobalScriptPath()) {
       this.writeGlobal()
     }
   }
@@ -477,7 +480,7 @@ class DoerWebpackPlugin {
       this.removeLayout(file)
     }
 
-    if (file === this.globalScriptPath) {
+    if (file === this.getGlobalScriptPath()) {
       this.writeGlobal()
     }
   }
