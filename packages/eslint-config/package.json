@@ -1,6 +1,6 @@
 {
   "name": "@doerjs/eslint-config",
-  "version": "0.0.5-alpha.4",
+  "version": "0.0.5-alpha.5",
   "description": "",
   "author": "FaureWu <502556093@qq.com>",
   "license": "MIT",
@@ -15,7 +15,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "48f866d2b60e7aaef55c97131fb21bec7a1bc308",
+  "gitHead": "418521620e0150255ef9e4fd2b3d2004e0a40dcb",
   "dependencies": {
     "@rushstack/eslint-patch": "^1.1.1",
     "@typescript-eslint/eslint-plugin": "^5.30.6",
