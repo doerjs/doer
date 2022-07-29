@@ -1,6 +1,6 @@
 {
   "name": "@doerjs/utils",
-  "version": "0.0.5-alpha.5",
+  "version": "0.0.5-y.0",
   "description": "",
   "author": "FaureWu <502556093@qq.com>",
   "license": "MIT",
@@ -8,7 +8,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "418521620e0150255ef9e4fd2b3d2004e0a40dcb",
+  "gitHead": "a6d99cb28fd7e24df1165a78c441fa589ce80485",
   "dependencies": {
     "chalk": "4.1.2",
     "dayjs": "^1.11.3",
