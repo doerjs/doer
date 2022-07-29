@@ -37,7 +37,11 @@ function Webpack(option) {
   this.webpackChain = new WebpackChain()
 }
 
-Webpack.prototype.run = async function () {
+Webpack.prototype.run = function () {
+  this.webpackComplier.run()
+}
+
+Webpack.prototype.createComplier = async function () {
   const isProduction = process.env.NODE_ENV === 'production'
   const isEnableProfiler = isProduction && process.env.ENABLE_PROFILER === 'true'
   const isEnableGzip = process.env.GZIP === 'true'

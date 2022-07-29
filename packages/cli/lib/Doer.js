@@ -23,16 +23,12 @@ Doer.prototype.init = async function () {
   this.config.parseFile()
   this.config.parseConfig()
 
-  await this.runPlugins()
+  await this.plugins()
 
   this.plugin.hooks.environment.call(this)
 }
 
-Doer.prototype.run = async function () {
-  await this.runComplier()
-}
-
-Doer.prototype.runPlugins = async function () {
+Doer.prototype.plugins = async function () {
   const plugins = this.config.config.plugins
   if (!plugins.length) {
     return
@@ -49,7 +45,7 @@ Doer.prototype.runPlugins = async function () {
   await this.plugin.hooks.afterPlugins.promise(this.plugin)
 }
 
-Doer.prototype.runComplier = async function () {
+Doer.prototype.createComplier = async function () {
   this.plugin.hooks.complier.call()
   this.complier = new Webpack({
     env: this.env,
@@ -57,9 +53,12 @@ Doer.prototype.runComplier = async function () {
     config: this.config,
     plugin: this.plugin,
   })
-
-  await this.complier.run()
+  await this.complier.createComplier()
   this.plugin.hooks.afterComplier.call(this.complier)
+}
+
+Doer.prototype.runComplier = function () {
+  this.complier.run()
 }
 
 Doer.prototype.runServer = async function () {
@@ -71,9 +70,8 @@ Doer.prototype.runServer = async function () {
     plugin: this.plugin,
     complier: this.complier,
   })
-
-  await this.server.run()
   this.plugin.hooks.afterServer.call(this.server)
+  await this.server.run()
 }
 
 module.exports = Doer

@@ -10,5 +10,6 @@ const Doer = require('../lib/Doer')
 module.exports = async function build() {
   const doer = new Doer()
   await doer.init()
-  await doer.run()
+  await doer.createComplier()
+  doer.runComplier()
 }
