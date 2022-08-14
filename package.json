@@ -1,18 +1,19 @@
 {
   "name": "doer",
   "scripts": {
-    "install": "husky install && npm run clean && npm run bootstrap",
-    "bootstrap": "lerna bootstrap",
+    "install": "husky install",
+    "bootstrap": "lerna clean && lerna bootstrap",
     "publish": "lerna publish --force-publish",
     "clean": "lerna clean",
-    "link": "lerna link --force-local",
-    "lint": "eslint --ext .js,.jsx,.mjs ./"
+    "link": "lerna link --force-local"
   },
   "lint-staged": {
-    "**/*.{js,jsx,json}": [
+    "**/*.{js,jsx}": [
       "prettier --write",
-      "npm run lint",
-      "git add ."
+      "eslint"
+    ],
+    "**/*.json": [
+      "prettier --write"
     ]
   },
   "dependencies": {

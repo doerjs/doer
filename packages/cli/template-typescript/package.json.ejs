@@ -8,10 +8,12 @@
     "build": "doer build"
   },
   "lint-staged": {
-    "**/*.{js,jsx,json}": [
+    "**/*.{js,jsx}": [
       "prettier --write",
-      "eslint",
-      "git add"
+      "eslint"
+    ],
+    "**/*.json": [
+      "prettier --write"
     ]
   },
   "dependencies": {},
