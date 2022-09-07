@@ -46,7 +46,7 @@ Webpack.prototype.createComplier = async function () {
   const isEnableProfiler = isProduction && process.env.ENABLE_PROFILER === 'true'
   const isEnableGzip = process.env.GZIP === 'true'
   const isEnableAnalyzer = process.env.ENABLE_ANALYZER === 'true'
-  const assetModuleFilename = isProduction ? 'static/media/[name].[contenthash:8].[ext]' : 'static/media/[name].[ext]'
+  const assetModuleFilename = isProduction ? 'static/media/[name].[contenthash:8][ext]' : 'static/media/[name][ext]'
   const appPackage = require(this.paths.appPaths.packageJsonPath)
 
   this.webpackChain.mode(isProduction ? 'production' : 'development')
@@ -140,7 +140,7 @@ Webpack.prototype.module = function (option) {
   this.webpackChain.module
     .rule('resource')
     .type('asset/resource')
-    .test([/\.json$/, /\.txt$/])
+    .test([/\.json$/, /\.txt$/, /\.eot$/, /\.woff$/, /\.woff2$/, /\.ttf$/])
     .end()
 }
 
