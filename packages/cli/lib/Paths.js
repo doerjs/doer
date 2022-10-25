@@ -55,7 +55,7 @@ Paths.prototype.resolvePath = function (filePath, alias) {
 
   const relativeFilePath = this.resolveAliasRelativePath(filePath, alias)
 
-  const modules = [this.appPaths.srcPath, this.appPaths.nodeModulesPath, this.cliPaths.nodeModulesPath]
+  const modules = [this.cliPaths.runtimePath, this.appPaths.nodeModulesPath, this.cliPaths.nodeModulesPath]
 
   let moduleFilePath
   modules.some((modulePath) => {
