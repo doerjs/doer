@@ -1,7 +1,7 @@
 {
   "name": "doer",
   "scripts": {
-    "preinstall": "npx only-allow pnpm",
+    "preinstall": "husky install && npx only-allow pnpm",
     "beta": "pnpm changeset pre enter beta",
     "alpha": "pnpm changeset pre enter alpha",
     "rc": "pnpm changeset pre enter rc",
