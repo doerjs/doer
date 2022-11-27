@@ -25,16 +25,39 @@ $ pnpm i 包名 -r
 $ pnpm i 包名 -r --filter 包名
 ```
 
-### 发布新版本
+### 发布alpha测试版本
+
+是内部测试版，一般不向外部发布，会有很多Bug，一般只有测试人员使用
 
 ```bash
+$ pnpm run alpha
 $ pnpm run pub
+$ pnpm run exit
 ```
 
 ### 发布beta测试版本
 
+也是测试版，这个阶段的版本会一直加入新的功能。在Alpha版之后推出
+
 ```bash
-$ pnpm run pre
+$ pnpm run beta
 $ pnpm run pub
-$ pnpm run unpre
+$ pnpm run exit
+```
+
+### 发布rc测试版本
+
+系统平台上就是发行候选版本。RC版不会再加入新的功能了，主要着重于除错
+
+```bash
+$ pnpm run rc
+$ pnpm run pub
+$ pnpm run exit
+```
+
+### 发布正式版本
+
+```bash
+$ pnpm run exit
+$ pnpm run pub
 ```

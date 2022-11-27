@@ -1,8 +1,11 @@
 {
   "name": "doer",
   "scripts": {
-    "pre": "pnpm changeset pre enter beta",
-    "unpre": "pnpm changeset pre exit",
+    "preinstall": "npx only-allow pnpm",
+    "beta": "pnpm changeset pre enter beta",
+    "alpha": "pnpm changeset pre enter alpha",
+    "rc": "pnpm changeset pre enter rc",
+    "exit": "pnpm changeset pre exit",
     "pub": "pnpm install && pnpm changeset && pnpm changeset version && git add . && git commit -m 'chore(release): 发布新版本' && pnpm publish -r",
     "clean": "rm -rf node_modules **/*/node_modules"
   },
@@ -16,10 +19,12 @@
     ]
   },
   "devDependencies": {
+    "@changesets/cli": "^2.25.2",
     "@commitlint/cli": "^16.0.1",
     "@commitlint/config-conventional": "^16.0.0",
+    "@doerjs/eslint-config": "workspace:*",
+    "@doerjs/prettier-config": "workspace:*",
     "husky": "^7.0.4",
-    "lint-staged": "^12.1.5",
-    "@changesets/cli": "^2.25.2"
+    "lint-staged": "^12.1.5"
   }
 }

@@ -1,5 +1,13 @@
 # @doerjs/cli
 
+## 0.0.6-beta.3
+
+### Patch Changes
+
+- eslint 功能测试包
+- Updated dependencies
+  - @doerjs/utils@0.0.6-beta.3
+
 ## 0.0.6-beta.2
 
 ### Patch Changes

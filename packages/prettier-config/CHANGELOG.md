@@ -1,5 +1,11 @@
 # @doerjs/prettier-config
 
+## 0.0.6-beta.3
+
+### Patch Changes
+
+- eslint 功能测试包
+
 ## 0.0.6-beta.2
 
 ### Patch Changes
