@@ -1,11 +1,11 @@
 {
   "name": "doer",
   "scripts": {
-    "install": "husky install",
-    "bootstrap": "lerna clean && lerna bootstrap",
-    "publish": "lerna publish --force-publish",
-    "clean": "lerna clean",
-    "link": "lerna link --force-local"
+    "pub": "pnpm changeset",
+    "log": "pnpm changeset version",
+    "pre": "pnpm changeset pre enter beta",
+    "exit": "pnpm changeset pre exit",
+    "clean": "rm -rf node_modules **/*/node_modules"
   },
   "lint-staged": {
     "**/*.{js,jsx}": [
@@ -16,13 +16,13 @@
       "prettier --write"
     ]
   },
-  "dependencies": {
+  "devDependencies": {
     "@commitlint/cli": "^16.0.1",
     "@commitlint/config-conventional": "^16.0.0",
-    "@doerjs/eslint-config": "0.0.5-alpha.0",
-    "@doerjs/prettier-config": "0.0.5-alpha.0",
+    "@doerjs/eslint-config": "workspace:0.0.5",
+    "@doerjs/prettier-config": "workspace:0.0.5",
     "husky": "^7.0.4",
-    "lerna": "^4.0.0",
-    "lint-staged": "^12.1.5"
+    "lint-staged": "^12.1.5",
+    "@changesets/cli": "^2.25.2"
   }
 }
