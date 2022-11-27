@@ -10,7 +10,7 @@ import { isDebug } from './helper'
   if (isDebug()) {
     try {
       const localUrls = window.sessionStorage.getItem('<%= appName %>__doer_remotes__')
-      urls = localUrls ? JSON.parse(localUrls) : urls
+      urls = localUrls ? Object.assign(urls, JSON.parse(localUrls)) : urls
     } catch (e) {}
   }
 
