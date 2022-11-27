@@ -1,5 +1,11 @@
 本包采用pnpm monorepo进行管理
 
+### 安装依赖
+
+```
+$ pnpm i
+```
+
 ### 安装全局共用的包
 
 ```bash
@@ -25,14 +31,10 @@ $ pnpm i 包名 -r --filter 包名
 $ pnpm run pub
 ```
 
-### 发布beta版本
+### 发布beta测试版本
 
 ```bash
 $ pnpm run pre
-```
-
-发布完成后执行
-
-```bash
-$ pnpm run exit
+$ pnpm run pub
+$ pnpm run unpre
 ```

@@ -10,5 +10,5 @@
     "@doerjs/prettier-config": "0.0.5",
     "@doerjs/utils": "0.0.5"
   },
-  "changesets": []
+  "changesets": ["fast-impalas-attack", "hot-books-remain", "lemon-tools-mate"]
 }
