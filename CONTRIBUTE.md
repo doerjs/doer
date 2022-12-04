@@ -4,7 +4,7 @@
 * Eslint
 * Prettier - Code formatter
 
-### 如何调试本项目
+### 如何调试本项目（这种调试方式还有问题）
 
 1. 首先通过npm第一次安装全局命令行工具doer
 ```bash
