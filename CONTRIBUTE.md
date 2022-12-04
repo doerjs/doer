@@ -1,3 +1,52 @@
+### 准备工作
+该项目采用eslint+prettier+commitlint实现项目的规范，因此代码编辑器需要安装如下插件：
+
+* Eslint
+* Prettier - Code formatter
+
+### 如何调试本项目
+
+1. 首先通过npm第一次安装全局命令行工具doer
+```bash
+$ npm install --global @doerjs/cli
+```
+
+2. 通过doer命令创建一个应用作为example进行调试
+```bash
+$ doer create example
+```
+
+3. 修改example中的package.json文件新增如下内容
+```json
+{
+  ...其他原本的信息,
+  "pnpm": {
+    "overrides": {
+      "@doerjs/cli": "link:../doer/packages/cli"
+    }
+  }
+}
+```
+
+4. 删除package-lock.json，node_modules
+
+5. 安装pnpm包管理工具
+```bash
+$ npm install --global pnpm
+```
+
+6. 执行依赖安装
+```bash
+$ pnpm i
+```
+由于之前已经配置@doerjs/cli的包路径的overrides，因此此时安装的脚手架指向了本地项目，
+直接跑起来本地项目，就可以直接调试了
+
+7. 运行项目
+```bash
+$ doer dev
+```
+
 本包采用pnpm monorepo进行管理
 
 ### 安装依赖

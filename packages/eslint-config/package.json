@@ -15,7 +15,6 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "a6d99cb28fd7e24df1165a78c441fa589ce80485",
   "dependencies": {
     "@rushstack/eslint-patch": "^1.1.1",
     "@typescript-eslint/eslint-plugin": "^5.30.6",
