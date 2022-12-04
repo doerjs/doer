@@ -1,8 +1,8 @@
 module.exports = `
 import React, { useState, useEffect, useRef } from 'react'
-import { unstable_HistoryRouter as HistoryRouter } from 'react-router-dom'
+import { HashRouter } from 'react-router-dom'
 
-import history, { useHistoryChange } from './history'
+import { useHistoryChange } from './history'
 import { loadScopeComponent, loadScopeModule } from './loader'
 import { isFunction, isUndefined, isDebug, isEnableEditDebug } from './helper'
 import { enter, leave } from './global'
@@ -109,9 +109,9 @@ export default function App({ location }) {
           <Error mode="page">
             <Suspense mode="page">
               {status === 'loading' ? AppRouter && <AppRouter /> : (
-                <HistoryRouter basename={basename} history={history}>
+                <HashRouter basename={basename}>
                   {status === 'succeed' && AppRouter ? <AppRouter /> : <Router />}
-                </HistoryRouter>
+                </HashRouter>
               )}
             </Suspense>
           </Error>

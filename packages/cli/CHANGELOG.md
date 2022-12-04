@@ -1,5 +1,11 @@
 # @doerjs/cli
 
+## 0.0.6-beta.7
+
+### Patch Changes
+
+- 移除无用的依赖
+
 ## 0.0.6-beta.6
 
 ### Patch Changes
