@@ -44,9 +44,13 @@ export function render(oldRender: () => void) {
 /**
  * 应用进入时触发
  */
-export function enter() {}
+export function enter() {
+  // no action
+}
 
 /**
  * 应用离开时触发
  */
-export function leave() {}
+export function leave() {
+  // no action
+}

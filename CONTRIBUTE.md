@@ -4,7 +4,7 @@
 * Eslint
 * Prettier - Code formatter
 
-### 如何调试本项目（这种调试方式还有问题）
+### 如何调试本项目
 
 1. 首先通过npm第一次安装全局命令行工具doer
 ```bash
@@ -35,14 +35,25 @@ $ doer create example
 $ npm install --global pnpm
 ```
 
-6. 执行依赖安装
+6. 添加.npmrc文件
+```
+public-hoist-pattern[]=*eslint*
+public-hoist-pattern[]=*prettier*
+public-hoist-pattern[]=*react*
+public-hoist-pattern[]=*react-dom*
+public-hoist-pattern[]=*react-router-dom*
+public-hoist-pattern[]=*history*
+```
+这个文件的作用主要解决pnpm导致间接依赖解析失败的问题
+
+7. 执行依赖安装
 ```bash
 $ pnpm i
 ```
 由于之前已经配置@doerjs/cli的包路径的overrides，因此此时安装的脚手架指向了本地项目，
 直接跑起来本地项目，就可以直接调试了
 
-7. 运行项目
+8. 运行项目
 ```bash
 $ doer dev
 ```
