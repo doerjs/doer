@@ -1,5 +1,11 @@
 # @doerjs/cli
 
+## 0.0.6-beta.6
+
+### Patch Changes
+
+- 修复创建应用期间，执行了不存在的脚本
+
 ## 0.0.6-beta.5
 
 ### Patch Changes

@@ -192,7 +192,7 @@ async function createApplication(appPath, answers) {
     console.error(error)
   })
 
-  const { stderr } = shell.execSync(`cd ${appPath} && git init && npm run setup`)
+  const { stderr } = shell.execSync(`cd ${appPath} && git init`)
   if (stderr) {
     console.error(stderr.toString())
   }

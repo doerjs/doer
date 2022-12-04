@@ -3,13 +3,6 @@
 
 该项目目前还缺乏真实场景考验，仅处于玩具阶段
 
-TODO
-
-[ ] 支持browser history
-[ ] debug为空的场景
-[ ] manifest.json报错问题
-[ ] 全局路由库如何统一输出api
-
 ## 特点
 
 * 代码风格检查

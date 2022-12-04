@@ -2,15 +2,16 @@
   "mode": "pre",
   "tag": "beta",
   "initialVersions": {
-    "@doerjs/cli": "0.0.5",
-    "@doerjs/eslint-config": "0.0.5",
-    "@doerjs/plugin-less": "0.0.5",
-    "@doerjs/plugin-mock": "0.0.5",
-    "@doerjs/plugin-typescript": "0.0.5",
-    "@doerjs/prettier-config": "0.0.5",
-    "@doerjs/utils": "0.0.5"
+    "@doerjs/cli": "0.0.6-beta.5",
+    "@doerjs/eslint-config": "0.0.6-beta.3",
+    "@doerjs/plugin-less": "0.0.6-beta.3",
+    "@doerjs/plugin-mock": "0.0.6-beta.3",
+    "@doerjs/plugin-typescript": "0.0.6-beta.3",
+    "@doerjs/prettier-config": "0.0.6-beta.3",
+    "@doerjs/utils": "0.0.6-beta.3"
   },
   "changesets": [
+    "brown-rocks-worry",
     "fast-impalas-attack",
     "gentle-olives-clap",
     "hot-books-remain",
