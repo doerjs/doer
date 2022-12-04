@@ -1,5 +1,11 @@
 # @doerjs/cli
 
+## 0.0.6-beta.4
+
+### Patch Changes
+
+- 修复包路径问题
+
 ## 0.0.6-beta.3
 
 ### Patch Changes

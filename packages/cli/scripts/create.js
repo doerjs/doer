@@ -100,10 +100,10 @@ function readTemplates(templatePath) {
 
 function getEJSRenderData(answers) {
   const cliPackage = require(cliBasePaths.packageJsonPath)
-  const eslintPackage = require('../../eslint-config/package.json')
-  const prettierPackage = require('../../prettier-config/package.json')
-  const pluginLessPackage = require('../../plugin-less/package.json')
-  const pluginTypescriptPackage = require('../../plugin-typescript/package.json')
+  const eslintPackage = require('@doerjs/eslint-config/package.json')
+  const prettierPackage = require('@doerjs/prettier-config/package.json')
+  const pluginLessPackage = require('@doerjs/plugin-less/package.json')
+  const pluginTypescriptPackage = require('@doerjs/plugin-typescript/package.json')
 
   return {
     answers,
