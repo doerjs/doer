@@ -1,5 +1,11 @@
 # @doerjs/cli
 
+## 0.0.6-beta.5
+
+### Patch Changes
+
+- 修复 husky 报错
+
 ## 0.0.6-beta.4
 
 ### Patch Changes
