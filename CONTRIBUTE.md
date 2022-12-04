@@ -22,7 +22,7 @@ $ doer create example
   ...其他原本的信息,
   "pnpm": {
     "overrides": {
-      "@doerjs/cli": "link:../doer/packages/cli"
+      "@doerjs/cli": "link:../doer/packages/cli"(备注，这里的地址是你doer项目的绝对地址或者相对地址)
     }
   }
 }
