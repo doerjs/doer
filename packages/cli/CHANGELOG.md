@@ -1,5 +1,14 @@
 # @doerjs/cli
 
+## 0.0.6-beta.8
+
+### Patch Changes
+
+- 调整应用匹配规则
+- Updated dependencies
+  - @doerjs/plugin-typescript@0.0.6-beta.4
+  - @doerjs/utils@0.0.6-beta.4
+
 ## 0.0.6-beta.7
 
 ### Patch Changes

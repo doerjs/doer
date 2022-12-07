@@ -1,5 +1,11 @@
 # @doerjs/utils
 
+## 0.0.6-beta.4
+
+### Patch Changes
+
+- 调整应用匹配规则
+
 ## 0.0.6-beta.3
 
 ### Patch Changes
