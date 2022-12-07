@@ -6,7 +6,7 @@ module.exports = function (plugin, option) {
       plugin.registerBabelLoader(webpackChain, {
         name: 'typescript',
         test: [/\.ts$/, /\.tsx$/],
-        include: [environment.paths.appPaths.srcPath],
+        include: environment.paths.appPaths.contextPaths.concat(environment.config.config.extraBabelCompileNodeModules),
         exclude: [/\.d\.ts$/],
         presets: ['@babel/preset-typescript'],
       })

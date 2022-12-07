@@ -3,7 +3,7 @@ import React, { useMemo } from 'react'
 <% layouts.forEach(function(layout) { %>
 import <%= layout.layoutName %> from './layouts/<%= layout.layoutName %>'
 <% }) %>
-import { firstCharToUpperCase } from './helper'
+import { firstCharToUpperCase, getHashPath } from './helper'
 
 const LayoutComponents = {
   <% layouts.forEach(function(layout) { %>
@@ -18,7 +18,8 @@ function getLayoutComponent(layoutName = '') {
 }
 
 export function getLayoutName() {
-  const [layoutName = ''] = window.location.hash.replace('#', '').split('/').filter(item => item)
+  const hash = getHashPath()
+  const [layoutName = ''] = hash.split('/').filter(item => item)
 
   const LayoutComponent = getLayoutComponent(layoutName)
 

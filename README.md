@@ -96,7 +96,7 @@ http://localhost:4000/#/index/order/detail
 假设我们需要在app1中访问app2的order/detail页面，这个时候无需重新编译app1和app2
 
 直接访问如下地址即可：
-http://localhost:3000/#/index/@app2/order/detail
+http://localhost:3000/#/index/app2/order/detail
 
 这个时候布局index用的是http://localhost:3000该域名指向的app1中的资源，页面访问的是order/detail
 

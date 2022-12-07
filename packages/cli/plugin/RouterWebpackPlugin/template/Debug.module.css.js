@@ -88,6 +88,26 @@ module.exports = `
   color: #999;
 }
 
+.content .empty {
+  height: 120px;
+  line-height: 120px;
+  color: #999;
+  text-align: center;
+}
+
+.content .search {
+  height: 40px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 8px 16px;
+  background: #f5f5f5;
+}
+
+.content .search > input {
+  width: 100%;
+}
+
 .content .footer {
   display: flex;
   flex-direction: row;

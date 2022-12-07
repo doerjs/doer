@@ -4,7 +4,7 @@ import { HashRouter } from 'react-router-dom'
 
 import { useHistoryChange } from './history'
 import { loadScopeComponent, loadScopeModule } from './loader'
-import { isFunction, isUndefined, isDebug, isEnableEditDebug } from './helper'
+import { isFunction, isString, isUndefined, isObject, isDebug, isEnableEditDebug, getHashPath } from './helper'
 import { enter, leave } from './global'
 
 import Layout, { getLayoutName } from './Layout'
@@ -13,12 +13,13 @@ import Error from './Error'
 import Suspense from './Suspense'
 import Debug from './Debug'
 
-function getAppName(hasLayout) {
-  const [layoutName = '', appName = ''] = window.location.hash.replace('#', '').split('/').filter(item => item)
+export function getAppName(hasLayout) {
+  const hash = getHashPath()
+  const [layoutName = '', appName = ''] = hash.split('/').filter(item => item)
   const name = hasLayout ? appName : layoutName
 
-  if (name.startsWith('@')) {
-    return name.substr(1)
+  if (isString(window.__doer_remotes__[name]) && window.__doer_remotes__[name]) {
+    return name
   }
 }
 
@@ -78,7 +79,7 @@ function useAppRouter() {
       console.error(error)
     }
 
-    currState.basename = [layoutName, appName ? '@' + appName : ''].filter(Boolean).join('/')
+    currState.basename = [layoutName, appName].filter(Boolean).join('/')
 
     setState(currState)
   }

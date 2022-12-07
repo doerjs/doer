@@ -52,45 +52,61 @@ function getRemotes() {
 
 function DebugContent({ onClose = noop }) {
   const remotes = useRef(getRemotes())
+  const [searchText, setSearchText] = useState('')
 
-  const handleChange = useCallback(({ target: { value } }, name) => {
-    remotes.current[name] = value
-  }, [])
+  function handleChange(event, name) {
+    remotes.current[name] = event.target.value
+  }
 
-  const handleReset = useCallback(() => {
+  function handleReset() {
     window.sessionStorage.removeItem('<%= appName %>__doer_remotes__')
     onClose()
     window.location.reload()
-  }, [])
+    setSearchText('')
+  }
 
-  const handleConfirm = useCallback(() => {
+  function handleConfirm() {
     window.sessionStorage.setItem('<%= appName %>__doer_remotes__', JSON.stringify(remotes.current))
     onClose()
     window.location.reload()
-  }, [onClose])
+  }
+
+  function handleSearch(event) {
+    setSearchText(event.target.value)
+  }
+
+  const remoteOptions = Object.keys(remotes.current).reduce((result, name) => {
+    if (!searchText || name.includes(searchText)) {
+      result.push({ label: name, value: remotes.current[name] })
+    }
+    return result
+  }, [])
 
   return (
     <Container>
       <div className={styles.content}>
         <div className={styles.header}>
-          <span className={styles.title}>调试地址{isEnableEditDebug() ? '(未生效)' : ''}</span>
+          <span className={styles.title}>调试模式{isEnableEditDebug() ? '(当前未生效)' : ''}</span>
           <button className={styles.button} onClick={onClose}>关闭</button>
         </div>
+        <div className={styles.search}>
+          <input placeholder="请输入应用名称搜索" onChange={handleSearch} />
+        </div>
         <div className={styles.remotes}>
-          <div></div>
-          {Object.keys(remotes.current).map(name => {
+          {!remoteOptions.length && <div className={styles.empty}>暂无其他应用</div>}
+          {remoteOptions.map(option => {
             return (
-              <div className={styles.remote} key={name}>
-                <div className={styles.label}>{name}:</div>
-                <input className={styles.value} defaultValue={remotes.current[name]} onChange={(event) => handleChange(event, name)} />
-                <div className={styles.tip}>{window.__doer_remotes__[name]}(默认值)</div>
+              <div className={styles.remote} key={option.label}>
+                <div className={styles.label}>{option.label}:</div>
+                <input className={styles.value} defaultValue={option.value} onChange={(event) => handleChange(event, option.label)} />
+                <div className={styles.tip}>{window.__doer_remotes__[option.label]}(默认值)</div>
               </div>
             )
           })}
         </div>
         <div className={styles.footer}>
           <div className={styles.toolbar}>
-            debug模式：debug='true'(生效) debug=''(未生效)
+            debug模式：debug='true'(生效) debug=''(仅编辑，暂不生效)
           </div>
           <div className={styles.actions}>
             <button className={styles.button} onClick={handleReset}>重置</button>
@@ -105,21 +121,21 @@ function DebugContent({ onClose = noop }) {
 export default function Debug() {
   const [visible, setVisible] = useState(false)
 
-  const show = useCallback(() => {
+  function show() {
     setVisible(true)
-  }, [])
+  }
 
-  const hide = useCallback(() => {
+  function hide() {
     setVisible(false)
-  }, [])
+  }
 
-  const handleClose = useCallback(() => {
+  function handleClose() {
     hide()
-  }, [])
+  }
 
-  const handleTriggerClick = useCallback(() => {
+  function handleTriggerClick() {
     visible ? hide() : show()
-  }, [visible])
+  }
 
   return (
     <div className={styles.debug}>

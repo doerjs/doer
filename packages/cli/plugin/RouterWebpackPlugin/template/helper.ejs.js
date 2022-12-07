@@ -5,6 +5,10 @@ export function firstCharToUpperCase(str) {
   return str.replace(/^\\S/, (c) => c.toUpperCase())
 }
 
+export function getHashPath() {
+  return window.location.hash.replace('#', '').split('?')[0] || ''
+}
+
 function check(data, type) {
   return Object.prototype.toString.call(data) === \`[object \${type}]\`
 }
@@ -15,6 +19,14 @@ export function isFunction(data) {
 
 export function isUndefined(data) {
   return check(data, 'Undefined')
+}
+
+export function isString(data) {
+  return check(data, 'String')
+}
+
+export function isObject(data) {
+  return check(data, 'Object')
 }
 
 function debug() {

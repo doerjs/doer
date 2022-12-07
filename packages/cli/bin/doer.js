@@ -6,7 +6,6 @@ const chalk = require('chalk')
 const logger = require('@doerjs/utils/logger')
 
 const helper = require('../lib/helper')
-
 process.on('unhandledRejection', (err) => {
   throw err
 })

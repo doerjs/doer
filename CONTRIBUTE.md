@@ -16,26 +16,14 @@ $ npm install --global @doerjs/cli
 $ doer create example
 ```
 
-3. 修改example中的package.json文件新增如下内容
-```json
-{
-  ...其他原本的信息,
-  "pnpm": {
-    "overrides": {
-      "@doerjs/cli": "link:../doer/packages/cli"(备注，这里的地址是你doer项目的绝对地址或者相对地址)
-    }
-  }
-}
-```
+3. 删除package-lock.json，node_modules
 
-4. 删除package-lock.json，node_modules
-
-5. 安装pnpm包管理工具
+4. 安装pnpm包管理工具
 ```bash
 $ npm install --global pnpm
 ```
 
-6. 添加.npmrc文件
+5. 添加.npmrc文件
 ```
 public-hoist-pattern[]=*eslint*
 public-hoist-pattern[]=*prettier*
@@ -46,19 +34,25 @@ public-hoist-pattern[]=*history*
 ```
 这个文件的作用主要解决pnpm导致间接依赖解析失败的问题
 
-7. 执行依赖安装
+6. 执行依赖安装
 ```bash
 $ pnpm i
 ```
 由于之前已经配置@doerjs/cli的包路径的overrides，因此此时安装的脚手架指向了本地项目，
 直接跑起来本地项目，就可以直接调试了
 
-8. 运行项目
-```bash
-$ doer dev
+7. link本地脚手架
+```
+$ pnpm link /Volumes/Code/workspace/doer/packages/cli(这里的路径替换为你本地的真实路径)
+$ 还可以link其他本地包
 ```
 
-本包采用pnpm monorepo进行管理
+8. 运行项目
+```bash
+$ pnpm run dev
+```
+
+本包采用pnpm monorepo进行管理，相关命令如下
 
 ### 安装依赖
 

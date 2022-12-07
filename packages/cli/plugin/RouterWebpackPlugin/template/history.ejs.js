@@ -1,12 +1,13 @@
 module.exports = `
 import { useRef, useEffect } from 'react'
 import { createHashHistory } from 'history'
-export * from 'react-router-dom'
+
+import { getLayoutName } from './Layout'
 
 import { isFunction } from './helper'
 
 const history = createHashHistory()
-
+history.getLayout = getLayoutName()
 export function useHistoryChange(handler) {
   const listener = useRef(handler)
   listener.current = handler
@@ -26,7 +27,7 @@ export function useHistoryChange(handler) {
   }, [])
 }
 
-window.history = history
+window.doer.history = history
 
 export default history
 `

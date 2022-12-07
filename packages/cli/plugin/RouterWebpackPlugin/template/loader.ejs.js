@@ -1,7 +1,7 @@
 module.exports = `
 import React, { lazy } from 'react'
 
-import { isUndefined, isFunction } from './helper'
+import { isUndefined, isFunction, isString } from './helper'
 
 export function loadModule(scope, module) {
   return async () => {
@@ -54,7 +54,7 @@ async function loadScopeScript(scope) {
   if (isScopeLoaded(scope)) return
 
   let scopeRemoteUrl = window.__doer_remotes__[scope]
-  if (!scopeRemoteUrl) {
+  if (!isString(scopeRemoteUrl) || !scopeRemoteUrl) {
     throw new Error(\`application \${scope} not register\`)
   }
 

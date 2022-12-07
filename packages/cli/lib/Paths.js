@@ -28,6 +28,7 @@ function getAppPaths(cliPaths) {
     nodeModulesPath: path.resolve(cliPaths.runtimePath, 'node_modules'),
     htmlPath,
     tempComplierPath,
+    contextPaths: [srcPath],
   }
 }
 
