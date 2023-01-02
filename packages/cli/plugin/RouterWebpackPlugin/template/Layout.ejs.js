@@ -29,7 +29,7 @@ export function getLayoutName() {
 function useLayoutName() {
   return useMemo(() => {
     return getLayoutName()
-  }, [window.location.hash])
+  }, [getRouterPath()])
 }
 
 export default function Layout({ children }) {
