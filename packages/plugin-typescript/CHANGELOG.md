@@ -1,5 +1,11 @@
 # @doerjs/plugin-typescript
 
+## 0.0.6-beta.5
+
+### Patch Changes
+
+- 支持 browser history
+
 ## 0.0.6-beta.4
 
 ### Patch Changes

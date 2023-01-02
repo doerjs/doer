@@ -1,5 +1,11 @@
 # @doerjs/prettier-config
 
+## 0.0.6-beta.4
+
+### Patch Changes
+
+- 支持 browser history
+
 ## 0.0.6-beta.3
 
 ### Patch Changes

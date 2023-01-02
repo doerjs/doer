@@ -11,6 +11,7 @@
     "@doerjs/utils": "0.0.6-beta.3"
   },
   "changesets": [
+    "blue-walls-lay",
     "brown-rocks-worry",
     "fast-impalas-attack",
     "gentle-olives-clap",

@@ -1,5 +1,20 @@
 # @doerjs/cli
 
+## 0.1.0-beta.9
+
+### Minor Changes
+
+- 支持 browser history
+
+### Patch Changes
+
+- Updated dependencies
+  - @doerjs/eslint-config@0.0.6-beta.4
+  - @doerjs/plugin-less@0.0.6-beta.4
+  - @doerjs/plugin-typescript@0.0.6-beta.5
+  - @doerjs/prettier-config@0.0.6-beta.4
+  - @doerjs/utils@0.0.6-beta.5
+
 ## 0.0.6-beta.8
 
 ### Patch Changes
