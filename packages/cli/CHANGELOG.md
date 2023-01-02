@@ -1,5 +1,11 @@
 # @doerjs/cli
 
+## 0.1.0-beta.10
+
+### Patch Changes
+
+- 修复 browser history 下 layout 变更监听失败问题
+
 ## 0.1.0-beta.9
 
 ### Minor Changes

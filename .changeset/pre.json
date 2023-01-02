@@ -1,14 +1,14 @@
 {
-  "mode": "exit",
+  "mode": "pre",
   "tag": "beta",
   "initialVersions": {
-    "@doerjs/cli": "0.0.6-beta.5",
-    "@doerjs/eslint-config": "0.0.6-beta.3",
-    "@doerjs/plugin-less": "0.0.6-beta.3",
-    "@doerjs/plugin-mock": "0.0.6-beta.3",
-    "@doerjs/plugin-typescript": "0.0.6-beta.3",
-    "@doerjs/prettier-config": "0.0.6-beta.3",
-    "@doerjs/utils": "0.0.6-beta.3"
+    "@doerjs/cli": "0.1.0-beta.9",
+    "@doerjs/eslint-config": "0.0.6-beta.4",
+    "@doerjs/plugin-less": "0.0.6-beta.4",
+    "@doerjs/plugin-mock": "0.0.6-beta.5",
+    "@doerjs/plugin-typescript": "0.0.6-beta.5",
+    "@doerjs/prettier-config": "0.0.6-beta.4",
+    "@doerjs/utils": "0.0.6-beta.5"
   },
   "changesets": [
     "blue-walls-lay",
@@ -20,6 +20,7 @@
     "quiet-rings-compete",
     "slimy-dolphins-dream",
     "swift-otters-watch",
-    "warm-stingrays-jump"
+    "warm-stingrays-jump",
+    "wise-otters-watch"
   ]
 }
