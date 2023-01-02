@@ -1,6 +1,6 @@
 ## 需要开发的功能
 1. Debug组件支持搜索等方便管理的能力 [done]
-2. 支持browser history
+2. 支持browser history [done]
 3. 升级react-router到最新版本，并且由于新版本不支持history api调用，需要实现相关功能 [done]
 4. 编译速度优化
 5. 通过实现新插件的形式添加sass插件支持

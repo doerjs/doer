@@ -9,6 +9,9 @@ module.exports = {
   exposes: {},
   shared: {},
 
+  // 开启BrowserRouter模式
+  browserHistory: false,
+
   plugins: [
   <% if (answers.style === 'less') { %>
   '<%= packages.pluginLess.name %>',

@@ -157,8 +157,12 @@ class DoerWebpackPlugin {
         remoteFileName: this.options.remoteFileName,
       })
       this.writeFile('bootstrap.js', bootstrapTemplate)
-      this.writeFile('history.js', historyTemplate)
-      this.writeFile('helper.js', helperTemplate)
+      this.writeTemplate('history.js', historyTemplate, {
+        browserHistory: this.options.appConfig.browserHistory,
+      })
+      this.writeTemplate('helper.js', helperTemplate, {
+        browserHistory: this.options.appConfig.browserHistory,
+      })
       this.writeTemplate('Debug.jsx', debugTemplate, {
         appName: this.options.appPackage.name,
       })
@@ -272,7 +276,9 @@ class DoerWebpackPlugin {
 
   writeApp() {
     const appFileName = 'App.jsx'
-    this.writeFile(appFileName, appTemplate)
+    this.writeTemplate(appFileName, appTemplate, {
+      browserHistory: this.options.appConfig.browserHistory,
+    })
   }
 
   writeLayouts() {

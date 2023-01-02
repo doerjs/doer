@@ -1,10 +1,16 @@
 module.exports = `
 import React, { useState, useEffect, useRef } from 'react'
-import { HashRouter } from 'react-router-dom'
+import {
+  <% if (browserHistory) { %>
+  BrowserRouter,
+  <% } else { %>
+  HashRouter,
+  <% } %>
+} from 'react-router-dom'
 
 import { useHistoryChange } from './history'
 import { loadScopeComponent, loadScopeModule } from './loader'
-import { isFunction, isString, isUndefined, isObject, isDebug, isEnableEditDebug, getHashPath } from './helper'
+import { isFunction, isString, isUndefined, isObject, isDebug, isEnableEditDebug, getRouterPath } from './helper'
 import { enter, leave } from './global'
 
 import Layout, { getLayoutName } from './Layout'
@@ -14,8 +20,8 @@ import Suspense from './Suspense'
 import Debug from './Debug'
 
 export function getAppName(hasLayout) {
-  const hash = getHashPath()
-  const [layoutName = '', appName = ''] = hash.split('/').filter(item => item)
+  const routerPath = getRouterPath()
+  const [layoutName = '', appName = ''] = routerPath.split('/').filter(item => item)
   const name = hasLayout ? appName : layoutName
 
   if (isString(window.__doer_remotes__[name]) && window.__doer_remotes__[name]) {
@@ -110,9 +116,9 @@ export default function App({ location }) {
           <Error mode="page">
             <Suspense mode="page">
               {status === 'loading' ? AppRouter && <AppRouter /> : (
-                <HashRouter basename={basename}>
+                <<% if (browserHistory) { %>BrowserRouter<% } else { %>HashRouter<% } %> basename={basename}>
                   {status === 'succeed' && AppRouter ? <AppRouter /> : <Router />}
-                </HashRouter>
+                </<% if (browserHistory) { %>BrowserRouter<% } else { %>HashRouter<% } %>>
               )}
             </Suspense>
           </Error>

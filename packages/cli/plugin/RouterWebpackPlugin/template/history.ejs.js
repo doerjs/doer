@@ -1,12 +1,18 @@
 module.exports = `
 import { useRef, useEffect } from 'react'
-import { createHashHistory } from 'history'
+import {
+  <% if (browserHistory) { %>
+  createBrowserHistory,
+  <% } else { %>
+  createHashHistory,
+  <% } %>
+} from 'history'
 
 import { getLayoutName } from './Layout'
 
 import { isFunction } from './helper'
 
-const history = createHashHistory()
+const history = <% if (browserHistory) { %>createBrowserHistory()<% } else { %>createHashHistory()<% } %>
 history.getLayout = getLayoutName()
 export function useHistoryChange(handler) {
   const listener = useRef(handler)

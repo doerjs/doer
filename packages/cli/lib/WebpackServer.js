@@ -64,6 +64,7 @@ WebpackServer.prototype.run = async function () {
       directory: this.paths.appPaths.publicDirectory,
       publicPath: process.env.PUBLIC_URL,
     },
+    historyApiFallback: true,
     client: {
       logging: 'none',
       overlay: false,

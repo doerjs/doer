@@ -268,7 +268,7 @@ Webpack.prototype.optimization = function ({ isProduction, isEnableProfiler }) {
     cacheGroups: {
       framework: {
         test: (module) => {
-          return /react|react-router-dom|react-dom/.test(module.context)
+          return /react|react-router-dom|react-dom|history/.test(module.context)
         },
         name: 'framework',
         enforce: true,

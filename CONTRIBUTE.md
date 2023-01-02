@@ -79,19 +79,6 @@ $ pnpm i 包名 -r
 $ pnpm i 包名 -r --filter 包名
 ```
 
-### 基于pnpm如何调试本地包
-
-目标项目的package.json文件中重写路径为本地路径
-```json
-{
-  "pnpm": {
-    "overrides": {
-      "@doerjs/cli": "link:../doer/packages/cli"
-    }
-  }
-}
-```
-
 ### 发布alpha测试版本
 
 是内部测试版，一般不向外部发布，会有很多Bug，一般只有测试人员使用

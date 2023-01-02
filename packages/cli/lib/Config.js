@@ -5,16 +5,25 @@ const is = require('@doerjs/utils/is')
 const logger = require('@doerjs/utils/logger')
 
 const defaultConfig = {
+  // 项目别名
   alias: {},
+  // 配置额外的node_modules编译包，部分第三方包没有提供编译后的版本，需要自行配置编译
   extraBabelCompileNodeModules: [],
-  themes: {},
+  // 配置项目导出资源
   exposes: {},
+  // 配置项目需要共享的库
   shared: {},
+  // 配置项目的页面及布局loading组件
   loading: {},
+  // 配置项目的页面及布局加载失败时的error组件
   error: {},
+  // 配置相关插件
   plugins: [],
+  // 是否开启browserHistory
+  browserHistory: false,
 }
 
+// 创建简单类型配置获取函数
 function createConfigFactory(rawConfig) {
   return function (name, check) {
     const value = rawConfig[name]
@@ -32,6 +41,7 @@ function createConfigFactory(rawConfig) {
   }
 }
 
+// 解析loading配置，最终分别输出page和layout的对应loading组件路径
 function getLoading(option) {
   const rawConfig = option.rawConfig
 
@@ -63,6 +73,7 @@ function getLoading(option) {
   process.exit(-1)
 }
 
+// 解析error配置，最终分别输出page和layout的对应error组件路径
 function getError(option) {
   const rawConfig = option.rawConfig
 
@@ -92,6 +103,11 @@ function getError(option) {
   process.exit(-1)
 }
 
+/**
+ * 获取插件的配置信息和插件路径
+ * 1. 支持简单字符串路径配置如：@doerjs/plugin-less
+ * 2. 支持复杂的带配置信息的配置如：['@doerjs/plugin-less', {}]
+ */
 function getPlugins(option) {
   const rawConfig = option.rawConfig
 
@@ -148,9 +164,9 @@ Config.prototype.parseConfig = function () {
 
   this.config.alias = getConfigValue('alias', is.isObject)
   this.config.extraBabelCompileNodeModules = getConfigValue('extraBabelCompileNodeModules', is.isArray)
-  this.config.themes = getConfigValue('themes', is.isObject)
   this.config.exposes = getConfigValue('exposes', is.isObject)
   this.config.shared = getConfigValue('shared', is.isObject)
+  this.config.browserHistory = getConfigValue('browserHistory', is.isBoolean)
 
   this.config.loading = getLoading(this)
   this.config.error = getError(this)

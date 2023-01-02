@@ -96,7 +96,6 @@ module.exports = `
 }
 
 .content .search {
-  height: 40px;
   display: flex;
   flex-direction: row;
   align-items: center;
