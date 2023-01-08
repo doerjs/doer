@@ -7,7 +7,8 @@
     "rc": "pnpm changeset pre enter rc",
     "exit": "pnpm changeset pre exit",
     "pub": "pnpm install && pnpm changeset && pnpm changeset version && git add . && git commit -m 'chore(release): 发布新版本' && pnpm publish -r",
-    "clean": "rm -rf node_modules **/*/node_modules"
+    "clean": "rm -rf node_modules **/*/node_modules",
+    "docs": "docsify serve docs"
   },
   "lint-staged": {
     "**/*.{js,jsx}": [
@@ -24,6 +25,7 @@
     "@commitlint/config-conventional": "^16.0.0",
     "@doerjs/eslint-config": "workspace:*",
     "@doerjs/prettier-config": "workspace:*",
+    "docsify-cli": "^4.4.4",
     "husky": "^7.0.4",
     "lint-staged": "^12.1.5"
   }
