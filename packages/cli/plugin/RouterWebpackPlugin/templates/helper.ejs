@@ -1,8 +1,7 @@
-module.exports = `
 export function noop() {}
 
-export function firstCharToUpperCase(str) {
-  return str.replace(/^\\S/, (c) => c.toUpperCase())
+export function firstCharToUpperCase(word) {
+  return word.charAt(0).toUpperCase() + word.slice(1)
 }
 
 <% if (!browserHistory) { %>
@@ -22,7 +21,7 @@ export function getRouterPath() {
 }
 
 function check(data, type) {
-  return Object.prototype.toString.call(data) === \`[object \${type}]\`
+  return Object.prototype.toString.call(data) === `[object ${type}]`
 }
 
 export function isFunction(data) {
@@ -54,4 +53,3 @@ export function isDebug() {
 export function isEnableEditDebug() {
   return debug() === '' && process.env.NODE_ENV === 'development'
 }
-`

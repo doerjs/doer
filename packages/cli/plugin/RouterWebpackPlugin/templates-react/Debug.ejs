@@ -1,4 +1,3 @@
-module.exports = `
 import React, { useCallback, useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 
@@ -95,10 +94,15 @@ function DebugContent({ onClose = noop }) {
         <div className={styles.remotes}>
           {!remoteOptions.length && <div className={styles.empty}>暂无其他应用</div>}
           {remoteOptions.map(option => {
+
+            function handleInputChange(event) {
+              handleChange(event, option.label)
+            }
+
             return (
               <div className={styles.remote} key={option.label}>
                 <div className={styles.label}>{option.label}:</div>
-                <input className={styles.value} defaultValue={option.value} onChange={(event) => handleChange(event, option.label)} />
+                <input className={styles.value} defaultValue={option.value} onChange={handleInputChange} />
                 <div className={styles.tip}>{window.__doer_remotes__[option.label]}(默认值)</div>
               </div>
             )
@@ -146,4 +150,3 @@ export default function Debug() {
     </div>
   )
 }
-`

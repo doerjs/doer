@@ -14,6 +14,10 @@ Doer是基于webpack模块联合的微前端方案，对于中小型应用仅使
 * 数据mock能力
 * 代码风格校验
 
+## 教程
+
+[Doer 官方文档](https://doerjs.github.io/doer/)
+
 ## 联系
 
 502556093@qq.com

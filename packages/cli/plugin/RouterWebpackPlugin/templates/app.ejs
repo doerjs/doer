@@ -1,8 +1,7 @@
-module.exports = `
-<% if (relativeGlobalScriptPath) { %>
-export * from '<%= relativeGlobalScriptPath %>'
+<% if (relativeAppEntryPath) { %>
+export * from '<%= relativeAppEntryPath %>'
 <% if (exports.default) { %>
-export { default } from '<%= relativeGlobalScriptPath %>'
+export { default } from '<%= relativeAppEntryPath %>'
 <% } %>
 <% } %>
 
@@ -22,4 +21,3 @@ export function enter() {}
 <% if (!exports.leave) { %>
 export function leave() {}
 <% } %>
-`

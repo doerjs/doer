@@ -1,4 +1,3 @@
-module.exports = `
 import React, { useMemo } from 'react'
 <% layouts.forEach(function(layout) { %>
 import <%= layout.layoutName %> from './layouts/<%= layout.layoutName %>'
@@ -43,4 +42,3 @@ export default function Layout({ children }) {
 
   return children
 }
-`

@@ -223,7 +223,7 @@ Webpack.prototype.plugins = function ({ isProduction, isEnableGzip, isEnableAnal
       exposes: {
         ...this.config.config.exposes,
         './$$Router': path.resolve(this.paths.appPaths.tempComplierPath, 'Router.jsx'),
-        './$$app': path.resolve(this.paths.appPaths.tempComplierPath, 'global.js'),
+        './$$app': path.resolve(this.paths.appPaths.tempComplierPath, 'app.js'),
       },
       shared: {
         ...this.config.config.shared,

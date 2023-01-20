@@ -3,4 +3,6 @@
 **/*.json
 **/template
 **/template-typescript
+**/templates
+**/templates-react
 examples

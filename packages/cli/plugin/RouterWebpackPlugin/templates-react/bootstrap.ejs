@@ -1,10 +1,9 @@
-module.exports = `
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 
 import App from './App'
 
-import { render as customRender } from './global'
+import { render as customRender } from './app'
 import { isFunction } from './helper'
 
 function render(Node) {
@@ -23,4 +22,3 @@ if (isFunction(customRender)) {
 } else {
   render(<App />)
 }
-`

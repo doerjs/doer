@@ -1,4 +1,3 @@
-module.exports = `
 import React, { useState, useEffect, useRef } from 'react'
 import {
   <% if (browserHistory) { %>
@@ -9,9 +8,10 @@ import {
 } from 'react-router-dom'
 
 import { useHistoryChange } from './history'
-import { loadScopeComponent, loadScopeModule } from './loader'
+import { loadScopeModule } from './loader'
+import { loadScopeComponent } from './loaderComponent'
 import { isFunction, isString, isUndefined, isObject, isDebug, isEnableEditDebug, getRouterPath } from './helper'
-import { enter, leave } from './global'
+import { enter, leave } from './app'
 
 import Layout, { getLayoutName } from './Layout'
 import Router from './Router'
@@ -127,4 +127,3 @@ export default function App({ location }) {
     </Error>
   )
 }
-`

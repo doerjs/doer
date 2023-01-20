@@ -1,5 +1,4 @@
-module.exports = `
-import { remotes } from './global'
+import { remotes } from './app'
 import { isDebug } from './helper'
 
 (async () => {
@@ -18,4 +17,3 @@ import { isDebug } from './helper'
 
   import(/* webpackChunkName: "bootstrap" */'./bootstrap')
 })()
-`

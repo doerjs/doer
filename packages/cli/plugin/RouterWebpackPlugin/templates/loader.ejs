@@ -1,22 +1,19 @@
-module.exports = `
-import React, { lazy } from 'react'
-
 import { isUndefined, isFunction, isString } from './helper'
 
 export function loadModule(scope, module) {
   return async () => {
     await __webpack_init_sharing__('default')
     if (isUndefined(window[scope]) || !isFunction(window[scope].init)) {
-      throw new Error(\`module \${scope}.\${module} not found\`)
+      throw new Error(`module ${scope}.${module} not found`)
     }
     await window[scope].init(__webpack_share_scopes__.default)
     if (!isFunction(window[scope].get)) {
-      throw new Error(\`module \${scope}.\${module} not found\`)
+      throw new Error(`module ${scope}.${module} not found`)
     }
     const Module = await window[scope].get(module)
 
     if (isUndefined(Module)) {
-      throw new Error(\`module \${scope}.\${module} not found\`)
+      throw new Error(`module ${scope}.${module} not found`)
     }
     return Module()
   }
@@ -50,12 +47,12 @@ function isScopeLoaded(scope) {
 }
 
 // 加载应用远程入口地址
-async function loadScopeScript(scope) {
+export async function loadScopeScript(scope) {
   if (isScopeLoaded(scope)) return
 
   let scopeRemoteUrl = window.__doer_remotes__[scope]
   if (!isString(scopeRemoteUrl) || !scopeRemoteUrl) {
-    throw new Error(\`application \${scope} not register\`)
+    throw new Error(`application ${scope} not register`)
   }
 
   if (scopeRemoteUrl.endsWith('/')) {
@@ -72,11 +69,3 @@ export async function loadScopeModule(scope, module) {
   await loadScopeScript(scope)
   return loadModule(scope, module)()
 }
-
-// 加载应用组件
-export async function loadScopeComponent(scope, module) {
-  await loadScopeScript(scope)
-  const ComponentLoader = loadModule(scope, module)
-  return lazy(ComponentLoader)
-}
-`
