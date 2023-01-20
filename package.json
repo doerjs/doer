@@ -1,5 +1,14 @@
 {
   "name": "doer",
+  "description": "An React Micro App Build Toolkit",
+  "keywords": [
+    "react",
+    "react-router",
+    "webpack",
+    "module-federation",
+    "micro-frontends",
+    "build-tool"
+  ],
   "scripts": {
     "preinstall": "husky install && npx only-allow pnpm",
     "beta": "pnpm changeset pre enter beta",
