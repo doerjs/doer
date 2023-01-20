@@ -262,13 +262,229 @@ module.exports = {
 
 # API
 
+目前api分为两部分，一部分是在项目根目录下的app.js文件中导出，一部分是挂载载window.doer对象上
+
+## remotes()
+
+支持异步方式
+
+```js
+// app.js文件
+
+export function remotes() {
+  return {
+    app1: 'http://app1host'
+  }
+}
+```
+该函数主要用于注册微前端应用的域名，可以通过接口返回或者写死
+
+## render(oldRender)
+
+自定义render逻辑
+
+```js
+// app.js文件
+import LocaleProvider from '...'
+
+export function render(oldRender) {
+  oldRender((children) => {
+    return (
+      <LocaleProvider>
+        {children}
+      </LocaleProvider>
+    )
+  })
+}
+```
+
+## enter()
+
+应用进入时触发的函数
+
+```js
+// app.js文件
+
+export function enter() {}
+```
+
+## leave()
+
+应用离开时触发的函数
+
+```js
+// app.js文件
+
+export function leave() {}
+```
+
+## history
+
+路由操作对象
+
+```js
+window.doer.history
+```
+
 # 环境
+
+项目的环境变量通过项目根目录下的.env文件进行写入，目前内置了如下环境
+
+* dev: 开发环境，执行```npm run dev```时自动添加该环境变量
+* prod: 打包环境，执行```npm run build```时自动添加该环境变量
+
+优先级如下：
+
+.env < .env.local < .env.[环境] < .env.[环境].local
+
+**自定义环境**
+
+以添加自定义mock环境为例
+
+```package.json```
+```json
+{
+  "scripts": {
+    "mock": "ENV=mock doer dev"
+  }
+}
+```
+
+然后新增.env.mock环境变量文件即可
+
+注：要支持mock能力，需要配合mock插件进行，请查看[mock插件](#插件)
+
+**可用环境变量**
+
+| 名称 | 可用模式 | 描述 | 默认值 |
+| :- | :- | :- | :- |
+| IMAGE_INLINE_LIMIT_SIZE | 通用 | 图片资源内联最大限制 | 10000 |
+| PUBLIC_URL | 通用 | 静态资源路径 | / |
+| ROOT_ELEMENT_ID | 通用 | 挂载的根节点ID | root |
+| HOST | 开发 | 开发服务器的域名 | 0.0.0.0 |
+| PORT | 开发 | 开发服务器的端口 | 3000 |
+| HTTPS | 开发 | 开启https | false |
+| HTTPS_KEY | 开发 | 开发服务器的证书key | 无 |
+| HTTPS_CERT | 开发 | 开发服务器的证书cert | 无 |
+| ENABLE_PROFILER | 生产 | 开启性能分析 | false |
+| GZIP | 生产 | 开启GZIP | false |
+| ENABLE_ANALYZER | 生产 | 开启分包大小分析 | false |
+
+**自定义环境变量**
+
+需要以```APP_```打头，该类型的变量会被解析并通过webpack的definePlugin注入到应用中，应用可以通过process.env.APP_xxx进行访问
 
 # 微前端
 
+本项目基于webpack的模块联合机制打造的微前端能力，支持跨项目页面访问，跨项目资源访问等能力
+
+**跨项目页面访问**
+
+假如你有一个壳应用main，两个子应用sub1, sub2(目前这些应用都是需由doer脚手架生成，其他老项目接入需要单独改造)
+你需要在main应用下访问sub1，和 sub2应用的页面，此时只需要按如下步骤进行：
+
+1. 在main应用中的app.js文件里的[remotes](#remotes)函数中注册应用的域名
+2. 按```http://main.com/#/sub1/page``` ```http://main.com/#/sub2/page``` 即可访问到子应用的页面
+3. 如果main应用需要以名为layout的布局进行访问, ```http://main.com/#/layout/sub1/page```
+
+访问规则如下：http://[host]/#/[?布局]/[?应用]/[路由]，布局和应用没有时可以不需要
+
+**跨项目资源共享**
+
+假如你有一个通用组件项目components，该项目主要用于向其他项目提供公共组件资源，此时你可以通过[exposes](#exposes)配置导出相关资源
+
+其他项目在引用时无需额外配置可以直接按如下方式使用
+```js
+import Button from 'remote:components/Button'
+```
+
 # 插件
 
+通过[插件配置](#plugins)进行插件的使用
+
+## plugin-less
+
+配置支持less文件编译
+
+```bash
+npm install @doerjs/plugin-less
+```
+
+```js
+module.exports = {
+  plugins: ['@doerjs/plugin-less'],
+}
+```
+
+## plugin-mock
+
+配置支持开发模式下的数据mock能力
+
+```bash
+npm install @doerjs/plugin-mock
+```
+
+```js
+module.exports = {
+  plugins: ['@doerjs/plugin-mock'],
+}
+```
+
+**mock插件新增的可用环境变量**
+
+| 名称 | 可用模式 | 描述 | 默认值 |
+| :- | :- | :- | :- |
+| MOCK | 开发 | 开启数据mock | false |
+| MOCK_DELAY | 开发 | mock接口的响应延迟 | 0 |
+| MOCK_SERVER_PREFIX | 开发 | mock接口的统一前缀 | /mock |
+
+**mock文件的存放路径**
+
+在项目的根目录下/mocks目录
+
+**如何编写mock服务**
+
+```js
+// mocks/demo.js
+
+export default {
+  'GET /mock/jsonDemo': {
+    code: '200',
+    data: {},
+  },
+
+  'POST /mock/funcDemo': function (req, res) {
+    return res.status(200).json({
+      code: '200',
+      data: {},
+    })
+  },
+}
+```
+
+整体mock服务基于express搭建，遵循express语法即可
+
+## plugin-typescript
+
+配置支持ts，如果通过脚手架初始化时选择ts，此插件及tsconfig.json会自动加入
+
+```bash
+npm install @doerjs/plugin-typescript
+```
+
+```js
+module.exports = {
+  plugins: ['@doerjs/plugin-typescript'],
+}
+```
+
+## 自定义插件开发
+
+由于相关api较多，这里不列举出来，如需开发自定义插件，请参考现有插件源码及```packages/cli/lib/Plugin.js```中查看对应的插件hooks以及其调用时机
+
 # 部署
+
+部署方式与其他前端应用没有差别，值得注意的一点是微前端应用场景下，每个应用都存在一个remote.js文件，缓存时应设置为不缓存
 
 # 贡献代码
 
