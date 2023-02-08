@@ -1,5 +1,11 @@
 # @doerjs/cli
 
+## 0.1.0-beta.12
+
+### Patch Changes
+
+- 测试
+
 ## 0.1.0-beta.10
 
 ### Patch Changes
