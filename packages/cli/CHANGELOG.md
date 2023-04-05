@@ -1,5 +1,17 @@
 # @doerjs/cli
 
+## 0.1.0-beta.13
+
+### Patch Changes
+
+- 发布最新版本
+- Updated dependencies
+  - @doerjs/eslint-config@0.0.6-beta.5
+  - @doerjs/plugin-less@0.0.6-beta.5
+  - @doerjs/plugin-typescript@0.0.6-beta.6
+  - @doerjs/prettier-config@0.0.6-beta.5
+  - @doerjs/utils@0.0.6-beta.6
+
 ## 0.1.0-beta.12
 
 ### Patch Changes
