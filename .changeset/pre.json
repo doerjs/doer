@@ -2,27 +2,13 @@
   "mode": "pre",
   "tag": "beta",
   "initialVersions": {
-    "@doerjs/cli": "0.1.0-beta.9",
-    "@doerjs/eslint-config": "0.0.6-beta.4",
-    "@doerjs/plugin-less": "0.0.6-beta.4",
-    "@doerjs/plugin-mock": "0.0.6-beta.5",
-    "@doerjs/plugin-typescript": "0.0.6-beta.5",
-    "@doerjs/prettier-config": "0.0.6-beta.4",
-    "@doerjs/utils": "0.0.6-beta.5"
+    "@doerjs/cli": "0.1.0-beta.13",
+    "@doerjs/eslint-config": "0.0.6-beta.5",
+    "@doerjs/plugin-less": "0.0.6-beta.5",
+    "@doerjs/plugin-mock": "0.0.6-beta.6",
+    "@doerjs/plugin-typescript": "0.0.6-beta.6",
+    "@doerjs/prettier-config": "0.0.6-beta.5",
+    "@doerjs/utils": "0.0.6-beta.6"
   },
-  "changesets": [
-    "blue-walls-lay",
-    "brown-rocks-worry",
-    "fast-impalas-attack",
-    "gentle-olives-clap",
-    "hot-books-remain",
-    "lemon-tools-mate",
-    "quiet-rings-compete",
-    "slimy-dolphins-dream",
-    "swift-otters-watch",
-    "warm-stingrays-jump",
-    "wet-ears-divide",
-    "wise-files-peel",
-    "wise-otters-watch"
-  ]
+  "changesets": ["strange-squids-film"]
 }

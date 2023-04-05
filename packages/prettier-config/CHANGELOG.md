@@ -1,5 +1,11 @@
 # @doerjs/prettier-config
 
+## 0.0.6-beta.6
+
+### Patch Changes
+
+- 提交新版本
+
 ## 0.0.6-beta.5
 
 ### Patch Changes

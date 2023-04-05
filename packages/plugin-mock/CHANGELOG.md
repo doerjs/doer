@@ -1,5 +1,13 @@
 # @doerjs/plugin-mock
 
+## 0.0.6-beta.7
+
+### Patch Changes
+
+- 提交新版本
+- Updated dependencies
+  - @doerjs/utils@0.0.6-beta.7
+
 ## 0.0.6-beta.6
 
 ### Patch Changes
