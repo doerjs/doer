@@ -1,5 +1,11 @@
 # @doerjs/plugin-less
 
+## 0.0.6
+
+### Patch Changes
+
+- a985667: 提交新版本
+
 ## 0.0.6-beta.6
 
 ### Patch Changes
