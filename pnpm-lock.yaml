@@ -32,7 +32,7 @@ importers:
       '@babel/preset-react': ^7.16.7
       '@babel/register': ^7.17.7
       '@babel/traverse': ^7.17.3
-      '@doerjs/eslint-config': workspace:0.0.6
+      '@doerjs/eslint-config': workspace:0.0.7
       '@doerjs/plugin-less': workspace:0.0.6
       '@doerjs/plugin-typescript': workspace:0.0.6
       '@doerjs/prettier-config': workspace:0.0.6

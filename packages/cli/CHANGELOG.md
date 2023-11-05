@@ -1,5 +1,17 @@
 # @doerjs/cli
 
+## 0.1.3
+
+### Patch Changes
+
+- 脚手架 sourceMap 支持排除 node_modules
+
+## 0.1.2
+
+### Patch Changes
+
+- 脚手架 sourceMap 排除 node_modules
+
 ## 0.1.1
 
 ### Patch Changes

@@ -15,7 +15,7 @@
     "alpha": "pnpm changeset pre enter alpha",
     "rc": "pnpm changeset pre enter rc",
     "exit": "pnpm changeset pre exit",
-    "pub": " pnpm install && pnpm changeset && pnpm changeset version && pnpm publish -r",
+    "pub": " pnpm install && pnpm changeset && pnpm changeset version && git add . && git commit -m 'chore(version): 发布新版本' && pnpm publish -r",
     "clean": "rm -rf node_modules **/*/node_modules",
     "docs": "docsify serve docs"
   },
