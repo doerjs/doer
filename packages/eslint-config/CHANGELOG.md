@@ -1,5 +1,11 @@
 # @doerjs/eslint-config
 
+## 0.0.7
+
+### Patch Changes
+
+- 发布版本测试
+
 ## 0.0.6
 
 ### Patch Changes

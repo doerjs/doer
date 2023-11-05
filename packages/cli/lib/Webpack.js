@@ -118,7 +118,10 @@ Webpack.prototype.module = function (option) {
     .rule('sourceMap')
     .test([/\.js$/, /\.jsx$/, /\.css$/])
     .enforce('pre')
-  sourceMapRule.exclude.add(/@babel(?:\/|\\{1,2})runtime/).end()
+  sourceMapRule.exclude
+    .add(/@babel(?:\/|\\{1,2})runtime/)
+    .add(/node_modules/)
+    .end()
   sourceMapRule.use('sourceMap').loader(require.resolve('source-map-loader')).end()
   sourceMapRule.end()
 

@@ -1,5 +1,12 @@
 # @doerjs/cli
 
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @doerjs/eslint-config@0.0.7
+
 ## 0.1.0
 
 ### Patch Changes
