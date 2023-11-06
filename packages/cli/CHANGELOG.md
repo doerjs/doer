@@ -1,5 +1,17 @@
 # @doerjs/cli
 
+## 0.1.4
+
+### Patch Changes
+
+- 升级依赖及固化依赖
+- Updated dependencies
+  - @doerjs/eslint-config@0.0.8
+  - @doerjs/plugin-less@0.0.7
+  - @doerjs/plugin-typescript@0.0.7
+  - @doerjs/prettier-config@0.0.7
+  - @doerjs/utils@0.0.7
+
 ## 0.1.3
 
 ### Patch Changes

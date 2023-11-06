@@ -1,5 +1,11 @@
 # @doerjs/prettier-config
 
+## 0.0.7
+
+### Patch Changes
+
+- 升级依赖及固化依赖
+
 ## 0.0.6
 
 ### Patch Changes
