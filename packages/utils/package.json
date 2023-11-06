@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "chalk": "4.1.2",
-    "dayjs": "^1.11.3",
-    "loader-utils": "^3.2.0"
+    "dayjs": "1.11.10",
+    "loader-utils": "3.2.1"
   }
 }

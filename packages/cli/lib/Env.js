@@ -20,7 +20,7 @@ Env.prototype.parseFile = function () {
 
   envFiles.forEach((envFile) => {
     if (file.isExist(envFile)) {
-      dotenvExpand(dotenv.config({ path: envFile }))
+      dotenvExpand.expand(dotenv.config({ path: envFile }))
     }
   })
 }
