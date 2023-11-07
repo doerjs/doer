@@ -1,8 +1,8 @@
 'use strict'
 
-module.exports = function (plugin, option) {
+module.exports = function (plugin, option, api) {
   plugin.hooks.webpack.tap('Less', (webpackChain) => {
-    plugin.registerStyleLoader(webpackChain, {
+    api.registerStyleLoader(webpackChain, {
       name: 'less',
       test: /\.less$/,
       exclude: [/\.module\.less$/],
@@ -20,7 +20,7 @@ module.exports = function (plugin, option) {
       ],
     })
 
-    plugin.registerStyleLoader(webpackChain, {
+    api.registerStyleLoader(webpackChain, {
       name: 'lessModule',
       test: /\.module\.less$/,
       cssModule: true,

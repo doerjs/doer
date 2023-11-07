@@ -1,8 +1,10 @@
 'use strict'
 
 const MiniCssExtractWebpackPlugin = require('mini-css-extract-plugin')
-const getLocalIdent = require('@doerjs/utils/getLocalIdent')
+const localIdent = require('@doerjs/utils/getLocalIdent')
 const is = require('@doerjs/utils/is')
+
+const context = require('../context')
 
 module.exports = function (webpackChain, option) {
   const styleRule = webpackChain.module.rule(option.name).test(option.test).sideEffects(true)
@@ -29,7 +31,8 @@ module.exports = function (webpackChain, option) {
   }
   if (option.cssModule) {
     cssOptions.modules = {
-      getLocalIdent,
+      getLocalIdent:
+        context.config.config.mode === 'library' ? localIdent.getLibraryLocalIndent : localIdent.getProjectLocalIdent,
     }
   }
   styleRule.use('css').loader(require.resolve('css-loader')).options(cssOptions).end()

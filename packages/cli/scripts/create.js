@@ -9,7 +9,7 @@ const file = require('@doerjs/utils/file')
 const logger = require('@doerjs/utils/logger')
 const shell = require('@doerjs/utils/shell')
 
-const cliBasePaths = require('../lib/cliBasePaths')
+const context = require('../context')
 
 const spinning = ora()
 
@@ -99,7 +99,7 @@ function readTemplates(templatePath) {
 }
 
 function getEJSRenderData(answers) {
-  const cliPackage = require(cliBasePaths.packageJsonPath)
+  const cliPackage = require(context.paths.packageJsonPath)
   const eslintPackage = require('@doerjs/eslint-config/package.json')
   const prettierPackage = require('@doerjs/prettier-config/package.json')
   const pluginLessPackage = require('@doerjs/plugin-less/package.json')
@@ -165,10 +165,10 @@ async function createApplication(appPath, answers) {
   console.log(`👣 正在创建全新应用 ${chalk.greenBright(answers.name)}...`)
   console.log()
 
-  const templatePath = answers.typescript ? cliBasePaths.typescriptTemplatePath : cliBasePaths.templatePath
+  const templatePath = answers.typescript ? context.paths.typescriptTemplatePath : context.paths.templatePath
   const templates = readTemplates(templatePath)
 
-  readTemplates(cliBasePaths.templatePath)
+  readTemplates(context.paths.templatePath)
 
   createDirectory(appPath)
 
@@ -218,7 +218,7 @@ async function createApplication(appPath, answers) {
 
 module.exports = async function create(params) {
   const answers = await qa(params)
-  const appPath = path.resolve(cliBasePaths.runtimePath, answers.name)
+  const appPath = path.resolve(context.paths.runtimePath, answers.name)
   if (file.isExist(appPath)) {
     console.log()
     logger.fail(`目录已经存在，无法正常创建：${appPath}`)

@@ -3,14 +3,14 @@
 const figlet = require('figlet')
 const chalk = require('chalk')
 
-const cliBasePaths = require('./cliBasePaths')
+const paths = require('../context/Paths')
 
 function logo() {
   console.log(figlet.textSync('Doer', 'Ghost'))
 }
 
 function version() {
-  const packageInfo = require(cliBasePaths.packageJsonPath)
+  const packageInfo = require(paths.packageJsonPath)
 
   if (packageInfo.version) {
     console.log(`👣 Doer v${packageInfo.version}`)
@@ -22,7 +22,7 @@ function version() {
 }
 
 function name() {
-  const packageInfo = require(cliBasePaths.appPackageJsonPath)
+  const packageInfo = require(paths.appPackageJsonPath)
 
   if (packageInfo.name) {
     console.log(`👣 应用名称：${chalk.blue(chalk.bold(packageInfo.name))}`)

@@ -3,7 +3,7 @@
 const path = require('node:path')
 const loaderUtils = require('loader-utils')
 
-function getLocalIdent(context, localIdentName, localName, options) {
+function getProjectLocalIdent(context, localIdentName, localName, options) {
   const { dir, name } = path.parse(context.resourcePath)
   const res = path.parse(path.resolve(dir, name))
 
@@ -14,4 +14,11 @@ function getLocalIdent(context, localIdentName, localName, options) {
   return `${res.name}__${localName}--${hash}`
 }
 
-module.exports = getLocalIdent
+function getLibraryLocalIndent(context, localIdentName, localName, options) {
+  const { dir, name } = path.parse(context.resourcePath)
+  const res = path.parse(path.resolve(dir, name))
+
+  return `${res.name}__${localName}`
+}
+
+module.exports = { getProjectLocalIdent, getLibraryLocalIndent }

@@ -1,12 +1,12 @@
 'use strict'
 
-module.exports = function (plugin, option) {
-  plugin.hooks.environment.tap('Typescript', (environment) => {
+module.exports = function (plugin, option, api) {
+  plugin.hooks.environment.tap('Typescript', (context) => {
     plugin.hooks.webpack.tap('Typescript', (webpackChain) => {
-      plugin.registerBabelLoader(webpackChain, {
+      api.registerBabelLoader(webpackChain, {
         name: 'typescript',
         test: [/\.ts$/, /\.tsx$/],
-        include: environment.paths.appPaths.contextPaths.concat(environment.config.config.extraBabelCompileNodeModules),
+        include: context.paths.contextPaths.concat(context.config.config.extraBabelCompileNodeModules),
         exclude: [/\.d\.ts$/],
         presets: ['@babel/preset-typescript'],
       })

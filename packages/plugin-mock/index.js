@@ -15,12 +15,12 @@ module.exports = function (plugin, option) {
     }
   }
 
-  plugin.hooks.environment.tap('Mock', (environment) => {
+  plugin.hooks.environment.tap('Mock', (context) => {
     env.setBoolean('MOCK', false)
     env.setNumber('MOCK_DELAY', 0)
     env.setString('MOCK_SERVER_PREFIX', '/mock')
 
-    mock.setMockPath(path.resolve(environment.paths.cliPaths.runtimePath, 'mocks'))
+    mock.setMockPath(path.resolve(context.paths.runtimePath, 'mocks'))
   })
 
   plugin.hooks.devServer.tap('Mock', (config) => {

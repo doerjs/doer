@@ -1,5 +1,13 @@
 # @doerjs/plugin-mock
 
+## 0.0.9
+
+### Patch Changes
+
+- 脚手架提取通用context
+- Updated dependencies
+  - @doerjs/utils@0.0.9
+
 ## 0.0.8
 
 ### Patch Changes

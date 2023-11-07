@@ -22,18 +22,14 @@ const svgLoader = require('../loader/svg')
 const cssLoader = require('../loader/css')
 const babelLoader = require('../loader/babel')
 
+const context = require('../context')
+
 const shared = require('./shared')
 
 const { ModuleFederationPlugin } = webpack.container
 
 function Webpack(option) {
-  this.env = option.env
-  this.paths = option.paths
-  this.plugin = option.plugin
-  this.config = option.config
-
   this.webpackComplier = null
-
   this.webpackChain = new WebpackChain()
 }
 
@@ -47,12 +43,12 @@ Webpack.prototype.createComplier = async function () {
   const isEnableGzip = process.env.GZIP === 'true'
   const isEnableAnalyzer = process.env.ENABLE_ANALYZER === 'true'
   const assetModuleFilename = isProduction ? 'static/media/[name].[contenthash:8].[ext]' : 'static/media/[name].[ext]'
-  const appPackage = require(this.paths.appPaths.packageJsonPath)
+  const appPackage = require(context.paths.appPackageJsonPath)
 
   this.webpackChain.mode(isProduction ? 'production' : 'development')
   // 生产环境下当编译出现出现错误时，立刻停止编译，而不是继续打包
   this.webpackChain.bail(isProduction)
-  this.webpackChain.entry('main').add(this.paths.appPaths.entryPath).end()
+  this.webpackChain.entry('main').add(context.paths.entryPath).end()
   this.webpackChain.devtool(isProduction ? 'source-map' : 'cheap-module-source-map')
 
   this.output({ isProduction })
@@ -63,7 +59,7 @@ Webpack.prototype.createComplier = async function () {
 
   this.webpackChain.stats('none')
 
-  await this.plugin.hooks.webpack.promise(this.webpackChain)
+  await context.plugin.hooks.webpack.promise(this.webpackChain)
 
   const webpackConfig = this.webpackChain.toConfig()
   webpackConfig.output.assetModuleFilename = assetModuleFilename
@@ -73,13 +69,13 @@ Webpack.prototype.createComplier = async function () {
     level: 'none',
   }
 
-  await this.plugin.hooks.webpackConfig.promise(webpackConfig)
+  await context.plugin.hooks.webpackConfig.promise(webpackConfig)
   this.webpackComplier = webpack(webpackConfig)
 }
 
 Webpack.prototype.output = function ({ isProduction }) {
   this.webpackChain.output
-    .path(this.paths.appPaths.buildPath)
+    .path(context.paths.buildPath)
     .pathinfo(isProduction)
     .filename(isProduction ? 'static/js/[name].[contenthash:8].js' : 'static/js/main.js')
     .chunkFilename(isProduction ? 'static/js/[name].[contenthash:8].chunk.js' : 'static/js/[name].chunk.js')
@@ -87,7 +83,7 @@ Webpack.prototype.output = function ({ isProduction }) {
 }
 
 Webpack.prototype.resolve = function ({ isEnableProfiler }) {
-  this.webpackChain.context(this.paths.cliPaths.runtimePath)
+  this.webpackChain.context(context.paths.runtimePath)
 
   this.webpackChain.resolve.symlinks(true)
 
@@ -102,10 +98,10 @@ Webpack.prototype.resolve = function ({ isEnableProfiler }) {
       .end()
   })
 
-  const alias = this.config.config.alias
+  const alias = context.config.config.alias
   const webpackAlias = this.webpackChain.resolve.alias
   Object.keys(alias).forEach((name) => {
-    webpackAlias.set(name, path.resolve(this.paths.cliPaths.runtimePath, alias[name]))
+    webpackAlias.set(name, path.resolve(context.paths.runtimePath, alias[name]))
   })
   webpackAlias.end()
 }
@@ -151,7 +147,7 @@ Webpack.prototype.plugins = function ({ isProduction, isEnableGzip, isEnableAnal
   this.webpackChain.plugin('html').use(HtmlWebpackPlugin, [
     {
       inject: true,
-      template: this.paths.appPaths.htmlPath,
+      template: context.paths.htmlPath,
       ...(isProduction
         ? {
             minify: {
@@ -174,11 +170,11 @@ Webpack.prototype.plugins = function ({ isProduction, isEnableGzip, isEnableAnal
   this.webpackChain.plugin('replaceHtmlEnv').use(ReplaceHtmlEnvWebpackPlugin, [
     {
       HtmlWebpackPlugin,
-      env: this.env.env,
+      env: context.env.env,
     },
   ])
 
-  this.webpackChain.plugin('define').use(webpack.DefinePlugin, [this.env.stringify()])
+  this.webpackChain.plugin('define').use(webpack.DefinePlugin, [context.env.stringify()])
 
   this.webpackChain.plugin('miniCssExtract').use(MiniCssExtractWebpackPlugin, [
     {
@@ -206,30 +202,27 @@ Webpack.prototype.plugins = function ({ isProduction, isEnableGzip, isEnableAnal
   this.webpackChain.plugin('router').use(RouterWebpackPlugin, [
     {
       appPackage,
-      appConfig: this.config.config,
-      outputPath: this.paths.appPaths.tempComplierPath,
-      srcPath: this.paths.appPaths.srcPath,
-      publicPath: this.paths.getRemotePublicUrlPath(),
+      appConfig: context.config.config,
+      outputPath: context.paths.tempComplierPath,
+      srcPath: context.paths.srcPath,
+      publicPath: context.paths.getRemotePublicUrlPath(),
       remoteFileName,
       extensions: ['.js', '.jsx'],
     },
   ])
-  this.webpackChain
-    .entry(appPackage.name)
-    .add(path.resolve(this.paths.appPaths.tempComplierPath, 'publicPath.js'))
-    .end()
+  this.webpackChain.entry(appPackage.name).add(path.resolve(context.paths.tempComplierPath, 'publicPath.js')).end()
 
   this.webpackChain.plugin('moduleFederation').use(ModuleFederationPlugin, [
     {
       name: appPackage.name,
       filename: remoteFileName,
       exposes: {
-        ...this.config.config.exposes,
-        './$$Router': path.resolve(this.paths.appPaths.tempComplierPath, 'Router.jsx'),
-        './$$app': path.resolve(this.paths.appPaths.tempComplierPath, 'app.js'),
+        ...context.config.config.exposes,
+        './$$Router': path.resolve(context.paths.tempComplierPath, 'Router.jsx'),
+        './$$app': path.resolve(context.paths.tempComplierPath, 'app.js'),
       },
       shared: {
-        ...this.config.config.shared,
+        ...context.config.config.shared,
         ...shared,
       },
     },

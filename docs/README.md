@@ -148,6 +148,7 @@ export default function Vertical({ children }) {
 
 ```js
 module.exports = {
+  mode: 'project', // project项目 library库
   alias: {}, // 项目别名配置
   extraBabelCompileNodeModules: [], // 额外需要babel编译的node_modules包
   exposes: {}, // 项目导出的资源

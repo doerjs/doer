@@ -4,7 +4,11 @@ const file = require('@doerjs/utils/file')
 const is = require('@doerjs/utils/is')
 const logger = require('@doerjs/utils/logger')
 
+const paths = require('./Paths')
+
 const defaultConfig = {
+  // 项目模式 project项目 library组件库
+  mode: 'project',
   // 项目别名
   alias: {},
   // 配置额外的node_modules编译包，部分第三方包没有提供编译后的版本，需要自行配置编译
@@ -50,7 +54,6 @@ function getLoading(option) {
   }
 
   const config = option.config
-  const paths = option.paths
 
   if (is.isString(rawConfig.loading)) {
     const loadingFilePath = paths.resolvePath(rawConfig.loading, config.alias)
@@ -82,7 +85,6 @@ function getError(option) {
   }
 
   const config = option.config
-  const paths = option.paths
 
   if (is.isString(rawConfig.error)) {
     const errorFilePath = paths.resolvePath(rawConfig.error, config.alias)
@@ -116,7 +118,6 @@ function getPlugins(option) {
   }
 
   const config = option.config
-  const paths = option.paths
   const plugins = rawConfig.plugins
     .map((plugin) => {
       let pluginPath
@@ -142,36 +143,56 @@ function getPlugins(option) {
   return plugins
 }
 
-function Config(option) {
-  this.paths = option.paths
+class Config {
+  // 单例实例
+  static instance = null
 
-  this.rawConfig = {}
-  this.config = {}
-}
+  // 原始配置信息，通过简单解析配置文件得来
+  rawConfig = {}
 
-Config.prototype.parseFile = function () {
-  const hasConfigFile = file.isExist(this.paths.appPaths.configPath)
-  if (!hasConfigFile) {
-    this.config = defaultConfig
-    return
+  // 解析并校验后的准确配置信息，可以放心使用的配置
+  config = {}
+
+  static getInstance() {
+    if (!Config.instance) {
+      Config.instance = new Config()
+    }
+    return Config.instance
   }
 
-  this.rawConfig = require(this.paths.appPaths.configPath)
+  _parseRawConfig() {
+    const hasConfigFile = file.isExist(paths.configPath)
+    if (!hasConfigFile) {
+      this.config = defaultConfig
+      return
+    }
+
+    this.rawConfig = require(paths.configPath)
+  }
+
+  _parseConfig() {
+    const getConfigValue = createConfigFactory(this.rawConfig)
+
+    this.config.mode = getConfigValue('mode', is.isEnum(['project', 'library']))
+    this.config.alias = getConfigValue('alias', is.isObject)
+    this.config.extraBabelCompileNodeModules = getConfigValue('extraBabelCompileNodeModules', is.isArray)
+    this.config.exposes = getConfigValue('exposes', is.isObject)
+    this.config.shared = getConfigValue('shared', is.isObject)
+    this.config.browserHistory = getConfigValue('browserHistory', is.isBoolean)
+
+    this.config.loading = getLoading(this)
+    this.config.error = getError(this)
+
+    this.config.plugins = getPlugins(this)
+  }
+
+  /**
+   * 解析配置文件
+   */
+  parse() {
+    this._parseRawConfig()
+    this._parseConfig()
+  }
 }
 
-Config.prototype.parseConfig = function () {
-  const getConfigValue = createConfigFactory(this.rawConfig)
-
-  this.config.alias = getConfigValue('alias', is.isObject)
-  this.config.extraBabelCompileNodeModules = getConfigValue('extraBabelCompileNodeModules', is.isArray)
-  this.config.exposes = getConfigValue('exposes', is.isObject)
-  this.config.shared = getConfigValue('shared', is.isObject)
-  this.config.browserHistory = getConfigValue('browserHistory', is.isBoolean)
-
-  this.config.loading = getLoading(this)
-  this.config.error = getError(this)
-
-  this.config.plugins = getPlugins(this)
-}
-
-module.exports = Config
+module.exports = Config.getInstance()

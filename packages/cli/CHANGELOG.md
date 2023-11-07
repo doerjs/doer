@@ -1,5 +1,15 @@
 # @doerjs/cli
 
+## 0.1.6
+
+### Patch Changes
+
+- 脚手架提取通用context
+- Updated dependencies
+  - @doerjs/plugin-typescript@0.0.9
+  - @doerjs/plugin-less@0.0.9
+  - @doerjs/utils@0.0.9
+
 ## 0.1.5
 
 ### Patch Changes

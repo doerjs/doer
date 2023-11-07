@@ -5,6 +5,8 @@ const address = require('address')
 const chalk = require('chalk')
 const WebpackDevServer = require('webpack-dev-server')
 
+const context = require('../context')
+
 function getHttpsConfig(option) {
   if (process.env.HTTPS !== 'true') return false
 
@@ -35,12 +37,7 @@ function resolveServerUrl(option) {
 }
 
 function WebpackServer(option) {
-  this.env = option.env
-  this.paths = option.paths
-  this.plugin = option.plugin
-  this.config = option.config
   this.complier = option.complier
-
   this.webpackServer = null
 
   this.config = {}
@@ -61,7 +58,7 @@ WebpackServer.prototype.run = async function () {
       'Access-Control-Allow-Headers': '*',
     },
     static: {
-      directory: this.paths.appPaths.publicDirectory,
+      directory: context.paths.publicDirectory,
       publicPath: process.env.PUBLIC_URL,
     },
     historyApiFallback: true,
@@ -76,7 +73,7 @@ WebpackServer.prototype.run = async function () {
     https: getHttpsConfig(this),
   }
 
-  await this.plugin.hooks.devServer.promise(this.config)
+  await context.plugin.hooks.devServer.promise(this.config)
   this.webpackServer = new WebpackDevServer(this.config, this.complier.webpackComplier)
 
   // 注册结束信号监听

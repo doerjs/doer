@@ -2,17 +2,24 @@
 
 const { SyncHook, /* AsyncParallelHook, */ AsyncSeriesHook } = require('tapable')
 
-const registerStyleLoader = require('./style')
-const registerBabelLoader = require('./babel')
+class Plugin {
+  // 单例实例
+  static instance = null
 
-function Plugin() {
-  this.hooks = {
+  static getInstance() {
+    if (!Plugin.instance) {
+      Plugin.instance = new Plugin()
+    }
+    return Plugin.instance
+  }
+
+  hooks = {
     plugins: new AsyncSeriesHook(['plugin']),
     plugin: new SyncHook(['option', 'plugin']),
     afterPlugin: new SyncHook(['option', 'plugin']),
     afterPlugins: new AsyncSeriesHook(['plugin']),
 
-    environment: new SyncHook(['environment']),
+    environment: new SyncHook(['context']),
 
     complier: new SyncHook([]),
     afterComplier: new SyncHook(['complier']),
@@ -25,12 +32,4 @@ function Plugin() {
   }
 }
 
-Plugin.prototype.registerStyleLoader = function (webpackChain, option) {
-  registerStyleLoader(webpackChain, option)
-}
-
-Plugin.prototype.registerBabelLoader = function (webpackChain, option) {
-  registerBabelLoader(webpackChain, option)
-}
-
-module.exports = Plugin
+module.exports = Plugin.getInstance()

@@ -1,5 +1,11 @@
 # @doerjs/plugin-typescript
 
+## 0.0.9
+
+### Patch Changes
+
+- 脚手架提取通用context
+
 ## 0.0.8
 
 ### Patch Changes

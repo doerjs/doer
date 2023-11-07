@@ -1,60 +1,44 @@
 'use strict'
 
-const Paths = require('./Paths')
-const Plugin = require('./Plugin')
-const Env = require('./Env')
-const Config = require('./Config')
 const Webpack = require('./Webpack')
 const WebpackServer = require('./WebpackServer')
+const context = require('../context')
+
+const registerStyleLoader = require('./style')
+const registerBabelLoader = require('./babel')
 
 function Doer() {
-  this.plugin = new Plugin()
-  this.paths = new Paths()
-  this.env = new Env({ paths: this.paths })
-  this.config = new Config({ paths: this.paths })
-
   this.complier = null
   this.server = null
 }
 
 Doer.prototype.init = async function () {
-  this.env.parseFile()
-  this.env.parseEnv()
-  this.config.parseFile()
-  this.config.parseConfig()
-
   await this.plugins()
-
-  this.plugin.hooks.environment.call(this)
+  context.plugin.hooks.environment.call(context)
 }
 
 Doer.prototype.plugins = async function () {
-  const plugins = this.config.config.plugins
+  const plugins = context.config.config.plugins
   if (!plugins.length) {
     return
   }
 
-  await this.plugin.hooks.plugins.promise(this.plugin)
+  await context.plugin.hooks.plugins.promise(context.plugin)
 
   plugins.forEach((plugin) => {
-    this.plugin.hooks.plugin.call(plugin, this.plugin)
-    require(plugin.path)(this.plugin, plugin.option)
-    this.plugin.hooks.afterPlugin.call(plugin, this.plugin)
+    context.plugin.hooks.plugin.call(plugin, context.plugin)
+    require(plugin.path)(context.plugin, plugin.option, { registerBabelLoader, registerStyleLoader })
+    context.plugin.hooks.afterPlugin.call(plugin, context.plugin)
   })
 
-  await this.plugin.hooks.afterPlugins.promise(this.plugin)
+  await context.plugin.hooks.afterPlugins.promise(context.plugin)
 }
 
 Doer.prototype.createComplier = async function () {
-  this.plugin.hooks.complier.call()
-  this.complier = new Webpack({
-    env: this.env,
-    paths: this.paths,
-    config: this.config,
-    plugin: this.plugin,
-  })
+  context.plugin.hooks.complier.call()
+  this.complier = new Webpack()
   await this.complier.createComplier()
-  this.plugin.hooks.afterComplier.call(this.complier)
+  context.plugin.hooks.afterComplier.call(this.complier)
 }
 
 Doer.prototype.runComplier = function () {
@@ -62,15 +46,11 @@ Doer.prototype.runComplier = function () {
 }
 
 Doer.prototype.runServer = async function () {
-  this.plugin.hooks.server.call()
+  context.plugin.hooks.server.call()
   this.server = new WebpackServer({
-    env: this.env,
-    paths: this.paths,
-    config: this.config,
-    plugin: this.plugin,
     complier: this.complier,
   })
-  this.plugin.hooks.afterServer.call(this.server)
+  context.plugin.hooks.afterServer.call(this.server)
   await this.server.run()
 }
 

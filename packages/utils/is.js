@@ -44,6 +44,15 @@ function isBoolean(data) {
   return check(data, 'Boolean')
 }
 
+function isEnum(enums = []) {
+  return function (data) {
+    if (isArray(enums)) {
+      return enums.some((item) => item === data)
+    }
+    return false
+  }
+}
+
 module.exports = {
   isUndefined,
   isNull,
@@ -55,4 +64,5 @@ module.exports = {
   isArray,
   isDate,
   isBoolean,
+  isEnum,
 }

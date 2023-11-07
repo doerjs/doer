@@ -1,6 +1,6 @@
 {
   "name": "@doerjs/plugin-mock",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "",
   "author": "FaureWu <502556093@qq.com>",
   "license": "MIT",
@@ -9,7 +9,7 @@
     "@babel/core": "7.23.2",
     "@babel/preset-env": "7.23.2",
     "@babel/register": "7.22.15",
-    "@doerjs/utils": "workspace:0.0.8",
+    "@doerjs/utils": "workspace:0.0.9",
     "express": "4.18.2"
   },
   "publishConfig": {
