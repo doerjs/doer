@@ -577,6 +577,7 @@ $ pnpm i 包名 -r --filter 包名
 
 ```bash
 $ pnpm run alpha
+$ pnpm run version
 $ pnpm run pub
 $ pnpm run exit
 ```
@@ -587,6 +588,7 @@ $ pnpm run exit
 
 ```bash
 $ pnpm run beta
+$ pnpm run version
 $ pnpm run pub
 $ pnpm run exit
 ```
@@ -597,6 +599,7 @@ $ pnpm run exit
 
 ```bash
 $ pnpm run rc
+$ pnpm run version
 $ pnpm run pub
 $ pnpm run exit
 ```
@@ -605,6 +608,7 @@ $ pnpm run exit
 
 ```bash
 $ pnpm run exit
+$ pnpm run version
 $ pnpm run pub
 ```
 
