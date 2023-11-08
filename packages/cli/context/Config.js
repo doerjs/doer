@@ -9,6 +9,8 @@ const paths = require('./Paths')
 const defaultConfig = {
   // 项目模式 project项目 library组件库
   mode: 'project',
+  // mode为library时，作为库名的前缀
+  libraryName: '',
   // 项目别名
   alias: {},
   // 配置额外的node_modules编译包，部分第三方包没有提供编译后的版本，需要自行配置编译
@@ -174,6 +176,7 @@ class Config {
     const getConfigValue = createConfigFactory(this.rawConfig)
 
     this.config.mode = getConfigValue('mode', is.isEnum(['project', 'library']))
+    this.config.libraryName = getConfigValue('libraryName', is.isString)
     this.config.alias = getConfigValue('alias', is.isObject)
     this.config.extraBabelCompileNodeModules = getConfigValue('extraBabelCompileNodeModules', is.isArray)
     this.config.exposes = getConfigValue('exposes', is.isObject)

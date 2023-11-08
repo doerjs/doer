@@ -1,5 +1,11 @@
 # @doerjs/utils
 
+## 0.0.10
+
+### Patch Changes
+
+- 支持指定编译库名
+
 ## 0.0.9
 
 ### Patch Changes

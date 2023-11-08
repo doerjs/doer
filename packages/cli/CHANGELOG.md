@@ -1,5 +1,13 @@
 # @doerjs/cli
 
+## 0.1.7
+
+### Patch Changes
+
+- 支持指定编译库名
+- Updated dependencies
+  - @doerjs/utils@0.0.10
+
 ## 0.1.6
 
 ### Patch Changes

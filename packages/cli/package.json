@@ -1,6 +1,6 @@
 {
   "name": "@doerjs/cli",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "",
   "author": "FaureWu <502556093@qq.com>",
   "license": "MIT",
@@ -21,7 +21,7 @@
     "@doerjs/plugin-less": "workspace:0.0.9",
     "@doerjs/plugin-typescript": "workspace:0.0.9",
     "@doerjs/prettier-config": "workspace:0.0.8",
-    "@doerjs/utils": "workspace:^0.0.9",
+    "@doerjs/utils": "workspace:^0.0.10",
     "@svgr/webpack": "8.1.0",
     "address": "2.0.1",
     "babel-loader": "9.1.3",

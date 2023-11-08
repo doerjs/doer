@@ -14,11 +14,13 @@ function getProjectLocalIdent(context, localIdentName, localName, options) {
   return `${res.name}__${localName}--${hash}`
 }
 
-function getLibraryLocalIndent(context, localIdentName, localName, options) {
-  const { dir, name } = path.parse(context.resourcePath)
-  const res = path.parse(path.resolve(dir, name))
-
-  return `${res.name}__${localName}`
+function createGetLibraryLocalIndent(libraryName) {
+  return function (context, localIdentName, localName, options) {
+    const { dir, name } = path.parse(context.resourcePath)
+    const res = path.parse(path.resolve(dir, name))
+    const prefix = libraryName ? `${libraryName}-` : ''
+    return `${prefix}${res.name}__${localName}`
+  }
 }
 
-module.exports = { getProjectLocalIdent, getLibraryLocalIndent }
+module.exports = { getProjectLocalIdent, createGetLibraryLocalIndent }

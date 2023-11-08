@@ -32,7 +32,9 @@ module.exports = function (webpackChain, option) {
   if (option.cssModule) {
     cssOptions.modules = {
       getLocalIdent:
-        context.config.config.mode === 'library' ? localIdent.getLibraryLocalIndent : localIdent.getProjectLocalIdent,
+        context.config.config.mode === 'library'
+          ? localIdent.createGetLibraryLocalIndent(context.config.config.libraryName)
+          : localIdent.getProjectLocalIdent,
     }
   }
   styleRule.use('css').loader(require.resolve('css-loader')).options(cssOptions).end()

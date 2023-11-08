@@ -60,19 +60,19 @@ importers:
         specifier: 7.23.2
         version: 7.23.2
       '@doerjs/eslint-config':
-        specifier: workspace:0.0.8
+        specifier: workspace:0.0.9
         version: link:../eslint-config
       '@doerjs/plugin-less':
-        specifier: workspace:0.0.7
+        specifier: workspace:0.0.9
         version: link:../plugin-less
       '@doerjs/plugin-typescript':
-        specifier: workspace:0.0.7
+        specifier: workspace:0.0.9
         version: link:../plugin-typescript
       '@doerjs/prettier-config':
-        specifier: workspace:0.0.7
+        specifier: workspace:0.0.8
         version: link:../prettier-config
       '@doerjs/utils':
-        specifier: workspace:^0.0.7
+        specifier: workspace:^0.0.9
         version: link:../utils
       '@svgr/webpack':
         specifier: 8.1.0
@@ -276,7 +276,7 @@ importers:
         specifier: 7.22.15
         version: 7.22.15(@babel/core@7.23.2)
       '@doerjs/utils':
-        specifier: workspace:0.0.7
+        specifier: workspace:0.0.9
         version: link:../utils
       express:
         specifier: 4.18.2

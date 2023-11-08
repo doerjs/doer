@@ -1,16 +1,21 @@
 'use strict'
 
+const path = require('node:path')
 const figlet = require('figlet')
 const chalk = require('chalk')
 
-const paths = require('../context/Paths')
+const runtimePath = process.cwd()
+const rootPath = path.resolve(__dirname, '../')
+
+const packageJsonPath = path.resolve(rootPath, 'package.json')
+const appPackageJsonPath = path.resolve(runtimePath, 'package.json')
 
 function logo() {
   console.log(figlet.textSync('Doer', 'Ghost'))
 }
 
 function version() {
-  const packageInfo = require(paths.packageJsonPath)
+  const packageInfo = require(packageJsonPath)
 
   if (packageInfo.version) {
     console.log(`👣 Doer v${packageInfo.version}`)
@@ -22,7 +27,7 @@ function version() {
 }
 
 function name() {
-  const packageInfo = require(paths.appPackageJsonPath)
+  const packageInfo = require(appPackageJsonPath)
 
   if (packageInfo.name) {
     console.log(`👣 应用名称：${chalk.blue(chalk.bold(packageInfo.name))}`)
