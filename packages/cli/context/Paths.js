@@ -40,7 +40,7 @@ class Paths {
   typescriptTemplatePath = path.resolve(rootPath, 'template-typescript')
 
   // env环境配置文件路径
-  env = path.resolve(runtimePath, './env')
+  env = path.resolve(runtimePath, './.env')
 
   // 脚手架应用配置文件路径
   configPath = path.resolve(runtimePath, '.doerrc.js')

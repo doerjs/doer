@@ -1,5 +1,11 @@
 # @doerjs/cli
 
+## 0.1.8
+
+### Patch Changes
+
+- 修改环境变量文件路径
+
 ## 0.1.7
 
 ### Patch Changes
