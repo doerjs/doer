@@ -1,0 +1,12 @@
+<% if (relativeConfigPath) { %>
+export * from '<%= relativeConfigPath %>'
+<% if (exports.default) { %>
+export { default } from '<%= relativeConfigPath %>'
+<% } %>
+<% } %>
+
+<% if (!exports.remotes) { %>
+export function remotes() {
+  return {}
+}
+<% } %>

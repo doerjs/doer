@@ -10,10 +10,13 @@ const babelParser = require('@babel/parser')
 const ast = require('./ast')
 
 // 读取模版内容
-const templates = ['app.ejs', 'publicPath.ejs', 'loader.ejs', 'helper.ejs', 'index.ejs'].reduce((result, template) => {
-  result[template] = file.readFileContent(path.resolve(__dirname, `./templates/${template}`))
-  return result
-}, {})
+const templates = ['app.ejs', 'config.ejs', 'publicPath.ejs', 'loader.ejs', 'helper.ejs', 'index.ejs'].reduce(
+  (result, template) => {
+    result[template] = file.readFileContent(path.resolve(__dirname, `./templates/${template}`))
+    return result
+  },
+  {},
+)
 
 /**
  * a.b.c.d.e -> a/b/c/d/e
@@ -123,6 +126,14 @@ class Router {
     return layoutRegex.test(basename)
   }
 
+  // 检测是否是配置文件
+  isConfig(filePath) {
+    const configPath = path.resolve(this.options.srcPath, 'config')
+    return this.options.extensions.some((ext) => {
+      return filePath === configPath + ext
+    })
+  }
+
   // 检测是否是app.js
   isAppEntry(filePath) {
     const globalScriptPath = path.resolve(this.options.srcPath, 'app')
@@ -157,6 +168,17 @@ class Router {
     }
   }
 
+  getAppConfigPath() {
+    const appConfigPath = path.resolve(this.options.srcPath, 'config')
+    let ext = this.options.extensions.find((ext) => {
+      return file.isExist(appConfigPath + ext)
+    })
+    if (!ext) {
+      ext = '.js'
+    }
+    return appConfigPath + ext
+  }
+
   getAppEntryPath() {
     const appEntryPath = path.resolve(this.options.srcPath, 'app')
     let ext = this.options.extensions.find((ext) => {
@@ -171,6 +193,31 @@ class Router {
   // 物理删除文件
   removeFile(filePath) {
     shell.execSync(`rm ${filePath}`)
+  }
+
+  writeConfig() {
+    const configFileName = 'config.js'
+
+    const configPath = this.getAppConfigPath()
+
+    const isExist = file.isExist(configPath)
+    const configData = {
+      relativeConfigPath: isExist
+        ? this.relativePath(path.resolve(this.options.outputPath, configFileName), configPath)
+        : '',
+      exports: {},
+    }
+
+    if (isExist) {
+      // 解析文件内容，收集用户自定义的勾子函数
+      const code = file.readFileContent(configPath)
+      const astTree = babelParser.parse(code, {
+        sourceType: 'module',
+        plugins: ['jsx', 'typescript'],
+      })
+      configData.exports = ast.parseExports(astTree)
+    }
+    this.writeTemplate(configFileName, templates['config.ejs'], configData)
   }
 
   writeAppEntry() {
@@ -230,6 +277,7 @@ class Router {
 
   // 启动
   bootstrap() {
+    this.writeConfig()
     this.writeIndex()
     this.writeAppEntry()
     this.writePublicPath()
@@ -266,6 +314,10 @@ class Router {
     if (this.isAppEntry(filePath)) {
       this.writeAppEntry()
     }
+
+    if (this.isConfig(filePath)) {
+      this.writeConfig()
+    }
   }
 
   removePage(filePath) {
@@ -290,6 +342,10 @@ class Router {
 
     if (this.isAppEntry(filePath)) {
       this.writeAppEntry()
+    }
+
+    if (this.isConfig(filePath)) {
+      this.writeConfig()
     }
   }
 
@@ -325,6 +381,10 @@ class Router {
 
     if (this.isAppEntry(filePath)) {
       this.writeAppEntry()
+    }
+
+    if (this.isConfig(filePath)) {
+      this.writeConfig()
     }
   }
 }

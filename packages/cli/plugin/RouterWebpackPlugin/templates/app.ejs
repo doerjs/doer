@@ -5,11 +5,6 @@ export { default } from '<%= relativeAppEntryPath %>'
 <% } %>
 <% } %>
 
-<% if (!exports.remotes) { %>
-export function remotes() {
-  return {}
-}
-<% } %>
 <% if (!exports.render) { %>
 export function render(oldRender) {
   oldRender()

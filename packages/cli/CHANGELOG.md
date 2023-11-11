@@ -1,5 +1,11 @@
 # @doerjs/cli
 
+## 0.1.9
+
+### Patch Changes
+
+- feat(cli): 分离配置与应用函数
+
 ## 0.1.8
 
 ### Patch Changes
