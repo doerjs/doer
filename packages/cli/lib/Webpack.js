@@ -253,6 +253,7 @@ Webpack.prototype.optimization = function ({ isProduction, isEnableProfiler }) {
 
   this.webpackChain.optimization.minimizer('cssMinimizer').use(CssMinimizerWebpackPlugin).end()
 
+  const remoteModuleTypes = ['provide-module', 'consume-shared-module', 'remote-module']
   this.webpackChain.optimization.splitChunks({
     chunks: 'async',
     minSize: 20000,
@@ -264,6 +265,10 @@ Webpack.prototype.optimization = function ({ isProduction, isEnableProfiler }) {
     cacheGroups: {
       framework: {
         test: (module) => {
+          if (remoteModuleTypes.includes(module.type)) {
+            return false
+          }
+
           return /react|react-router-dom|react-dom|history/.test(module.context)
         },
         name: 'framework',
@@ -271,7 +276,13 @@ Webpack.prototype.optimization = function ({ isProduction, isEnableProfiler }) {
         reuseExistingChunk: true,
       },
       vendors: {
-        test: /[\\/]node_modules[\\/]/,
+        test: (module) => {
+          if (remoteModuleTypes.includes(module.type)) {
+            return false
+          }
+
+          return /[\\/]node_modules[\\/]/.test(module.context)
+        },
         name: 'vendors',
         priority: -10,
         reuseExistingChunk: true,

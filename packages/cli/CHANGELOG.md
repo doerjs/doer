@@ -1,5 +1,11 @@
 # @doerjs/cli
 
+## 0.1.10
+
+### Patch Changes
+
+- feat(cli): 修复分包导致的模块联合分享功能失败问题
+
 ## 0.1.9
 
 ### Patch Changes

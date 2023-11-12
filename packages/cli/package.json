@@ -1,6 +1,6 @@
 {
   "name": "@doerjs/cli",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "",
   "author": "FaureWu <502556093@qq.com>",
   "license": "MIT",
@@ -33,7 +33,6 @@
     "copy-paste": "1.5.3",
     "css-loader": "6.8.1",
     "css-minimizer-webpack-plugin": "5.0.1",
-    "dayjs": "1.11.10",
     "dotenv": "16.3.1",
     "dotenv-expand": "10.0.0",
     "ejs": "3.1.9",
