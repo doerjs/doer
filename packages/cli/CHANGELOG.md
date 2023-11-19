@@ -1,5 +1,11 @@
 # @doerjs/cli
 
+## 0.1.12
+
+### Patch Changes
+
+- feat(cli): 修复loadRemoteModule问题
+
 ## 0.1.11
 
 ### Patch Changes
