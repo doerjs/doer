@@ -1,5 +1,11 @@
 # @doerjs/cli
 
+## 0.1.11
+
+### Patch Changes
+
+- feat(cli): 修复大小写不敏感的系统报错问题
+
 ## 0.1.10
 
 ### Patch Changes

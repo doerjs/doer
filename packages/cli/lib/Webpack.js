@@ -100,6 +100,7 @@ Webpack.prototype.resolve = function ({ isEnableProfiler }) {
 
   const alias = context.config.config.alias
   const webpackAlias = this.webpackChain.resolve.alias
+  webpackAlias.set('doer', path.resolve(context.paths.tempComplierPath, 'expose.js'))
   Object.keys(alias).forEach((name) => {
     webpackAlias.set(name, path.resolve(context.paths.runtimePath, alias[name]))
   })

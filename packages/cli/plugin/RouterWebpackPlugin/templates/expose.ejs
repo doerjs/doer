@@ -1,0 +1,6 @@
+import { loadScopeScript, loadModule } from './loader'
+
+export async function loadRemoteModule(scope, module) {
+  await loadScopeScript(scope)
+  return loadModule(scope, module)
+}

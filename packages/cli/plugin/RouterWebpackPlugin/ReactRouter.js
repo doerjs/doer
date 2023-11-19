@@ -15,7 +15,7 @@ const templates = [
   'Debug.module.ejs',
   'dynamicLayout.ejs',
   'Layout.ejs',
-  'App.ejs',
+  'Root.ejs',
   'NotFound.ejs',
   'dynamicPage.ejs',
   'Router.ejs',
@@ -108,7 +108,7 @@ class ReactRouter extends Router {
   }
 
   writeApp() {
-    this.writeTemplate('App.jsx', templates['App.ejs'], {
+    this.writeTemplate('Root.jsx', templates['Root.ejs'], {
       browserHistory: this.options.appConfig.browserHistory,
     })
   }

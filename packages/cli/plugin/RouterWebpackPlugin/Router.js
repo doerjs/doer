@@ -10,13 +10,18 @@ const babelParser = require('@babel/parser')
 const ast = require('./ast')
 
 // 读取模版内容
-const templates = ['app.ejs', 'config.ejs', 'publicPath.ejs', 'loader.ejs', 'helper.ejs', 'index.ejs'].reduce(
-  (result, template) => {
-    result[template] = file.readFileContent(path.resolve(__dirname, `./templates/${template}`))
-    return result
-  },
-  {},
-)
+const templates = [
+  'app.ejs',
+  'config.ejs',
+  'publicPath.ejs',
+  'loader.ejs',
+  'helper.ejs',
+  'index.ejs',
+  'expose.ejs',
+].reduce((result, template) => {
+  result[template] = file.readFileContent(path.resolve(__dirname, `./templates/${template}`))
+  return result
+}, {})
 
 /**
  * a.b.c.d.e -> a/b/c/d/e
@@ -261,6 +266,10 @@ class Router {
     })
   }
 
+  writeExpose() {
+    this.writeTemplate('expose.js', templates['expose.ejs'])
+  }
+
   writeIndex() {
     this.writeTemplate('index.js', templates['index.ejs'], {
       appName: this.options.appPackage.name,
@@ -283,6 +292,7 @@ class Router {
     this.writePublicPath()
     this.writeLoader()
     this.writeHelper()
+    this.writeExpose()
   }
 
   writeTemplate(fileName, content, data = {}) {

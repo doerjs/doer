@@ -97,7 +97,7 @@ function useAppRouter() {
   return [state, load]
 }
 
-export default function App({ location }) {
+export default function Root({ location }) {
   const [{ basename, status, AppRouter }, load] = useAppRouter()
 
   useEffect(() => {

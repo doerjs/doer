@@ -327,6 +327,24 @@ export function leave() {}
 window.doer.history
 ```
 
+# 工具
+
+## loadRemoteModule(scope, module)
+
+加载远程资源
+
+```js
+import { loadRemoteModule } from 'doer'
+
+// 举个例子，我们有远程项目lib, 需要加载./utils以及./components/Input
+
+// 加载远程资源
+const module = await loadRemoteModule('lib', './utils')()
+
+// 加载组件
+const Component = React.lazy(() => loadRemoteModule('lib', './components/Input'))
+```
+
 # 环境
 
 项目的环境变量通过项目根目录下的.env文件进行写入，目前内置了如下环境
