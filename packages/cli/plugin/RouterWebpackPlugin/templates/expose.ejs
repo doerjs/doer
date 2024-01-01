@@ -4,3 +4,13 @@ export async function loadRemoteModule(scope, module) {
   await loadScopeScript(scope)
   return loadModule(scope, module)()
 }
+
+export function share(key, context) {
+  const symbolKey = Symbol.for(key)
+  window[symbolKey] = context
+}
+
+export function apply(key) {
+  const symbolKey = Symbol.for(key)
+  return window[symbolKey]
+}

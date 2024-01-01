@@ -345,6 +345,28 @@ const module = await loadRemoteModule('lib', './utils')()
 const Component = React.lazy(() => loadRemoteModule('lib', './components/Input'))
 ```
 
+## share(key, context)
+
+共享资源，调用该函数可以把对应资源共享到全局
+
+```js
+import { share } from 'doer'
+
+share('plugin', {})
+```
+
+## apply(key)
+
+获取共享的资源，调用该函数可以消费对应的共享资源
+
+```js
+import { apply } from 'doer'
+
+const plugin = apply('plugin')
+console.log(plugin)
+// 控制台打印：{}
+```
+
 # 环境
 
 项目的环境变量通过项目根目录下的.env文件进行写入，目前内置了如下环境

@@ -17,8 +17,8 @@ export default class Error extends React.PureComponent {
     this.state = { error: null, errorInfo: null }
   }
 
-  componentDidCatch(error, errorInfo) {
-    this.setState({ error, errorInfo })
+  static getDerivedStateFromError(error) {
+    return { error: true, errorInfo: error };
   }
 
   render() {

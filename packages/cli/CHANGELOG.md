@@ -1,5 +1,11 @@
 # @doerjs/cli
 
+## 0.1.13
+
+### Patch Changes
+
+- 支持共享方法
+
 ## 0.1.12
 
 ### Patch Changes
