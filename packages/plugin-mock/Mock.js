@@ -5,6 +5,7 @@ require('@babel/register')({
 })
 
 const express = require('express')
+const cors = require('cors')
 const is = require('@doerjs/utils/is')
 const file = require('@doerjs/utils/file')
 
@@ -46,6 +47,8 @@ Mock.prototype.setMockPath = function (mockPath) {
 }
 
 Mock.prototype.create = function (app) {
+  // 跨域
+  app.use(cors())
   // application/json
   app.use(express.json())
   // application/x-www-form-urlencoded

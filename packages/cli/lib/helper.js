@@ -11,42 +11,42 @@ const packageJsonPath = path.resolve(rootPath, 'package.json')
 const appPackageJsonPath = path.resolve(runtimePath, 'package.json')
 
 function logo() {
-  console.log(figlet.textSync('Doer', 'Ghost'))
+  console.info(figlet.textSync('Doer', 'Ghost'))
 }
 
 function version() {
   const packageInfo = require(packageJsonPath)
 
   if (packageInfo.version) {
-    console.log(`👣 Doer v${packageInfo.version}`)
+    console.info(`👣 Doer v${packageInfo.version}`)
   } else {
-    console.log('👣 Doer Unknown Version')
+    console.info('👣 Doer Unknown Version')
   }
 
-  console.log()
+  console.info()
 }
 
 function name() {
   const packageInfo = require(appPackageJsonPath)
 
   if (packageInfo.name) {
-    console.log(`👣 应用名称：${chalk.blue(chalk.bold(packageInfo.name))}`)
-    console.log()
+    console.info(`👣 应用名称：${chalk.blue(chalk.bold(packageInfo.name))}`)
+    console.info()
   }
 }
 
 function help() {
-  console.log('👣 用法: doer <命令> [选项]')
-  console.log()
-  console.log('👣 选项:')
-  console.log('👣   -v, --version       输出命令行版本号')
-  console.log('👣   -h, --help          输出命令行用法信息')
-  console.log()
-  console.log('👣 命令:')
-  console.log('👣   create [项目名称]     初始化默认模版项目')
-  console.log('👣   dev                  启动开发环境')
-  console.log('👣   build                打包项目文件用于发布')
-  console.log()
+  console.info('👣 用法: doer <命令> [选项]')
+  console.info()
+  console.info('👣 选项:')
+  console.info('👣   -v, --version       输出命令行版本号')
+  console.info('👣   -h, --help          输出命令行用法信息')
+  console.info()
+  console.info('👣 命令:')
+  console.info('👣   create [项目名称]     初始化默认模版项目')
+  console.info('👣   dev                  启动开发环境')
+  console.info('👣   build                打包项目文件用于发布')
+  console.info()
 }
 
 module.exports = {

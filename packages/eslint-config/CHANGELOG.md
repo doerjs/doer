@@ -1,5 +1,11 @@
 # @doerjs/eslint-config
 
+## 0.0.10
+
+### Patch Changes
+
+- mock支持跨域
+
 ## 0.0.9
 
 ### Patch Changes

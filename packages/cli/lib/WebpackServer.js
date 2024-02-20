@@ -96,17 +96,17 @@ WebpackServer.prototype.run = async function () {
 
     this.complier.webpackComplier.hooks.done.tap('done', () => {
       setTimeout(() => {
-        console.log(`👣 ${chalk.cyan('服务器启动成功')}`)
-        console.log()
-        console.log(`👣 ${chalk.cyan(url.localUrl)}`)
-        console.log(`👣 ${chalk.cyan(url.realUrl)}`)
-        console.log()
+        console.info(`👣 ${chalk.cyan('服务器启动成功')}`)
+        console.info()
+        console.info(`👣 ${chalk.cyan(url.localUrl)}`)
+        console.info(`👣 ${chalk.cyan(url.realUrl)}`)
+        console.info()
 
         if (isFirstComplierDone) {
           isFirstComplierDone = false
           import('clipboardy').then(({ default: clipboard }) => {
             clipboard.writeSync(url.localUrl)
-            console.log(`👣 访问地址已经复制到剪贴板，粘贴到浏览器查看吧`)
+            console.info(`👣 访问地址已经复制到剪贴板，粘贴到浏览器查看吧`)
           })
         }
       }, 0)

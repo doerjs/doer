@@ -185,6 +185,7 @@ module.exports = {
     'no-shadow-restricted-names': 'error',
     'no-sparse-arrays': 'error',
     'no-tabs': 'error',
+    'no-console': ['error', { allow: ['warn', 'error', 'info'] }],
     'no-template-curly-in-string': 'error',
     'no-this-before-super': 'error',
     'no-throw-literal': 'error',

@@ -1,6 +1,6 @@
 {
   "name": "@doerjs/cli",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "description": "",
   "author": "FaureWu <502556093@qq.com>",
   "license": "MIT",
@@ -17,7 +17,7 @@
     "@babel/preset-react": "7.22.15",
     "@babel/register": "7.22.15",
     "@babel/traverse": "7.23.2",
-    "@doerjs/eslint-config": "workspace:0.0.9",
+    "@doerjs/eslint-config": "workspace:0.0.10",
     "@doerjs/plugin-less": "workspace:0.0.9",
     "@doerjs/plugin-typescript": "workspace:0.0.9",
     "@doerjs/prettier-config": "workspace:0.0.8",

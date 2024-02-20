@@ -41,7 +41,7 @@ if (!isValidCommand) {
   logger.fail(
     `无效的命令参数111 ${chalk.bold(command)}，执行 \`${chalk.bold('doer --help | doer -h')}\` 获取帮助信息。`,
   )
-  console.log()
+  console.info()
   process.exit(-1)
 }
 

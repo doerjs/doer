@@ -1,5 +1,13 @@
 # @doerjs/cli
 
+## 0.1.14
+
+### Patch Changes
+
+- mock支持跨域
+- Updated dependencies
+  - @doerjs/eslint-config@0.0.10
+
 ## 0.1.13
 
 ### Patch Changes

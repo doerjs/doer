@@ -37,31 +37,31 @@ class LoggerWebpackPlugin {
 
       setTimeout(() => {
         if (!statsJSONData.errors.length) {
-          console.log(
+          console.info(
             `👣 ${chalk.green('成功编译')}，${chalk.green('祝你编码愉快 <(￣ˇ￣)/')}，总共用时 ${this.formatTime(
               statsJSONData.time,
             )}`,
           )
-          console.log(
+          console.info(
             `👣 ${chalk.red(statsJSONData.errors.length)} 个错误，${chalk.yellow(
               statsJSONData.warnings.length,
             )} 个警告`,
           )
-          console.log()
+          console.info()
           this.printAssets(statsJSONData)
-          console.log()
+          console.info()
         } else {
-          console.log(
+          console.info(
             `👣 ${chalk.red('编译失败')}，${chalk.red('一点小小状况 ﾍ(。_。)>')}，总共用时 ${this.formatTime(
               statsJSONData.time,
             )}`,
           )
-          console.log(
+          console.info(
             `👣 ${chalk.red(statsJSONData.errors.length)} 个错误，${chalk.yellow(
               statsJSONData.warnings.length,
             )} 个警告`,
           )
-          console.log()
+          console.info()
         }
 
         this.printWarning(statsJSONData)
@@ -123,21 +123,21 @@ class LoggerWebpackPlugin {
     stats.assets
       .sort((a, b) => a.size - b.size)
       .forEach((asset) => {
-        console.log('👣  ', asset.name, '  ', this.formatSize(asset.size))
+        console.info('👣  ', asset.name, '  ', this.formatSize(asset.size))
       })
   }
 
   printErrors(stats) {
     stats.errors.forEach((error) => {
       logger.fail(`编译错误：${chalk.green(error.moduleName)}`)
-      console.log(chalk.red(error.stack))
+      console.info(chalk.red(error.stack))
     })
   }
 
   printWarning(stats) {
     stats.warnings.forEach((warn) => {
       logger.warn(`编译告警：${chalk.green(warn.moduleName)}`)
-      console.log(chalk.yellow(warn.stack))
+      console.info(chalk.yellow(warn.stack))
     })
   }
 }

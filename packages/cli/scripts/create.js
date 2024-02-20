@@ -129,7 +129,7 @@ async function installDependencies(appPath) {
   })
 
   spinning.succeed()
-  console.log(stdout)
+  console.info(stdout)
 }
 
 function createDirectory(filePath) {
@@ -161,9 +161,9 @@ function createFile(filePath, { template, data }) {
 
 // 通过应用模版创建应用
 async function createApplication(appPath, answers) {
-  console.log()
-  console.log(`👣 正在创建全新应用 ${chalk.greenBright(answers.name)}...`)
-  console.log()
+  console.info()
+  console.info(`👣 正在创建全新应用 ${chalk.greenBright(answers.name)}...`)
+  console.info()
 
   const templatePath = answers.typescript ? context.paths.typescriptTemplatePath : context.paths.templatePath
   const templates = readTemplates(templatePath)
@@ -197,32 +197,32 @@ async function createApplication(appPath, answers) {
     console.error(stderr.toString())
   }
 
-  console.log()
-  console.log('👣 应用创建成功，感谢使用Doer')
-  console.log()
-  console.log('👣 你可以执行如下命令来启动程序')
-  console.log('')
-  console.log(`👣 ${chalk.yellowBright('cd ' + answers.name)}`)
-  console.log('')
-  console.log('👣 启动开发环境')
-  console.log('')
-  console.log(`👣 ${chalk.yellowBright('npm run dev')}`)
-  console.log('')
-  console.log('👣 打包生产环境')
-  console.log('')
-  console.log(`👣 ${chalk.yellowBright('npm run build')}`)
-  console.log('')
-  console.log('👣 开始你的欢乐代码之旅吧!!!')
-  console.log('')
+  console.info()
+  console.info('👣 应用创建成功，感谢使用Doer')
+  console.info()
+  console.info('👣 你可以执行如下命令来启动程序')
+  console.info('')
+  console.info(`👣 ${chalk.yellowBright('cd ' + answers.name)}`)
+  console.info('')
+  console.info('👣 启动开发环境')
+  console.info('')
+  console.info(`👣 ${chalk.yellowBright('npm run dev')}`)
+  console.info('')
+  console.info('👣 打包生产环境')
+  console.info('')
+  console.info(`👣 ${chalk.yellowBright('npm run build')}`)
+  console.info('')
+  console.info('👣 开始你的欢乐代码之旅吧!!!')
+  console.info('')
 }
 
 module.exports = async function create(params) {
   const answers = await qa(params)
   const appPath = path.resolve(context.paths.runtimePath, answers.name)
   if (file.isExist(appPath)) {
-    console.log()
+    console.info()
     logger.fail(`目录已经存在，无法正常创建：${appPath}`)
-    console.log()
+    console.info()
     process.exit(-1)
   }
 

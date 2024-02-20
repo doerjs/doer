@@ -608,7 +608,7 @@ $ pnpm i 包名 -r
 **安装包到指定的子包中**
 
 ```bash
-$ pnpm i 包名 -r --filter 包名
+$ pnpm i 依赖包 -r --filter 包
 ```
 
 **发布alpha测试版本**
