@@ -4,13 +4,10 @@
   "description": "",
   "author": "FaureWu <502556093@qq.com>",
   "license": "MIT",
-  "main": "prettier.config.js",
+  "main": "prettier.config.cjs",
   "files": [
     "prettier.config.js"
   ],
-  "peerDependencies": {
-    "prettier": ">= 2"
-  },
   "publishConfig": {
     "access": "public"
   }

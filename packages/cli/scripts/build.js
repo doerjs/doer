@@ -1,15 +1,11 @@
-'use strict'
+import Doer from '../lib/Doer.js'
 
-process.env.NODE_ENV = 'production'
-if (!process.env.ENV) {
-  process.env.ENV = 'prod'
-}
+export default function () {
+  process.env.NODE_ENV = 'production'
+  if (!process.env.ENV) {
+    process.env.ENV = 'prod'
+  }
 
-const Doer = require('../lib/Doer')
-
-module.exports = async function build() {
   const doer = new Doer()
-  await doer.init()
-  await doer.createComplier()
-  doer.runComplier()
+  doer.build()
 }

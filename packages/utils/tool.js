@@ -1,16 +1,11 @@
-'use strict'
+import path from 'node:path'
 
-const path = require('node:path')
-
-function formatToPosixPath(filePath) {
+// 路径转换为webpack路径
+export function toPosixPath(filePath) {
   return filePath.replace(new RegExp(path.sep, 'g'), '/')
 }
 
-function firstCharToUpperCase(str) {
+// 首字母大写
+export function toFirstUpperCase(str) {
   return str.replace(/^\S/, (c) => c.toUpperCase())
-}
-
-module.exports = {
-  formatToPosixPath,
-  firstCharToUpperCase,
 }

@@ -5,9 +5,16 @@
   "author": "FaureWu <502556093@qq.com>",
   "license": "MIT",
   "main": "index.js",
+  "type": "module",
   "dependencies": {
+    "css-loader": "6.8.1",
     "less": "4.2.0",
-    "less-loader": "11.1.3"
+    "less-loader": "11.1.3",
+    "postcss": "8.4.31",
+    "postcss-flexbugs-fixes": "5.0.2",
+    "postcss-loader": "7.3.3",
+    "postcss-normalize": "10.0.1",
+    "postcss-preset-env": "9.3.0"
   },
   "publishConfig": {
     "access": "public"

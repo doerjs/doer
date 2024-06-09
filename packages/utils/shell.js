@@ -1,9 +1,6 @@
-'use strict'
+import childProcess from 'node:child_process'
+import util from 'node:util'
 
-const childProcess = require('node:child_process')
-const util = require('node:util')
+export const execSync = childProcess.execSync
 
-module.exports = {
-  execSync: childProcess.execSync,
-  exec: util.promisify(childProcess.exec),
-}
+export const exec = util.promisify(childProcess.exec)

@@ -548,7 +548,7 @@ $ npm install --global @doerjs/cli
 $ doer create example
 ```
 
-3. 删除package-lock.json，node_modules
+3. 删除node_modules
 
 4. 安装pnpm包管理工具
 ```bash
@@ -575,7 +575,7 @@ $ pnpm i
 
 7. link本地脚手架
 ```
-$ pnpm link /Volumes/Code/workspace/doer/packages/cli(这里的路径替换为你本地的真实路径)
+$ pnpm link /Volumes/Work/doer/packages/cli(这里的路径替换为你本地的真实路径)
 $ 还可以link其他本地包
 ```
 

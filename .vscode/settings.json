@@ -45,7 +45,7 @@
     "editor.formatOnSave": false
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "eslint.alwaysShowStatus": true,
   "javascript.validate.enable": false,
-  "typescript.validate.enable": false
+  "typescript.validate.enable": false,
+  "eslint.experimental.useFlatConfig": false
 }

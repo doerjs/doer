@@ -1,230 +1,153 @@
-'use strict'
+import { createRequire } from 'node:module'
+import path from 'node:path'
+import inquirer from 'inquirer'
+import chalk from 'chalk'
+import download from 'download-git-repo'
+import ora from 'ora'
+import ejs from 'ejs'
+import trace from '@doerjs/utils/trace.js'
+import * as is from '@doerjs/utils/is.js'
+import * as file from '@doerjs/utils/file.js'
+import * as shell from '@doerjs/utils/shell.js'
 
-const path = require('node:path')
-const inquirer = require('inquirer')
-const ora = require('ora')
-const chalk = require('chalk')
-const ejs = require('ejs')
-const file = require('@doerjs/utils/file')
-const logger = require('@doerjs/utils/logger')
-const shell = require('@doerjs/utils/shell')
+import { cliPackageJsonPath } from '../lib/cliPath.js'
 
-const context = require('../context')
+const require = createRequire(import.meta.url)
 
-const spinning = ora()
+function downloadTemplate(source, target) {
+  return new Promise((resolve, reject) => {
+    download(source, target, (error) => {
+      if (error) {
+        reject(error)
+      } else {
+        resolve()
+      }
+    })
+  })
+}
 
-function qa(params) {
-  return inquirer.prompt([
-    {
+export function validateName(value) {
+  if (!/^[a-zA-Z]{1}[A-Za-z0-9_-]+$/.test(value)) {
+    return '应用名称只能由字母、数字、下划线、中横线组成，且首字符为字母！'
+  }
+}
+
+async function answers(options) {
+  const data = []
+
+  if (is.isUndefined(options.name)) {
+    data.push({
       type: 'input',
       name: 'name',
-      message: '请输入应用名称',
-      default: params.name,
-      validate(value) {
-        if (!/^[a-zA-Z]{1}[A-Za-z0-9_-]+$/.test(value)) {
-          return '应用名称只能由字母、数字、下划线、中横线组成，且首字符为字母！'
-        }
-        return true
-      },
-    },
-    {
+      message: '项目或者库名称',
+      validate: validateName,
+    })
+  }
+
+  if (is.isUndefined(options.type)) {
+    data.push({
+      type: 'list',
+      name: 'mode',
+      message: '创建哪种项目?',
+      default: 'project',
+      choices: ['project', 'library'],
+    })
+  }
+
+  if (is.isUndefined(options.style)) {
+    data.push({
       type: 'list',
       name: 'style',
-      message: '请选择应用使用的样式处理器',
+      message: '使用哪种样式处理器?',
       default: 'css',
       choices: ['css', 'less'],
-    },
-    {
+    })
+  }
+
+  if (!options.typescript) {
+    data.push({
       type: 'confirm',
       name: 'typescript',
-      message: '是否使用typescript？',
+      message: '是否使用typescript?',
       default: false,
-    },
-  ])
-}
-
-/**
- * 读取模版目录文件
- * isDirectory 是否是目录
- * isFile 是否是文件
- * isEjs 是否是ejs模板引擎文件
- * rawTemplateFilePath 原模板文件地址
- * templateFilePath 去掉模版引擎文件后缀地址
- */
-function readTemplates(templatePath) {
-  function resolveTemplate(result, filePath) {
-    const { dir, ext, name } = path.parse(filePath)
-
-    if (name === '.DS_Store') return result
-
-    if (file.isDirectory(filePath)) {
-      result.push({
-        isDirectory: true,
-        rawTemplateFilePath: filePath,
-        templateFilePath: filePath,
-      })
-
-      const readChildTemplates = file.reduceReaddirFactory((res, item) => {
-        return resolveTemplate(res, item)
-      })
-
-      return readChildTemplates(filePath, result)
-    }
-
-    const isEjs = ext === '.ejs'
-    result.push({
-      isFile: true,
-      isEjs,
-      rawTemplateFilePath: filePath,
-      templateFilePath: isEjs ? path.resolve(dir, name) : filePath,
     })
-
-    return result
   }
 
-  const read = file.reduceReaddirFactory((result, filePath) => {
-    return resolveTemplate(result, filePath)
-  })
-
-  spinning.text = '[获取模版] 基础应用模版'
-  spinning.start()
-  try {
-    const templates = read(templatePath, [])
-    spinning.succeed()
-    return templates
-  } catch (error) {
-    spinning.fail()
-    throw error
+  if (data.length) {
+    const result = await inquirer.prompt(data)
+    return { ...result, ...options }
   }
+
+  return Promise.resolve(options)
 }
 
-function getEJSRenderData(answers) {
-  const cliPackage = require(context.paths.packageJsonPath)
-  const eslintPackage = require('@doerjs/eslint-config/package.json')
-  const prettierPackage = require('@doerjs/prettier-config/package.json')
-  const pluginLessPackage = require('@doerjs/plugin-less/package.json')
-  const pluginTypescriptPackage = require('@doerjs/plugin-typescript/package.json')
+export default async function create(options) {
+  const config = await answers(options)
+  const template = config.typescript ? 'doerjs/template-typescript#main' : 'doerjs/template-javascript#main'
 
-  return {
-    answers,
+  console.info()
+  const spin = ora('下载项目模版').start()
+  const projectPath = `./${config.name}`
+  await downloadTemplate(template, projectPath).catch((error) => {
+    spin.clear()
+    spin.stop()
+    trace.error('下载项目模版失败')
+    console.info()
+    throw error
+  })
+  spin.clear()
+  spin.stop()
+  trace.success('下载项目模版成功')
+  console.info()
+
+  const templateFiles = file.readdirDeep(projectPath).filter((filePath) => {
+    const ext = path.extname(filePath)
+    return ext === '.ejs'
+  })
+
+  const renderContext = {
+    config,
     packages: {
-      cli: cliPackage,
-      eslint: eslintPackage,
-      prettier: prettierPackage,
-      pluginLess: pluginLessPackage,
-      pluginTypescript: pluginTypescriptPackage,
+      '@doerjs/cli': require(cliPackageJsonPath),
+      '@doerjs/utils': require('@doerjs/utils/package.json'),
+      '@doerjs/prettier-config': require('@doerjs/prettier-config/package.json'),
+      '@doerjs/eslint-config': require('@doerjs/eslint-config/package.json'),
+      '@doerjs/plugin-less': require('@doerjs/plugin-less/package.json'),
+      '@doerjs/plugin-mock': require('@doerjs/plugin-mock/package.json'),
+      '@doerjs/plugin-typescript': require('@doerjs/plugin-typescript/package.json'),
     },
   }
-}
 
-/**
- * 安装应用依赖
- */
-async function installDependencies(appPath) {
-  spinning.text = '[安装依赖] 应用依赖'
-  spinning.start()
-  const { stdout } = await shell.exec(`cd ${appPath} && npm install`).catch((error) => {
-    spinning.fail()
-    throw new Error(error)
-  })
-
-  spinning.succeed()
-  console.info(stdout)
-}
-
-function createDirectory(filePath) {
-  spinning.text = `[创建目录] ${filePath}`
-  spinning.start()
-  const { stderr } = shell.execSync(`mkdir ${filePath}`)
-  if (stderr) {
-    spinning.fail()
-    throw new Error(stderr.toString())
-  }
-  spinning.succeed()
-}
-
-function createFile(filePath, { template, data }) {
-  spinning.text = `[创建文件] ${filePath}`
-  spinning.start()
-  try {
-    let fileContent = file.readFileContent(template.rawTemplateFilePath)
-    if (template.isEjs) {
-      fileContent = ejs.render(fileContent, data)
-    }
-    file.writeFileContent(filePath, fileContent)
-    spinning.succeed()
-  } catch (error) {
-    spinning.fail()
-    throw error
-  }
-}
-
-// 通过应用模版创建应用
-async function createApplication(appPath, answers) {
-  console.info()
-  console.info(`👣 正在创建全新应用 ${chalk.greenBright(answers.name)}...`)
-  console.info()
-
-  const templatePath = answers.typescript ? context.paths.typescriptTemplatePath : context.paths.templatePath
-  const templates = readTemplates(templatePath)
-
-  readTemplates(context.paths.templatePath)
-
-  createDirectory(appPath)
-
-  // 获取模版渲染数据，并输出模版
-  const data = getEJSRenderData(answers)
-  templates.forEach((template) => {
-    const fileName = template.templateFilePath.replace(templatePath + path.sep, '')
-    const filePath = path.resolve(appPath, fileName)
-
-    if (template.isDirectory) {
-      createDirectory(filePath)
-      return
-    }
-
-    createFile(filePath, { template, data })
-  })
-
-  // 安装依赖失败时，不影响后续流程
-  await installDependencies(appPath).catch((error) => {
-    // no action
-    console.error(error)
-  })
-
-  const { stderr } = shell.execSync(`cd ${appPath} && git init`)
-  if (stderr) {
-    console.error(stderr.toString())
+  for (let i = 0; i < templateFiles.length; i++) {
+    trace.note(`[%d/${templateFiles.length}] - 模版应用中...`, i + 1)
+    const templateFilePath = templateFiles[i]
+    const templateContent = file.readFile(templateFilePath)
+    const { dir, name } = path.parse(templateFilePath)
+    const nextPath = path.resolve(dir, name)
+    const content = ejs.render(templateContent, renderContext)
+    file.writeFile(nextPath, content)
+    shell.execSync(`rm ${templateFilePath}`)
   }
 
   console.info()
-  console.info('👣 应用创建成功，感谢使用Doer')
+
+  shell.execSync(`cd ${projectPath} && git init`)
+
+  trace.note('应用创建成功，感谢使用Doer')
+  trace.note('你可以执行如下命令来启动程序')
   console.info()
-  console.info('👣 你可以执行如下命令来启动程序')
-  console.info('')
-  console.info(`👣 ${chalk.yellowBright('cd ' + answers.name)}`)
-  console.info('')
-  console.info('👣 启动开发环境')
-  console.info('')
-  console.info(`👣 ${chalk.yellowBright('npm run dev')}`)
-  console.info('')
-  console.info('👣 打包生产环境')
-  console.info('')
-  console.info(`👣 ${chalk.yellowBright('npm run build')}`)
-  console.info('')
-  console.info('👣 开始你的欢乐代码之旅吧!!!')
-  console.info('')
-}
-
-module.exports = async function create(params) {
-  const answers = await qa(params)
-  const appPath = path.resolve(context.paths.runtimePath, answers.name)
-  if (file.isExist(appPath)) {
-    console.info()
-    logger.fail(`目录已经存在，无法正常创建：${appPath}`)
-    console.info()
-    process.exit(-1)
-  }
-
-  createApplication(appPath, answers)
+  trace.note('进入目录')
+  trace.note(chalk.yellowBright('cd ' + config.name))
+  console.info()
+  trace.note('安装依赖')
+  trace.note(chalk.yellowBright('npm install'))
+  console.info()
+  trace.note('启动开发环境')
+  trace.note(chalk.yellowBright('npm run dev'))
+  console.info()
+  trace.note('打包生产环境')
+  trace.note(chalk.yellowBright('npm run build'))
+  console.info()
+  trace.note('开始你的欢乐代码之旅吧!!!')
+  console.info()
 }

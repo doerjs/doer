@@ -1,6 +1,4 @@
-'use strict'
-
-function setString(name, defaultValue) {
+export function setString(name, defaultValue) {
   const value = process.env[name]
   if (value) {
     return
@@ -8,7 +6,7 @@ function setString(name, defaultValue) {
   process.env[name] = defaultValue
 }
 
-function setBoolean(name, defaultValue) {
+export function setBoolean(name, defaultValue) {
   const value = process.env[name]
   if (value === 'true') {
     process.env[name] = true
@@ -23,7 +21,7 @@ function setBoolean(name, defaultValue) {
   process.env[name] = defaultValue
 }
 
-function setNumber(name, defaultValue) {
+export function setNumber(name, defaultValue) {
   const value = process.env[name]
   if (value) {
     process.env[name] = Number(value) || defaultValue
@@ -33,7 +31,7 @@ function setNumber(name, defaultValue) {
   process.env[name] = defaultValue
 }
 
-function setPath(name, defaultValue) {
+export function setPath(name, defaultValue) {
   const value = process.env[name]
   if (value && !value.endsWith('/')) {
     process.env[name] = value + '/'
@@ -45,11 +43,4 @@ function setPath(name, defaultValue) {
   }
 
   process.env[name] = defaultValue
-}
-
-module.exports = {
-  setBoolean,
-  setString,
-  setNumber,
-  setPath,
 }

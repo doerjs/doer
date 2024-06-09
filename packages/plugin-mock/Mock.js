@@ -1,25 +1,14 @@
-'use strict'
+import { createRequire } from 'node:module'
+import express from 'express'
+import cors from 'cors'
+import * as is from '@doerjs/utils/is.js'
+import * as file from '@doerjs/utils/file.js'
 
-require('@babel/register')({
-  presets: [['@babel/preset-env', { targets: { node: 'current' } }]],
-})
+const require = createRequire(import.meta.url)
 
-const express = require('express')
-const cors = require('cors')
-const is = require('@doerjs/utils/is')
-const file = require('@doerjs/utils/file')
-
-const readScripts = file.reduceReaddirFactory((result, filePath) => {
-  if (file.isDirectory(filePath)) {
-    return result.concat(readScripts(filePath))
-  }
-
-  if (file.isScript(filePath)) {
-    result.push(filePath)
-  }
-
-  return result
-})
+function readScripts(filePath) {
+  return file.readdirDeep(filePath).filter(file.isScript)
+}
 
 function delay(time) {
   return new Promise((resolve) => {
@@ -37,33 +26,33 @@ function readMocks(mockPath) {
   }, {})
 }
 
-function Mock() {
-  this.delay = Number(process.env.MOCK_DELAY)
-  this.mockPath = null
+export default class Mock {
+  constructor() {
+    this.delay = Number(process.env.MOCK_DELAY)
+    this.mockPath = null
+  }
+
+  setMockPath(mockPath) {
+    this.mockPath = mockPath
+  }
+
+  create(app) {
+    // 跨域
+    app.use(cors())
+    // application/json
+    app.use(express.json())
+    // application/x-www-form-urlencoded
+    app.use(express.urlencoded({ extended: true }))
+    app.use(process.env.MOCK_SERVER_PREFIX, (req, res, next) => {
+      const url = `${req.method.toLocaleUpperCase()} ${req.path}`
+      const mocks = readMocks(this.mockPath)
+      const route = mocks[url]
+
+      if (is.isFunction(route)) {
+        delay(this.delay).then(() => route(req, res))
+      } else {
+        delay(this.delay).then(() => res.status(200).json(route))
+      }
+    })
+  }
 }
-
-Mock.prototype.setMockPath = function (mockPath) {
-  this.mockPath = mockPath
-}
-
-Mock.prototype.create = function (app) {
-  // 跨域
-  app.use(cors())
-  // application/json
-  app.use(express.json())
-  // application/x-www-form-urlencoded
-  app.use(express.urlencoded({ extended: true }))
-  app.use(process.env.MOCK_SERVER_PREFIX, (req, res, next) => {
-    const url = `${req.method.toLocaleUpperCase()} ${req.path}`
-    const mocks = readMocks(this.mockPath)
-    const route = mocks[url]
-
-    if (is.isFunction(route)) {
-      delay(this.delay).then(() => route(req, res))
-    } else {
-      delay(this.delay).then(() => res.status(200).json(route))
-    }
-  })
-}
-
-module.exports = Mock

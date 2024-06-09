@@ -1,0 +1,152 @@
+import React, { useCallback, useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
+
+import { noop, isEnableEditDebug } from './helper.js'
+
+import styles from './Debug.module.css'
+
+function createContainerElement() {
+  const containerElement = document.createElement('div')
+  document.body.appendChild(containerElement)
+  return containerElement
+}
+
+function Portal({ visible, children }) {
+  const [containerElement, setContainerElement] = useState(null)
+
+  useEffect(() => {
+    if (visible && !containerElement) {
+      const element = createContainerElement()
+      setContainerElement(element)
+    } else if (!visible && containerElement) {
+      containerElement.remove()
+      setContainerElement(null)
+    }
+  }, [visible, containerElement])
+
+  return containerElement ? createPortal(children, containerElement) : null
+}
+
+function Container({ children }) {
+  return (
+    <div className={styles.modal}>
+      <div className={styles.mask}></div>
+      <div className={styles.container}>
+        <div className={styles.wrap}>{children}</div>
+      </div>
+    </div>
+  )
+}
+
+function getRemotes() {
+  try {
+    const localUrls = window.sessionStorage.getItem('<%= appName %>__doer_remotes__')
+    if (localUrls) {
+      return JSON.parse(localUrls)
+    }
+  } catch (e) {}
+
+  return window.__doer_remotes__
+}
+
+function DebugContent({ onClose = noop }) {
+  const remotes = useRef(getRemotes())
+  const [searchText, setSearchText] = useState('')
+
+  function handleChange(event, name) {
+    remotes.current[name] = event.target.value
+  }
+
+  function handleReset() {
+    window.sessionStorage.removeItem('<%= appName %>__doer_remotes__')
+    onClose()
+    window.location.reload()
+    setSearchText('')
+  }
+
+  function handleConfirm() {
+    window.sessionStorage.setItem('<%= appName %>__doer_remotes__', JSON.stringify(remotes.current))
+    onClose()
+    window.location.reload()
+  }
+
+  function handleSearch(event) {
+    setSearchText(event.target.value)
+  }
+
+  const remoteOptions = Object.keys(remotes.current).reduce((result, name) => {
+    if (!searchText || name.includes(searchText)) {
+      result.push({ label: name, value: remotes.current[name] })
+    }
+    return result
+  }, [])
+
+  return (
+    <Container>
+      <div className={styles.content}>
+        <div className={styles.header}>
+          <span className={styles.title}>调试模式{isEnableEditDebug() ? '(当前未生效)' : ''}</span>
+          <button className={styles.button} onClick={onClose}>关闭</button>
+        </div>
+        <div className={styles.search}>
+          <input placeholder="请输入应用名称搜索" onChange={handleSearch} />
+        </div>
+        <div className={styles.remotes}>
+          {!remoteOptions.length && <div className={styles.empty}>暂无其他应用</div>}
+          {remoteOptions.map(option => {
+
+            function handleInputChange(event) {
+              handleChange(event, option.label)
+            }
+
+            return (
+              <div className={styles.remote} key={option.label}>
+                <div className={styles.label}>{option.label}:</div>
+                <input className={styles.value} defaultValue={option.value} onChange={handleInputChange} />
+                <div className={styles.tip}>{window.__doer_remotes__[option.label]}(默认值)</div>
+              </div>
+            )
+          })}
+        </div>
+        <div className={styles.footer}>
+          <div className={styles.toolbar}>
+            debug模式：debug='true'(生效) debug=''(仅编辑，暂不生效)
+          </div>
+          <div className={styles.actions}>
+            <button className={styles.button} onClick={handleReset}>重置</button>
+            <button className={styles.button} onClick={handleConfirm}>确认</button>
+          </div>
+        </div>
+      </div>
+    </Container>
+  )
+}
+
+export default function Debug() {
+  const [visible, setVisible] = useState(false)
+
+  function show() {
+    setVisible(true)
+  }
+
+  function hide() {
+    setVisible(false)
+  }
+
+  function handleClose() {
+    hide()
+  }
+
+  function handleTriggerClick() {
+    visible ? hide() : show()
+  }
+
+  return (
+    <div className={styles.debug}>
+      <button className={styles.trigger} onClick={handleTriggerClick}>调试模式{isEnableEditDebug() ? '(未生效)' : ''}</button>
+      <Portal visible={visible}>
+        <DebugContent onClose={handleClose} />
+      </Portal>
+    </div>
+  )
+}

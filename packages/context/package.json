@@ -1,0 +1,18 @@
+{
+  "name": "@doerjs/context",
+  "version": "0.0.1",
+  "description": "",
+  "author": "FaureWu <502556093@qq.com>",
+  "license": "MIT",
+  "type": "module",
+  "main": "Context.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "dotenv": "16.3.1",
+    "dotenv-expand": "10.0.0",
+    "@doerjs/cli": "workspace:*",
+    "@doerjs/utils": "workspace:*"
+  }
+}

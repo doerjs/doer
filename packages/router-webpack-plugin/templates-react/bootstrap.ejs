@@ -1,0 +1,24 @@
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+
+import Root from './Root.jsx'
+
+import { render as customRender } from './app.js'
+import { isFunction } from './helper.js'
+
+function render(Node) {
+  const root = ReactDOM.createRoot(document.getElementById(process.env.ROOT_ELEMENT_ID || 'root'));
+  root.render(Node);
+}
+
+if (isFunction(customRender)) {
+  customRender((Container) => {
+    if (isFunction(Container)) {
+      return render(Container(<Root />))
+    }
+
+    return render(<Root />)
+  })
+} else {
+  render(<Root />)
+}

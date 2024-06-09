@@ -1,39 +1,75 @@
-'use strict'
+import { createRequire } from 'node:module'
 
-module.exports = function (plugin, option, api) {
-  plugin.hooks.environment.tap('Typescript', (context) => {
-    plugin.hooks.webpack.tap('Typescript', (webpackChain) => {
-      api.registerBabelLoader(webpackChain, {
-        name: 'typescript',
-        test: [/\.ts$/, /\.tsx$/],
-        include: context.paths.contextPaths.concat(context.config.config.extraBabelCompileNodeModules),
-        exclude: [/\.d\.ts$/],
-        presets: ['@babel/preset-typescript'],
+const require = createRequire(import.meta.url)
+
+export default function (plugin) {
+  plugin.hooks.context.tap((context) => {
+    plugin.hooks.webpackConfigure.tap((webpackConfigure) => {
+      const extensions = webpackConfigure.get('resolve.extensions')
+      extensions.set('ts', '.ts')
+      extensions.set('tsx', '.tsx')
+
+      const routerExtensions = webpackConfigure.get('plugins.router.extensions')
+      routerExtensions.set('ts', '.ts')
+      routerExtensions.set('tsx', '.tsx')
+
+      const sourcemap = webpackConfigure.get('module.rules.sourcemap')
+      if (sourcemap) {
+        sourcemap.set('test.ts', /\.ts$/)
+        sourcemap.set('test.tsx', /\.tsx$/)
+      }
+
+      webpackConfigure.set('module.rules.typescript', {
+        test: [],
+        resolve: {
+          fullySpecified: false,
+        },
+        include: context.config.extraBabelCompileNodeModules,
+        exclude: [],
+        use: [],
       })
 
-      const extensions = ['.ts', '.tsx']
-      const webpackExtensions = webpackChain.resolve.extensions
-      extensions.forEach((ext) => {
-        webpackExtensions.add(ext)
-      })
-      webpackExtensions.end()
+      const typescript = webpackConfigure.get('module.rules.typescript')
+      typescript.set('test.ts', /\.ts$/)
+      typescript.set('test.tsx', /\.tsx$/)
 
-      webpackChain.plugin('router').tap((args) => {
-        return args.map((arg) => {
-          arg.extensions = arg.extensions ? extensions.concat(arg.extensions) : extensions
-          return arg
-        })
-      })
-    })
+      typescript.set('include.src', context.path.src)
+      typescript.set('exclude.dts', /\.d\.ts$/)
 
-    plugin.hooks.webpackConfig.tap('Typescript', (webpackConfig) => {
-      const sourceMapRule = webpackConfig.module.rules.find((rule) => {
-        return rule.enforce === 'pre' && rule.use.some((item) => item.loader.includes('source-map-loader'))
+      typescript.set('use.babel', {
+        loader: require.resolve('babel-loader'),
+        options: {
+          babelrc: false,
+          configFile: false,
+          presets: [],
+          plugins: [],
+          browserslistEnv: process.env.NODE_ENV,
+          compact: process.env.NODE_ENV === 'production',
+          sourceMaps: true,
+          inputSourceMap: true,
+        },
       })
-      if (!sourceMapRule) return
 
-      sourceMapRule.test.push(/\.ts$/)
-      sourceMapRule.test.push(/\.tsx$/)
+      const babel = typescript.get('use.babel')
+
+      const babelPresets = babel.get('options.presets')
+      babelPresets.set('presetEnv', [])
+      babelPresets.set('presetEnv.0', require.resolve('@babel/preset-env'))
+      babelPresets.set('presetEnv.1', {
+        useBuiltIns: false,
+        loose: false,
+        debug: false,
+      })
+      babelPresets.set('presetReact', require.resolve('@babel/preset-react'))
+
+      const babelPlugins = babel.get('options.plugins')
+      babelPlugins.set('transformRuntime', [])
+      babelPlugins.set('transformRuntime.0', require.resolve('@babel/plugin-transform-runtime'))
+      babelPlugins.set('transformRuntime.1', {
+        corejs: 3,
+        helpers: true,
+        regenerator: true,
+      })
     })
   })
 }

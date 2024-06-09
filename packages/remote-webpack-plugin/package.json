@@ -1,0 +1,15 @@
+{
+  "name": "@doerjs/remote-webpack-plugin",
+  "version": "0.0.1",
+  "description": "",
+  "author": "FaureWu <502556093@qq.com>",
+  "license": "MIT",
+  "main": "RemoteWebpackPlugin.js",
+  "type": "module",
+  "peerDependencies": {
+    "webpack": ">= 5"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

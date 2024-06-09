@@ -1,89 +1,140 @@
-'use strict'
+import path from 'node:path'
+import fs from 'node:fs'
 
-const fs = require('node:fs')
-const path = require('node:path')
-
-function isExist(filePath) {
-  return fs.existsSync(filePath)
+// 是否存在
+export function isExist(filePath) {
+  return !!fs.statSync(filePath, { throwIfNoEntry: false })
 }
 
-function isDirectory(filePath) {
-  return fs.statSync(filePath).isDirectory()
-}
+// 是一个文件
+export function isFile(filePath) {
+  if (!isExist(filePath)) {
+    return false
+  }
 
-function isFile(filePath) {
   return fs.statSync(filePath).isFile()
 }
 
-function isEmptyFile(filePath) {
-  return !isExist(filePath) || !fs.readFileSync(filePath).toString()
+// 是一个文件夹
+export function isDir(filePath) {
+  if (!isExist(filePath)) {
+    return false
+  }
+
+  return fs.statSync(filePath).isDirectory()
 }
 
-function isScript(filePath) {
+// 是否为空
+export function isEmpty(filePath) {
+  if (!isExist(filePath)) {
+    return true
+  }
+
+  if (isFile(filePath)) {
+    return !readFile(filePath).length
+  }
+
+  return !readdir(filePath).length
+}
+
+// 是否是脚本
+export function isScript(filePath) {
+  if (!isExist(filePath)) {
+    return false
+  }
+
   const ext = path.extname(filePath)
-  return ['.js', '.jsx'].includes(ext)
+  return ['.js', '.jsx', '.mjs', '.ts', '.tsx', '.cjs', '.ejs'].includes(ext)
 }
 
-function readFileContent(filePath) {
+// 读取文件内容
+export function readFile(filePath) {
+  if (!isExist(filePath)) {
+    return ''
+  }
+
   return fs.readFileSync(filePath).toString()
 }
 
-function writeFileContent(filePath, content) {
+// 写入文件内容
+export function writeFile(filePath, content) {
+  const dirname = path.dirname(filePath)
+  if (!isExist(dirname)) {
+    mkdir(dirname)
+  }
+
   fs.writeFileSync(filePath, content)
 }
 
-function reduceReaddirFactory(reducer) {
-  return function (filePath, result) {
-    const files = fs.readdirSync(filePath)
-    return files.reduce((target, fileName, index) => {
-      const currFilePath = path.resolve(filePath, fileName)
-      return reducer(target, currFilePath, index)
-    }, result)
+// 创建文件夹
+export function mkdir(filePath) {
+  if (isExist(filePath) && isDir(filePath)) {
+    return
   }
+
+  fs.mkdirSync(filePath, { recursive: true })
 }
 
-function eachFile(filePath, handle) {
-  const files = fs.readdirSync(filePath)
-  return files.forEach((fileName) => {
-    const currFilePath = path.resolve(filePath, fileName)
+// 读取文件夹
+export function readdir(filePath) {
+  if (!isExist(filePath)) {
+    return []
+  }
 
-    if (isFile(currFilePath)) {
-      handle(currFilePath)
-      return
-    }
-
-    eachFile(currFilePath, handle)
-  })
+  return fs
+    .readdirSync(filePath)
+    .map((fileName) => {
+      return path.resolve(filePath, fileName)
+    })
+    .filter(isFile)
 }
 
-const readDirectories = reduceReaddirFactory((result, filePath) => {
-  if (isDirectory(filePath)) {
-    result.push(filePath)
+export function eachFile(filePath, fn) {
+  if (!isExist(filePath)) {
+    return
   }
-  return result
-})
 
-const readFiles = reduceReaddirFactory((result, filePath) => {
-  if (isFile(filePath)) {
-    result.push(filePath)
+  function readdir(currentFilePath) {
+    fs.readdirSync(currentFilePath)
+      .map((fileName) => {
+        return path.resolve(currentFilePath, fileName)
+      })
+      .forEach((item) => {
+        if (isFile(item)) {
+          fn(item)
+          return
+        }
+
+        readdir(item)
+      })
   }
-  return result
-})
 
-module.exports = {
-  isExist,
-  isDirectory,
-  isFile,
-  isEmptyFile,
-  isScript,
+  readdir(filePath)
+}
 
-  readFileContent,
-  writeFileContent,
+// 深度递归读取文件夹
+export function readdirDeep(filePath) {
+  if (!isExist(filePath)) {
+    return []
+  }
 
-  reduceReaddirFactory,
+  const files = []
+  function readdir(currentFilePath) {
+    fs.readdirSync(currentFilePath)
+      .map((fileName) => {
+        return path.resolve(currentFilePath, fileName)
+      })
+      .forEach((item) => {
+        if (isFile(item)) {
+          files.push(item)
+          return
+        }
 
-  readFiles,
-  readDirectories,
+        readdir(item)
+      })
+  }
 
-  eachFile,
+  readdir(filePath)
+
+  return files
 }

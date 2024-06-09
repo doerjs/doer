@@ -1,0 +1,10 @@
+import { lazy } from 'react'
+
+import { loadScopeScript, loadModule } from './loader.js'
+
+// 加载应用组件
+export async function loadScopeComponent(scope, module) {
+  await loadScopeScript(scope)
+  const ComponentLoader = loadModule(scope, module)
+  return lazy(ComponentLoader)
+}

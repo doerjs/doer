@@ -4,13 +4,12 @@
   "description": "",
   "author": "FaureWu <502556093@qq.com>",
   "license": "MIT",
+  "type": "module",
   "main": "index.js",
   "publishConfig": {
     "access": "public"
   },
   "dependencies": {
-    "chalk": "4.1.2",
-    "dayjs": "1.11.10",
-    "loader-utils": "3.2.1"
+    "signale": "^1.4.0"
   }
 }

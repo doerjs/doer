@@ -1,300 +1,642 @@
-'use strict'
+import path from 'node:path'
+import { createRequire } from 'node:module'
+import webpack from 'webpack'
+import loaderUtils from 'loader-utils'
+import { ObjectSet } from '@doerjs/configure'
+import SetupHtmlWebpackPlugin from '@doerjs/setup-html-webpack-plugin'
+import LogWebpackPlugin from '@doerjs/log-webpack-plugin'
+import RouterWebpackPlugin from '@doerjs/router-webpack-plugin'
+import RemoteWebpackPlugin from '@doerjs/remote-webpack-plugin'
+import MiniCssExtractWebpackPlugin from 'mini-css-extract-plugin'
+import CssMinimizerWebpackPlugin from 'css-minimizer-webpack-plugin'
+import HtmlWebpackPlugin from 'html-webpack-plugin'
+import CompressionWebpackPlugin from 'compression-webpack-plugin'
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
+import ExternalRemotesWebpackPlugin from 'external-remotes-plugin'
+import TerserWebpackPlugin from 'terser-webpack-plugin'
+import Webpackbar from 'webpackbar'
+import figlet from 'figlet'
+import chalk from 'chalk'
 
-const path = require('node:path')
-const webpack = require('webpack')
-
-const WebpackChain = require('webpack-chain')
-const TerserWebpackPlugin = require('terser-webpack-plugin')
-const CssMinimizerWebpackPlugin = require('css-minimizer-webpack-plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const MiniCssExtractWebpackPlugin = require('mini-css-extract-plugin')
-const CompressionWebpackPlugin = require('compression-webpack-plugin')
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
-const { CleanWebpackPlugin } = require('clean-webpack-plugin')
-const ExternalRemotesWebpackPlugin = require('external-remotes-plugin')
-
-const ReplaceHtmlEnvWebpackPlugin = require('../plugin/ReplaceHtmlEnvWebpackPlugin')
-const LogWebpackPlugin = require('../plugin/LogWebpackPlugin')
-const RemoteWebpackPlugin = require('../plugin/RemoteWebpackPlugin')
-const RouterWebpackPlugin = require('../plugin/RouterWebpackPlugin')
-
-const svgLoader = require('../loader/svg')
-const cssLoader = require('../loader/css')
-const babelLoader = require('../loader/babel')
-
-const context = require('../context')
-
-const shared = require('./shared')
+import plugin from './plugin.js'
 
 const { ModuleFederationPlugin } = webpack.container
 
-function Webpack(option) {
-  this.webpackComplier = null
-  this.webpackChain = new WebpackChain()
+const require = createRequire(import.meta.url)
+
+function clearConsole() {
+  process.stdout.write(process.platform === 'win32' ? '\x1B[2J\x1B[0f' : '\x1B[2J\x1B[3J\x1B[H')
 }
 
-Webpack.prototype.run = function () {
-  this.webpackComplier.run()
+function getProjectLocalIdent(context, localIdentName, localName, options) {
+  const { dir, name } = path.parse(context.resourcePath)
+  const res = path.parse(path.resolve(dir, name))
+
+  const hashKey =
+    path.basename(context.rootContext) + path.sep + path.posix.relative(context.rootContext, context.resourcePath)
+  const hash = loaderUtils.getHashDigest(hashKey, 'md5', 'base64', 5)
+
+  return `${res.name}__${localName}--${hash}`
 }
 
-Webpack.prototype.createComplier = async function () {
-  const isProduction = process.env.NODE_ENV === 'production'
-  const isEnableProfiler = isProduction && process.env.ENABLE_PROFILER === 'true'
-  const isEnableGzip = process.env.GZIP === 'true'
-  const isEnableAnalyzer = process.env.ENABLE_ANALYZER === 'true'
-  const assetModuleFilename = isProduction ? 'static/media/[name].[contenthash:8].[ext]' : 'static/media/[name].[ext]'
-  const appPackage = require(context.paths.appPackageJsonPath)
+function createGetLibraryLocalIndent(libraryName) {
+  return function (context, localIdentName, localName, options) {
+    const { dir, name } = path.parse(context.resourcePath)
+    const res = path.parse(path.resolve(dir, name))
+    const prefix = libraryName ? `${libraryName}-` : ''
+    return `${prefix}${res.name}__${localName}`
+  }
+}
 
-  this.webpackChain.mode(isProduction ? 'production' : 'development')
-  // 生产环境下当编译出现出现错误时，立刻停止编译，而不是继续打包
-  this.webpackChain.bail(isProduction)
-  this.webpackChain.entry('main').add(context.paths.entryPath).end()
-  this.webpackChain.devtool(isProduction ? 'source-map' : 'cheap-module-source-map')
-
-  this.output({ isProduction })
-  this.resolve({ isEnableProfiler })
-  this.module({ isProduction, assetModuleFilename })
-  this.plugins({ isProduction, isEnableGzip, isEnableAnalyzer, appPackage })
-  this.optimization({ isProduction, isEnableProfiler })
-
-  this.webpackChain.stats('none')
-
-  await context.plugin.hooks.webpack.promise(this.webpackChain)
-
-  const webpackConfig = this.webpackChain.toConfig()
-  webpackConfig.output.assetModuleFilename = assetModuleFilename
-  webpackConfig.output.uniqueName = appPackage.name
-
-  webpackConfig.infrastructureLogging = {
-    level: 'none',
+function getVenderName(module) {
+  const packageData = module.resourceResolveData.descriptionFileData
+  if (packageData.name && packageData.version) {
+    return `vender~${packageData.name.replace(/@/g, '').replace(/\//g, '-')}`
   }
 
-  await context.plugin.hooks.webpackConfig.promise(webpackConfig)
-  this.webpackComplier = webpack(webpackConfig)
+  let parts = module.context.split('node_modules').filter(Boolean)
+  const modulePath = parts[parts.length - 1]
+  parts = modulePath.split('/').filter(Boolean)
+  let name = parts[0]
+  if (name.includes('@')) {
+    name = [name.replace(/@/g, ''), parts[1]].join('-')
+  }
+
+  return ['vender', name.replace(/\//g, '-')].filter(Boolean).join('~')
 }
 
-Webpack.prototype.output = function ({ isProduction }) {
-  this.webpackChain.output
-    .path(context.paths.buildPath)
-    .pathinfo(isProduction)
-    .filename(isProduction ? 'static/js/[name].[contenthash:8].js' : 'static/js/main.js')
-    .chunkFilename(isProduction ? 'static/js/[name].[contenthash:8].chunk.js' : 'static/js/[name].chunk.js')
-    .publicPath(process.env.PUBLIC_URL)
-}
+class Webpack {
+  remoteFileName = 'remote.js'
 
-Webpack.prototype.resolve = function ({ isEnableProfiler }) {
-  this.webpackChain.context(context.paths.runtimePath)
+  get env() {
+    const isProduction = process.env.NODE_ENV === 'production'
+    const isEnableProfiler = isProduction && process.env.ENABLE_PROFILER === 'true'
+    const isEnableGzip = process.env.GZIP === 'true'
+    const isEnableAnalyzer = process.env.ENABLE_ANALYZER === 'true'
 
-  this.webpackChain.resolve.symlinks(true)
+    return {
+      isProduction,
+      isEnableProfiler,
+      isEnableGzip,
+      isEnableAnalyzer,
+    }
+  }
 
-  this.webpackChain.resolve.modules.add('node_modules').end()
+  constructor(context) {
+    this.context = context
+    this.config = new ObjectSet('webpack')
+  }
 
-  this.webpackChain.resolve.extensions.add('.js').add('.jsx').add('.json').end()
+  initial() {
+    this.config.set('context', this.context.path.runtime)
 
-  this.webpackChain.when(isEnableProfiler, (config) => {
-    config.resolve.alias
-      .set('react-dom$', 'react-dom/profiling')
-      .set('scheduler/tracing', 'scheduler/tracing-profiling')
-      .end()
-  })
+    this.config.set('entry', {})
+    this.config.set('entry.main', this.context.path.entry)
 
-  const alias = context.config.config.alias
-  const webpackAlias = this.webpackChain.resolve.alias
-  webpackAlias.set('doer', path.resolve(context.paths.tempComplierPath, 'expose.js'))
-  Object.keys(alias).forEach((name) => {
-    webpackAlias.set(name, path.resolve(context.paths.runtimePath, alias[name]))
-  })
-  webpackAlias.end()
-}
+    this.config.set('mode', this.env.isProduction ? 'production' : 'development')
 
-Webpack.prototype.module = function (option) {
-  // 将缺失的导出提示成错误而不是警告
-  this.webpackChain.module.strictExportPresence(true)
+    this.config.set('output', {
+      path: this.context.path.dist,
+      filename: this.env.isProduction ? 'static/js/[name].[contenthash:8].js' : 'static/js/[name].js',
+      chunkFilename: this.env.isProduction ? 'static/js/[name].[contenthash:8].chunk.js' : 'static/js/[name].chunk.js',
+      publicPath: process.env.PUBLIC_URL,
+      assetModuleFilename: this.env.isProduction
+        ? 'static/media/[name].[contenthash:8].[ext]'
+        : 'static/media/[name].[ext]',
+      uniqueName: require(this.context.path.packageJson).name,
+    })
 
-  const sourceMapRule = this.webpackChain.module
-    .rule('sourceMap')
-    .test([/\.js$/, /\.jsx$/, /\.css$/])
-    .enforce('pre')
-  sourceMapRule.exclude
-    .add(/@babel(?:\/|\\{1,2})runtime/)
-    .add(/node_modules/)
-    .end()
-  sourceMapRule.use('sourceMap').loader(require.resolve('source-map-loader')).end()
-  sourceMapRule.end()
+    this.config.set('resolve', {
+      symlinks: true,
+      alias: {},
+      modules: [],
+      extensions: [],
+    })
+    const modules = this.config.get('resolve.modules')
+    modules.set('node_modules', 'node_modules')
+    const extensions = this.config.get('resolve.extensions')
+    extensions.set('js', '.js')
+    extensions.set('jsx', '.jsx')
+    extensions.set('json', '.json')
 
-  this.webpackChain.module
-    .rule('image')
-    .type('asset')
-    .test([/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/])
-    .parser({
-      dataUrlCondition: {
-        maxSize: process.env.IMAGE_INLINE_LIMIT_SIZE,
+    this.config.set('module', {
+      strictExportPresence: true,
+      rules: [],
+    })
+
+    this.config.set('plugins', [])
+    this.config.set('stats', 'none')
+    this.config.set('infrastructureLogging.level', 'none')
+    this.config.set('bail', this.env.isProduction)
+
+    this.image()
+    this.asset()
+    this.css()
+    this.javascript()
+    this.registerHtmlPlugin()
+    this.registerRouterPlugin()
+    this.registerRemotePlugin()
+  }
+
+  // react调试工具辅助
+  reactProfiler() {
+    const alias = this.config.get('resolve.alias')
+    alias.set('react-dom$', 'react-dom/profiling')
+    alias.set('scheduler/tracing', 'scheduler/tracing-profiling')
+  }
+
+  sourcemap() {
+    this.config.set('devtool', 'cheap-module-source-map')
+
+    this.config.set('module.rules.sourcemap', {
+      test: [],
+      enforce: 'pre',
+      exclude: [],
+      use: [],
+    })
+
+    const sourcemap = this.config.get('module.rules.sourcemap')
+
+    sourcemap.set('test.js', /\.js$/)
+    sourcemap.set('test.jsx', /\.jsx$/)
+
+    sourcemap.set('exclude.babelRuntime', /@babel(?:\/|\\{1,2})runtime/)
+    sourcemap.set('exclude.node_modules', /node_modules/)
+
+    sourcemap.set('use.sourcemap', require.resolve('source-map-loader'))
+  }
+
+  image() {
+    this.config.set('module.rules.image', {
+      type: 'asset',
+      test: [],
+      parser: {
+        dataUrlCondition: {
+          maxSize: process.env.IMAGE_INLINE_LIMIT_SIZE,
+        },
       },
     })
-    .end()
 
-  svgLoader(this, option)
-  cssLoader(this, option)
-  babelLoader(this, option)
+    const image = this.config.get('module.rules.image')
 
-  this.webpackChain.module
-    .rule('resource')
-    .type('asset/resource')
-    .test([/\.json$/, /\.txt$/, /\.eot$/, /\.woff$/, /\.woff2$/, /\.ttf$/])
-    .end()
-}
+    image.set('test.bmp', /\.bmp$/)
+    image.set('test.gif', /\.gif$/)
+    image.set('test.jpg', /\.jpe?g$/)
+    image.set('test.png', /\.png$/)
+    image.set('test.svg', /\.svg$/)
+  }
 
-Webpack.prototype.plugins = function ({ isProduction, isEnableGzip, isEnableAnalyzer, appPackage }) {
-  this.webpackChain.plugin('html').use(HtmlWebpackPlugin, [
-    {
-      inject: true,
-      template: context.paths.htmlPath,
-      ...(isProduction
-        ? {
-            minify: {
-              removeComments: true,
-              collapseWhitespace: true,
-              removeRedundantAttributes: true,
-              useShortDoctype: true,
-              removeEmptyAttributes: true,
-              removeStyleLinkTypeAttributes: true,
-              keepClosingSlash: true,
-              minifyJS: true,
-              minifyCSS: true,
-              minifyURLs: true,
-            },
-          }
-        : {}),
-    },
-  ])
+  svgr() {
+    this.config.set('module.rules.svgr', {
+      test: [],
+      resourceQuery: /svgr/,
+      use: [],
+    })
 
-  this.webpackChain.plugin('replaceHtmlEnv').use(ReplaceHtmlEnvWebpackPlugin, [
-    {
-      HtmlWebpackPlugin,
-      env: context.env.env,
-    },
-  ])
+    const svgr = this.config.get('module.rules.svgr')
 
-  this.webpackChain.plugin('define').use(webpack.DefinePlugin, [context.env.stringify()])
+    svgr.set('test.svg', /\.svg$/)
 
-  this.webpackChain.plugin('miniCssExtract').use(MiniCssExtractWebpackPlugin, [
-    {
-      filename: isProduction ? 'static/css/[name].[contenthash:8].css' : 'static/css/[name].css',
-      chunkFilename: isProduction ? 'static/css/[name].[contenthash:8].chunk.css' : 'static/css/[name].chunk.css',
-    },
-  ])
+    svgr.set('use.svgr', require.resolve('@svgr/webpack'))
+  }
 
-  this.webpackChain.plugin('ignore').use(webpack.IgnorePlugin, [
-    {
-      resourceRegExp: /^\.\/locale$/,
-      contextRegExp: /moment$/,
-    },
-  ])
+  asset() {
+    this.config.set('module.rules.asset', {
+      type: 'asset/resource',
+      test: [],
+    })
 
-  this.webpackChain.plugin('log').use(LogWebpackPlugin)
+    const asset = this.config.get('module.rules.asset')
 
-  isEnableGzip && this.webpackChain.plugin('compression').use(CompressionWebpackPlugin)
+    asset.set('test.json', /\.json$/)
+    asset.set('test.txt', /\.txt$/)
+    asset.set('test.eot', /\.eot$/)
+    asset.set('test.woff', /\.woff$/)
+    asset.set('test.woff2', /\.woff2$/)
+    asset.set('test.ttf', /\.ttf$/)
+  }
 
-  isEnableAnalyzer && this.webpackChain.plugin('analyzer').use(BundleAnalyzerPlugin)
+  css() {
+    this.config.set('module.rules.css', {
+      test: [],
+      exclude: [],
+      use: [],
+    })
 
-  isProduction && this.webpackChain.plugin('clean').use(CleanWebpackPlugin)
+    const css = this.config.get('module.rules.css')
 
-  const remoteFileName = 'remote.js'
-  this.webpackChain.plugin('router').use(RouterWebpackPlugin, [
-    {
-      appPackage,
-      appConfig: context.config.config,
-      outputPath: context.paths.tempComplierPath,
-      srcPath: context.paths.srcPath,
-      publicPath: context.paths.getRemotePublicUrlPath(),
-      remoteFileName,
-      extensions: ['.js', '.jsx'],
-    },
-  ])
-  this.webpackChain.entry(appPackage.name).add(path.resolve(context.paths.tempComplierPath, 'publicPath.js')).end()
+    css.set('test.css', /\.css$/)
 
-  this.webpackChain.plugin('moduleFederation').use(ModuleFederationPlugin, [
-    {
-      name: appPackage.name,
-      filename: remoteFileName,
-      exposes: {
-        ...context.config.config.exposes,
-        './$$Router': path.resolve(context.paths.tempComplierPath, 'Router.jsx'),
-        './$$app': path.resolve(context.paths.tempComplierPath, 'app.js'),
+    css.set('exclude.moduleCss', /\.module\.css$/)
+
+    css.set('use.miniCss', MiniCssExtractWebpackPlugin.loader)
+    css.set('use.css', {
+      loader: require.resolve('css-loader'),
+      options: {
+        importLoaders: 2,
+        sourceMap: false,
       },
-      shared: {
-        ...context.config.config.shared,
-        ...shared,
+    })
+    css.set('use.postcss', {
+      loader: require.resolve('postcss-loader'),
+      options: {
+        sourceMap: false,
+        postcssOptions: {
+          config: false,
+          plugins: [],
+        },
       },
-    },
-  ])
-  this.webpackChain.plugin('externalRemotes').use(ExternalRemotesWebpackPlugin)
-  this.webpackChain.plugin('remote').use(RemoteWebpackPlugin, [{ fileName: remoteFileName }])
-}
+    })
+    const postcss = css.get('use.postcss')
+    const postcssPlugins = postcss.get('options.postcssOptions.plugins')
+    postcssPlugins.set('flexBugfixes', require.resolve('postcss-flexbugs-fixes'))
+    postcssPlugins.set('presetEnv', [])
+    postcssPlugins.set('presetEnv.0', require.resolve('postcss-preset-env'))
+    postcssPlugins.set('presetEnv.1', {
+      autoprefixer: {
+        flexbox: 'no-2009',
+      },
+      stage: 3,
+    })
+    postcssPlugins.set('normalize', require.resolve('postcss-normalize'))
 
-Webpack.prototype.optimization = function ({ isProduction, isEnableProfiler }) {
-  this.webpackChain.optimization.minimize(isProduction)
+    this.config.set('module.rules.cssModule', {
+      test: [],
+      use: [],
+    })
 
-  this.webpackChain.optimization
-    .minimizer('terser')
-    .use(TerserWebpackPlugin, [
+    const cssModule = this.config.get('module.rules.cssModule')
+
+    cssModule.set('test.cssModule', /\.module\.css$/)
+
+    cssModule.set('use.miniCss', MiniCssExtractWebpackPlugin.loader)
+    cssModule.set('use.css', {
+      loader: require.resolve('css-loader'),
+      options: {
+        importLoaders: 2,
+        sourceMap: false,
+        modules: {
+          getLocalIdent:
+            this.context.config.mode === 'library'
+              ? createGetLibraryLocalIndent(this.context.config.libraryName)
+              : getProjectLocalIdent,
+        },
+      },
+    })
+    cssModule.set('use.postcss', {
+      loader: require.resolve('postcss-loader'),
+      options: {
+        sourceMap: false,
+        postcssOptions: {
+          config: false,
+          plugins: [],
+        },
+      },
+    })
+    const cssModulePostcss = cssModule.get('use.postcss')
+    const cssModulePostcssPlugins = cssModulePostcss.get('options.postcssOptions.plugins')
+    cssModulePostcssPlugins.set('flexBugfixes', require.resolve('postcss-flexbugs-fixes'))
+    cssModulePostcssPlugins.set('presetEnv', [])
+    cssModulePostcssPlugins.set('presetEnv.0', require.resolve('postcss-preset-env'))
+    cssModulePostcssPlugins.set('presetEnv.1', {
+      autoprefixer: {
+        flexbox: 'no-2009',
+      },
+      stage: 3,
+    })
+    cssModulePostcssPlugins.set('normalize', require.resolve('postcss-normalize'))
+
+    this.config.set(
+      'plugins.miniCss',
+      {
+        filename: this.env.isProduction ? 'static/css/[name].[contenthash:8].css' : 'static/css/[name].css',
+        chunkFilename: this.env.isProduction
+          ? 'static/css/[name].[contenthash:8].chunk.css'
+          : 'static/css/[name].chunk.css',
+      },
+      { type: 'ClassSet', ClassObject: MiniCssExtractWebpackPlugin },
+    )
+  }
+
+  javascript() {
+    this.config.set('module.rules.javascript', {
+      test: [],
+      resolve: {
+        fullySpecified: false,
+      },
+      include: this.context.config.extraBabelCompileNodeModules,
+      use: [],
+    })
+
+    const javascript = this.config.get('module.rules.javascript')
+    javascript.set('test.js', /\.js$/)
+    javascript.set('test.jsx', /\.jsx$/)
+
+    javascript.set('include.src', this.context.path.src)
+
+    javascript.set('use.babel', {
+      loader: require.resolve('babel-loader'),
+      options: {
+        babelrc: false,
+        configFile: false,
+        presets: [],
+        plugins: [],
+        browserslistEnv: process.env.NODE_ENV,
+        compact: this.env.isProduction,
+        sourceMaps: true,
+        inputSourceMap: true,
+      },
+    })
+
+    const babel = javascript.get('use.babel')
+
+    const babelPresets = babel.get('options.presets')
+    babelPresets.set('presetEnv', [])
+    babelPresets.set('presetEnv.0', require.resolve('@babel/preset-env'))
+    babelPresets.set('presetEnv.1', {
+      useBuiltIns: false,
+      loose: false,
+      debug: false,
+    })
+    babelPresets.set('presetReact', require.resolve('@babel/preset-react'))
+
+    const babelPlugins = babel.get('options.plugins')
+    babelPlugins.set('transformRuntime', [])
+    babelPlugins.set('transformRuntime.0', require.resolve('@babel/plugin-transform-runtime'))
+    babelPlugins.set('transformRuntime.1', {
+      corejs: 3,
+      helpers: true,
+      regenerator: true,
+    })
+  }
+
+  alias() {
+    const alias = this.config.get('resolve.alias')
+
+    // 设置脚手架对外暴露的API方法别名
+    // 使用方法
+    // import {} from 'doer'
+    alias.set('doer', path.resolve(this.context.path.complier, 'expose.js'))
+
+    // 设置用户自定义的别名
+    Object.keys(this.context.config.alias).forEach((name) => {
+      alias.set(name, path.resolve(this.context.path.runtime, this.context.config.alias[name]))
+    })
+  }
+
+  registerHtmlPlugin() {
+    this.config.set(
+      'plugins.html',
+      {
+        inject: true,
+        template: this.context.path.html,
+        ...(this.env.isProduction
+          ? {
+              minify: {
+                removeComments: true,
+                collapseWhitespace: true,
+                removeRedundantAttributes: true,
+                useShortDoctype: true,
+                removeEmptyAttributes: true,
+                removeStyleLinkTypeAttributes: true,
+                keepClosingSlash: true,
+                minifyJS: true,
+                minifyCSS: true,
+                minifyURLs: true,
+              },
+            }
+          : {}),
+      },
+      { type: 'ClassSet', ClassObject: HtmlWebpackPlugin },
+    )
+
+    this.config.set(
+      'plugins.setupHtml',
+      {
+        HtmlWebpackPlugin,
+        env: this.context.env.env,
+      },
+      { type: 'ClassSet', ClassObject: SetupHtmlWebpackPlugin },
+    )
+  }
+
+  registerDefinePlugin() {
+    this.config.set('plugins.define', this.context.env.stringify(), {
+      type: 'ClassSet',
+      ClassObject: webpack.DefinePlugin,
+    })
+  }
+
+  registerLogPlugin() {
+    this.config.set('plugins.log', undefined, { type: 'ClassSet', ClassObject: LogWebpackPlugin })
+  }
+
+  registerCompressionPlugin() {
+    this.config.set('plugins.compression', undefined, { type: 'ClassSet', ClassObject: CompressionWebpackPlugin })
+  }
+
+  registerBundleAnalyzerPlugin() {
+    this.config.set('plugins.bundleAnalyzer', undefined, { type: 'ClassSet', ClassObject: BundleAnalyzerPlugin })
+  }
+
+  registerRouterPlugin() {
+    this.config.set(
+      'plugins.router',
+      {
+        appPackage: this.context.path.packageJson,
+        appConfig: this.context.config,
+        outputPath: this.context.path.complier,
+        srcPath: this.context.path.src,
+        publicPath: this.context.path.publicUrl,
+        remoteFileName: this.remoteFileName,
+        extensions: [],
+      },
+      { type: 'ClassSet', ClassObject: RouterWebpackPlugin },
+    )
+
+    const extensions = this.config.get('plugins.router.extensions')
+    extensions.set('js', '.js')
+    extensions.set('jsx', '.jsx')
+  }
+
+  registerRemotePlugin() {
+    const packageData = require(this.context.path.packageJson)
+    const cliPackageData = require(this.context.path.cliPackageJson)
+
+    this.config.set(`entry.${packageData.name}`, path.resolve(this.context.path.complier, 'publicPath.js'))
+
+    this.config.set(
+      'plugins.moduleFederation',
+      {
+        name: packageData.name,
+        filename: this.remoteFileName,
+        exposes: {
+          ...this.context.config.exposes,
+          './$$Router': path.resolve(this.context.path.complier, 'Router.jsx'),
+          './$$app': path.resolve(this.context.path.complier, 'app.js'),
+        },
+        shared: {
+          ...this.context.config.shared,
+          'react': {
+            singleton: true,
+            requiredVersion: cliPackageData.dependencies.react,
+            strictVersion: true,
+          },
+          'react-dom': {
+            singleton: true,
+            requiredVersion: cliPackageData.dependencies['react-dom'],
+            strictVersion: true,
+          },
+          'react-router-dom': {
+            singleton: true,
+            requiredVersion: cliPackageData.dependencies['react-router-dom'],
+            strictVersion: true,
+          },
+          'history': {
+            singleton: true,
+            requiredVersion: cliPackageData.dependencies.history,
+            strictVersion: true,
+          },
+        },
+      },
+      { type: 'ClassSet', ClassObject: ModuleFederationPlugin },
+    )
+
+    this.config.set('plugins.externalRemotes', undefined, {
+      type: 'ClassSet',
+      ClassObject: ExternalRemotesWebpackPlugin,
+    })
+
+    this.config.set(
+      'plugins.remote',
+      {
+        fileName: this.remoteFileName,
+        scopeName: 'remote',
+        windowScopeName: '__doer_remotes__',
+      },
+      { type: 'ClassSet', ClassObject: RemoteWebpackPlugin },
+    )
+  }
+
+  registerWebpackbarPlugin() {
+    this.config.set(
+      'plugins.webpackbar',
+      {
+        name: 'Doer',
+        color: '#08979c',
+        reporter: {
+          afterAllDone: () => {
+            const cliPackage = require(this.context.path.cliPackageJson)
+            const appPackage = require(this.context.path.packageJson)
+            clearConsole()
+            console.info(figlet.textSync('Doer', 'Ghost'))
+            console.info(`👣 Doer v${cliPackage.version}`)
+            console.info()
+            console.info(`👣 应用名称：${chalk.blue(chalk.bold(appPackage.name))}`)
+            console.info()
+          },
+        },
+      },
+      {
+        type: 'ClassSet',
+        ClassObject: Webpackbar,
+      },
+    )
+  }
+
+  optimization() {
+    this.config.set('optimization', {
+      minimize: this.env.isProduction,
+      minimizer: [],
+    })
+
+    const optimization = this.config.get('optimization')
+    const minimizer = optimization.get('minimizer')
+    minimizer.set(
+      'terser',
       {
         terserOptions: {
           // 开启性能分析时，不要破环类名及文件名
-          keep_classnames: isEnableProfiler,
-          keep_fnames: isEnableProfiler,
+          keep_classnames: this.env.isEnableProfiler,
+          keep_fnames: this.env.isEnableProfiler,
           output: {
             comments: false,
           },
         },
         extractComments: false,
       },
-    ])
-    .end()
+      { type: 'ClassSet', ClassObject: TerserWebpackPlugin },
+    )
+    minimizer.set('cssMinimizer', undefined, { type: 'ClassSet', ClassObject: CssMinimizerWebpackPlugin })
 
-  this.webpackChain.optimization.minimizer('cssMinimizer').use(CssMinimizerWebpackPlugin).end()
+    const remoteModuleTypes = ['provide-module', 'consume-shared-module', 'remote-module']
+    // 第三方包打包机制
+    const venderCacheGroup = {
+      test: (module) => {
+        if (remoteModuleTypes.includes(module.type)) {
+          return false
+        }
 
-  const remoteModuleTypes = ['provide-module', 'consume-shared-module', 'remote-module']
-  this.webpackChain.optimization.splitChunks({
-    chunks: 'async',
-    minSize: 20000,
-    minRemainingSize: 0,
-    minChunks: 1,
-    maxAsyncRequests: 30,
-    maxInitialRequests: 30,
-    enforceSizeThreshold: 50000,
-    cacheGroups: {
-      framework: {
-        test: (module) => {
-          if (remoteModuleTypes.includes(module.type)) {
-            return false
-          }
-
-          return /react|react-router-dom|react-dom|history/.test(module.context)
-        },
-        name: 'framework',
-        enforce: true,
-        reuseExistingChunk: true,
+        return /[\\/]node_modules[\\/]/.test(module.context)
       },
-      vendors: {
-        test: (module) => {
-          if (remoteModuleTypes.includes(module.type)) {
-            return false
-          }
+      name: (module) => {
+        return getVenderName(module)
+      },
+      reuseExistingChunk: true,
+    }
+    const cacheGroups = {}
+    cacheGroups.vender = venderCacheGroup
 
-          return /[\\/]node_modules[\\/]/.test(module.context)
-        },
-        name: 'vendors',
-        priority: -10,
-        reuseExistingChunk: true,
-      },
-      default: {
-        minChunks: 2,
-        priority: -20,
-        reuseExistingChunk: true,
-      },
-    },
-  })
+    optimization.set('splitChunks', {
+      chunks: 'all',
+      minSize: 0,
+      minRemainingSize: 0,
+      minChunks: 1,
+      maxAsyncRequests: Infinity,
+      maxInitialRequests: Infinity,
+      enforceSizeThreshold: 50000,
+      cacheGroups,
+    })
+  }
+
+  build(callback) {
+    // 初始化基础能力
+    this.initial()
+    // 添加别名能力支持
+    this.alias()
+    // 添加svg组件支持
+    this.svgr()
+    // 注册define支持
+    this.registerDefinePlugin()
+    // 注册log支持
+    this.registerLogPlugin()
+    // 注册进度条
+    this.registerWebpackbarPlugin()
+    // 注册打包优化
+    this.optimization()
+
+    // 添加sourcemap支持
+    if (!this.env.isProduction) {
+      this.sourcemap()
+    }
+
+    // 启用react调试功能
+    if (!this.env.isProduction && this.env.isEnableProfiler) {
+      this.reactProfiler()
+    }
+
+    // 启用gzip
+    if (this.env.isEnableGzip) {
+      this.registerCompressionPlugin()
+    }
+
+    plugin.hooks.webpackConfigure.call(this.config)
+    const webpackConfig = plugin.hooks.webpackConfig.call(this.config.toValue())
+    const compiler = webpack(webpackConfig, callback)
+    plugin.hooks.webpack.call(compiler)
+
+    return compiler
+  }
 }
 
-module.exports = Webpack
+export default Webpack

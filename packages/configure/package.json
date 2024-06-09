@@ -1,0 +1,16 @@
+{
+  "name": "@doerjs/configure",
+  "version": "0.0.1",
+  "description": "",
+  "author": "FaureWu <502556093@qq.com>",
+  "license": "MIT",
+  "type": "module",
+  "main": "index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "immer": "10.1.1",
+    "@doerjs/utils": "workspace:*"
+  }
+}
