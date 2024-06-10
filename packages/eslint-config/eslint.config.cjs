@@ -10,5 +10,6 @@ module.exports = {
         usePrettierrc: true,
       },
     ],
+    'no-console': ['error', { allow: ['info', 'warn', 'error'] }],
   },
 }

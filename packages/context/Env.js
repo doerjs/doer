@@ -48,6 +48,7 @@ class Env extends Parser {
     env.setBoolean('GZIP', false)
     env.setBoolean('ENABLE_ANALYZER', false)
     env.setBoolean('HTTPS', false)
+    env.setBoolean('FAST_REFRESH', false)
 
     // 解析自定义环境变量，都是以APP_打头
     this.env = Object.keys(process.env)

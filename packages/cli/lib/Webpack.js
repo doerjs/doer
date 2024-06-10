@@ -17,6 +17,7 @@ import TerserWebpackPlugin from 'terser-webpack-plugin'
 import Webpackbar from 'webpackbar'
 import figlet from 'figlet'
 import chalk from 'chalk'
+import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 
 import plugin from './plugin.js'
 
@@ -49,7 +50,7 @@ function createGetLibraryLocalIndent(libraryName) {
 }
 
 function getVenderName(module) {
-  const packageData = module.resourceResolveData.descriptionFileData
+  const packageData = module.resourceResolveData?.descriptionFileData || {}
   if (packageData.name && packageData.version) {
     return `vender~${packageData.name.replace(/@/g, '').replace(/\//g, '-')}`
   }
@@ -73,12 +74,14 @@ class Webpack {
     const isEnableProfiler = isProduction && process.env.ENABLE_PROFILER === 'true'
     const isEnableGzip = process.env.GZIP === 'true'
     const isEnableAnalyzer = process.env.ENABLE_ANALYZER === 'true'
+    const isFastRefresh = process.env.FAST_REFRESH === 'true'
 
     return {
       isProduction,
       isEnableProfiler,
       isEnableGzip,
       isEnableAnalyzer,
+      isFastRefresh,
     }
   }
 
@@ -94,6 +97,7 @@ class Webpack {
     this.config.set('entry.main', this.context.path.entry)
 
     this.config.set('mode', this.env.isProduction ? 'production' : 'development')
+    this.config.set('watch', !this.env.isProduction)
 
     this.config.set('output', {
       path: this.context.path.dist,
@@ -101,8 +105,8 @@ class Webpack {
       chunkFilename: this.env.isProduction ? 'static/js/[name].[contenthash:8].chunk.js' : 'static/js/[name].chunk.js',
       publicPath: process.env.PUBLIC_URL,
       assetModuleFilename: this.env.isProduction
-        ? 'static/media/[name].[contenthash:8].[ext]'
-        : 'static/media/[name].[ext]',
+        ? 'static/media/[name].[contenthash:8][ext]'
+        : 'static/media/[name][ext]',
       uniqueName: require(this.context.path.packageJson).name,
     })
 
@@ -132,6 +136,7 @@ class Webpack {
     this.image()
     this.asset()
     this.css()
+    this.cssModule()
     this.javascript()
     this.registerHtmlPlugin()
     this.registerRouterPlugin()
@@ -197,7 +202,18 @@ class Webpack {
 
     svgr.set('test.svg', /\.svg$/)
 
-    svgr.set('use.svgr', require.resolve('@svgr/webpack'))
+    svgr.set('use.svgr', {
+      loader: require.resolve('@svgr/webpack'),
+      options: {
+        prettier: false,
+        svgo: false,
+        svgoConfig: {
+          plugins: [{ removeViewBox: false }],
+        },
+        titleProp: true,
+        ref: true,
+      },
+    })
   }
 
   asset() {
@@ -260,6 +276,19 @@ class Webpack {
     })
     postcssPlugins.set('normalize', require.resolve('postcss-normalize'))
 
+    this.config.set(
+      'plugins.miniCss',
+      {
+        filename: this.env.isProduction ? 'static/css/[name].[contenthash:8].css' : 'static/css/[name].css',
+        chunkFilename: this.env.isProduction
+          ? 'static/css/[name].[contenthash:8].chunk.css'
+          : 'static/css/[name].chunk.css',
+      },
+      { type: 'ClassSet', ClassObject: MiniCssExtractWebpackPlugin },
+    )
+  }
+
+  cssModule() {
     this.config.set('module.rules.cssModule', {
       test: [],
       use: [],
@@ -305,17 +334,6 @@ class Webpack {
       stage: 3,
     })
     cssModulePostcssPlugins.set('normalize', require.resolve('postcss-normalize'))
-
-    this.config.set(
-      'plugins.miniCss',
-      {
-        filename: this.env.isProduction ? 'static/css/[name].[contenthash:8].css' : 'static/css/[name].css',
-        chunkFilename: this.env.isProduction
-          ? 'static/css/[name].[contenthash:8].chunk.css'
-          : 'static/css/[name].chunk.css',
-      },
-      { type: 'ClassSet', ClassObject: MiniCssExtractWebpackPlugin },
-    )
   }
 
   javascript() {
@@ -358,7 +376,12 @@ class Webpack {
       loose: false,
       debug: false,
     })
-    babelPresets.set('presetReact', require.resolve('@babel/preset-react'))
+    babelPresets.set('presetReact', [])
+    babelPresets.set('presetReact.0', require.resolve('@babel/preset-react'))
+    babelPresets.set('presetReact.1', {
+      development: !this.env.isProduction,
+      runtime: 'automatic',
+    })
 
     const babelPlugins = babel.get('options.plugins')
     babelPlugins.set('transformRuntime', [])
@@ -544,6 +567,17 @@ class Webpack {
     )
   }
 
+  registerReactRefreshPlugin() {
+    const babel = this.config.get('module.rules.javascript.use.babel')
+    const babelPlugins = babel.get('options.plugins')
+    babelPlugins.set('reactRefresh', require.resolve('react-refresh/babel'))
+    this.config.set(
+      'plugins.reactRefresh',
+      { overlay: false, exclude: [/node_modules/, /bootstrap\.js$/] },
+      { type: 'ClassSet', ClassObject: ReactRefreshWebpackPlugin },
+    )
+  }
+
   optimization() {
     this.config.set('optimization', {
       minimize: this.env.isProduction,
@@ -569,26 +603,20 @@ class Webpack {
     )
     minimizer.set('cssMinimizer', undefined, { type: 'ClassSet', ClassObject: CssMinimizerWebpackPlugin })
 
-    const remoteModuleTypes = ['provide-module', 'consume-shared-module', 'remote-module']
     // 第三方包打包机制
     const venderCacheGroup = {
       test: (module) => {
-        if (remoteModuleTypes.includes(module.type)) {
-          return false
-        }
-
         return /[\\/]node_modules[\\/]/.test(module.context)
       },
       name: (module) => {
         return getVenderName(module)
       },
-      reuseExistingChunk: true,
     }
     const cacheGroups = {}
     cacheGroups.vender = venderCacheGroup
 
     optimization.set('splitChunks', {
-      chunks: 'all',
+      chunks: 'async',
       minSize: 0,
       minRemainingSize: 0,
       minChunks: 1,
@@ -618,6 +646,7 @@ class Webpack {
     // 添加sourcemap支持
     if (!this.env.isProduction) {
       this.sourcemap()
+      this.env.isFastRefresh && this.registerReactRefreshPlugin()
     }
 
     // 启用react调试功能

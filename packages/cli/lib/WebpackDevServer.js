@@ -46,13 +46,14 @@ export default class {
 
   initial() {
     const isHttps = process.env.HTTPS === 'true'
+    const isFastRefresh = process.env.FAST_REFRESH === 'true'
 
     this.config.set('allowedHosts', 'all')
     this.config.set('host', process.env.HOST)
     this.config.set('port', isHttps ? process.env.HTTPS_PORT : process.env.PORT)
     this.config.set('open', false)
-    this.config.set('hot', false)
-    this.config.set('liveReload', true)
+    this.config.set('hot', isFastRefresh)
+    this.config.set('liveReload', !isFastRefresh)
     this.config.set('compress', true)
     this.config.set('headers', {
       'Access-Control-Allow-Origin': '*',
@@ -63,19 +64,27 @@ export default class {
       directory: this.context.path.public,
       publicPath: process.env.PUBLIC_URL,
     })
+    this.config.set(
+      'server',
+      isHttps
+        ? {
+            type: 'https',
+            options: getHttpsConfig(this.context),
+          }
+        : 'http',
+    )
     this.config.set('historyApiFallback', true)
+    this.config.set('setupExitSignals', true)
     this.config.set('client', {
-      logging: 'none',
       overlay: false,
       progress: false,
     })
     this.config.set('devMiddleware', {
       publicPath: process.env.PUBLIC_URL,
     })
-    this.config.set('https', getHttpsConfig(this.context))
   }
 
-  run(complier) {
+  async run(complier) {
     this.initial()
 
     plugin.hooks.webpackDevServerConfigure.call(this.config)
@@ -117,7 +126,5 @@ export default class {
       webpackDevServer.stop()
       process.exit(0)
     })
-
-    webpackDevServer.start()
   }
 }

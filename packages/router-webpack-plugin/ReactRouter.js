@@ -31,18 +31,6 @@ class ReactRouter extends Router {
     this.writeTemplate('loaderComponent.js', templates['loaderComponent.ejs'])
   }
 
-  writeError() {
-    const errorFileName = 'Error.jsx'
-
-    const errorFilePath = path.resolve(this.options.outputPath, errorFileName)
-    const { error = {} } = this.options.appConfig
-    const errorData = { error: {} }
-    errorData.error.page = error.page ? this.relativePath(errorFilePath, error.page) : ''
-    errorData.error.layout = error.layout ? this.relativePath(errorFilePath, error.layout) : ''
-
-    this.writeTemplate(errorFileName, templates['Error.ejs'], errorData)
-  }
-
   writeSuspense() {
     const suspenseFileName = 'Suspense.jsx'
 
@@ -139,7 +127,6 @@ class ReactRouter extends Router {
     super.bootstrap()
 
     this.writeLoaderComponent()
-    this.writeError()
     this.writeSuspense()
     this.writeBootstrap()
     this.writeHistory()

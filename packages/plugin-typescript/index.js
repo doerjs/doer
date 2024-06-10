@@ -19,6 +19,7 @@ export default function (plugin) {
         sourcemap.set('test.tsx', /\.tsx$/)
       }
 
+      const javascript = webpackConfigure.get('module.rules.javascript')
       webpackConfigure.set('module.rules.typescript', {
         test: [],
         resolve: {
@@ -36,40 +37,10 @@ export default function (plugin) {
       typescript.set('include.src', context.path.src)
       typescript.set('exclude.dts', /\.d\.ts$/)
 
-      typescript.set('use.babel', {
-        loader: require.resolve('babel-loader'),
-        options: {
-          babelrc: false,
-          configFile: false,
-          presets: [],
-          plugins: [],
-          browserslistEnv: process.env.NODE_ENV,
-          compact: process.env.NODE_ENV === 'production',
-          sourceMaps: true,
-          inputSourceMap: true,
-        },
-      })
-
+      typescript.set('use.babel', javascript.get('use.babel').toValue())
       const babel = typescript.get('use.babel')
-
       const babelPresets = babel.get('options.presets')
-      babelPresets.set('presetEnv', [])
-      babelPresets.set('presetEnv.0', require.resolve('@babel/preset-env'))
-      babelPresets.set('presetEnv.1', {
-        useBuiltIns: false,
-        loose: false,
-        debug: false,
-      })
-      babelPresets.set('presetReact', require.resolve('@babel/preset-react'))
-
-      const babelPlugins = babel.get('options.plugins')
-      babelPlugins.set('transformRuntime', [])
-      babelPlugins.set('transformRuntime.0', require.resolve('@babel/plugin-transform-runtime'))
-      babelPlugins.set('transformRuntime.1', {
-        corejs: 3,
-        helpers: true,
-        regenerator: true,
-      })
+      babelPresets.set('presetTypescript', require.resolve('@babel/preset-typescript'))
     })
   })
 }

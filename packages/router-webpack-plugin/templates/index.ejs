@@ -13,7 +13,27 @@ import { isDebug } from './helper.js'
     } catch (e) {}
   }
 
-  window.__doer_remotes__ = urls
+  if (Proxy !== undefined) {
+    window.__doer_remotes__ = new Proxy({}, {
+      get(_, prop) {
+        if (!prop) {
+          return
+        }
+
+        if (!urls[prop]) {
+          throw new Error(`Remote url not found for ${prop}`)
+        }
+
+        return urls[prop]
+      },
+    })
+  } else {
+    window.__doer_remotes__ = urls
+  }
+
+  window.__doer_uncheck_remote = function (name) {
+    return urls[name]
+  }
 
   import(/* webpackChunkName: "bootstrap" */'./bootstrap.js')
 })()

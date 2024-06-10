@@ -15,7 +15,6 @@ import { enter, leave } from './app.js'
 
 import Layout, { getLayoutName } from './Layout.jsx'
 import Router from './Router.jsx'
-import Error from './Error.jsx'
 import Suspense from './Suspense.jsx'
 import Debug from './Debug.jsx'
 
@@ -24,7 +23,7 @@ export function getAppName(hasLayout) {
   const [layoutName = '', appName = ''] = routerPath.split('/').filter(item => item)
   const name = hasLayout ? appName : layoutName
 
-  if (isString(window.__doer_remotes__[name]) && window.__doer_remotes__[name]) {
+  if (window.__doer_uncheck_remote(name)) {
     return name
   }
 }
@@ -109,21 +108,17 @@ export default function Root({ location }) {
   })
 
   return (
-    <Error>
-      <Suspense>
-        {(isEnableEditDebug() || isDebug()) && <Debug />}
-        <Layout>
-          <Error mode="page">
-            <Suspense mode="page">
-              {status === 'loading' ? AppRouter && <AppRouter /> : (
-                <<% if (browserHistory) { %>BrowserRouter<% } else { %>HashRouter<% } %> basename={basename}>
-                  {status === 'succeed' && AppRouter ? <AppRouter /> : <Router />}
-                </<% if (browserHistory) { %>BrowserRouter<% } else { %>HashRouter<% } %>>
-              )}
-            </Suspense>
-          </Error>
-        </Layout>
-      </Suspense>
-    </Error>
+    <Suspense>
+      {(isEnableEditDebug() || isDebug()) && <Debug />}
+      <Layout>
+        <Suspense mode="page">
+          {status === 'loading' ? AppRouter && <AppRouter /> : (
+            <<% if (browserHistory) { %>BrowserRouter<% } else { %>HashRouter<% } %> basename={basename}>
+              {status === 'succeed' && AppRouter ? <AppRouter /> : <Router />}
+            </<% if (browserHistory) { %>BrowserRouter<% } else { %>HashRouter<% } %>>
+          )}
+        </Suspense>
+      </Layout>
+    </Suspense>
   )
 }
