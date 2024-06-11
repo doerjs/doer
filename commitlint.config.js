@@ -15,6 +15,7 @@ export default {
         'chore', // 构建过程或辅助工具的变动
         'revert', // 提交记录回退
         'merge', // 分支合并，修复冲突
+        'release', // 发布版本
       ],
     ],
   },
