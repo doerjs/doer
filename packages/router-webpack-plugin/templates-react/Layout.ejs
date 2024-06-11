@@ -18,11 +18,16 @@ function getLayoutComponent(layoutName = '') {
 
 export function getLayoutName() {
   const routerPath = getRouterPath()
-  const [layoutName = ''] = routerPath.split('/').filter(item => item)
+  const [layoutName = ''] = routerPath.split('/').filter(Boolean)
 
   const LayoutComponent = getLayoutComponent(layoutName)
 
   return LayoutComponent ? layoutName : ''
+}
+
+export function hasLayout(layoutName) {
+  const LayoutComponent = getLayoutComponent(layoutName)
+  return !!LayoutComponents
 }
 
 function useLayoutName() {

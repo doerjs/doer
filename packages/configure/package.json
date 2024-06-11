@@ -10,7 +10,6 @@
     "access": "public"
   },
   "dependencies": {
-    "immer": "10.1.1",
     "@doerjs/utils": "workspace:*"
   }
 }

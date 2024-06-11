@@ -659,9 +659,13 @@ class Webpack {
       this.registerCompressionPlugin()
     }
 
+    this.context.config.webpackConfigure(this.config)
     plugin.hooks.webpackConfigure.call(this.config)
-    const webpackConfig = plugin.hooks.webpackConfig.call(this.config.toValue())
+
+    let webpackConfig = this.context.config.webpackConfig(this.config.toValue())
+    webpackConfig = plugin.hooks.webpackConfig.call(webpackConfig)
     const compiler = webpack(webpackConfig, callback)
+
     plugin.hooks.webpack.call(compiler)
 
     return compiler

@@ -1,8 +1,13 @@
 import { loadScopeScript, loadModule } from './loader.js'
+import { history } from './history.js'
 
-export async function loadRemoteModule(scope, module) {
+// eg: remote:glide_components/Input
+export async function remote(remoteUrl) {
+  let [scope, ...rest] = remoteUrl.split('/')
+  scope = scope.replace('remote:', '')
+
   await loadScopeScript(scope)
-  return loadModule(scope, module)()
+  return loadModule(scope, `./${rest.join('/')}`)()
 }
 
 export function share(key, context) {
@@ -13,4 +18,8 @@ export function share(key, context) {
 export function apply(key) {
   const symbolKey = Symbol.for(key)
   return window[symbolKey]
+}
+
+export {
+  history,
 }

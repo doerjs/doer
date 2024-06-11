@@ -613,34 +613,37 @@ $ pnpm i 依赖包 -r --filter 包
 
 **发布alpha测试版本**
 
-是内部测试版，一般不向外部发布，会有很多Bug，一般只有测试人员使用
+内部测试版本，版本功能还不完全，存在较多问题和错误，同时可能会在后续添加新功能，供给内部测试和开发人员使用，不建议普通用户使用
 
 ```bash
 $ pnpm run alpha
+$ pnpm run changeset
 $ pnpm run version
-$ pnpm run pub
+$ pnpm run publish
 $ pnpm run exit
 ```
 
 **发布beta测试版本**
 
-也是测试版，这个阶段的版本会一直加入新的功能。在Alpha版之后推出
+公开测试版，版本功能还不完全，存在问题和错误，相较于alpha版本更为稳定，提供对外公开测试版本，不建议普通用户使用
 
 ```bash
 $ pnpm run beta
+$ pnpm run changeset
 $ pnpm run version
-$ pnpm run pub
+$ pnpm run publish
 $ pnpm run exit
 ```
 
 **发布rc测试版本**
 
-系统平台上就是发行候选版本。RC版不会再加入新的功能了，主要着重于除错
+版本功能已经与正式稳定版一致，不存在重大问题和错误，基本与正式版相差无几
 
 ```bash
 $ pnpm run rc
+$ pnpm run changeset
 $ pnpm run version
-$ pnpm run pub
+$ pnpm run publish
 $ pnpm run exit
 ```
 
@@ -648,8 +651,9 @@ $ pnpm run exit
 
 ```bash
 $ pnpm run exit
+$ pnpm run changeset
 $ pnpm run version
-$ pnpm run pub
+$ pnpm run publish
 ```
 
 # 联系作者

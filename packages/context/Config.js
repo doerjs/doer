@@ -59,14 +59,17 @@ class Config extends Parser {
   // 配置项目的页面及布局loading组件
   loading = {}
 
-  // 配置项目的页面及布局加载失败时的error组件
-  error = {}
-
   // 配置插件
   plugins = []
 
   // 是否开启browserHistory
   browserHistory = false
+
+  // webpack配置式勾子
+  webpackConfigure = () => {}
+
+  // webpack配置勾子
+  webpackConfig = (config) => config
 
   constructor(pathInstance) {
     super()
@@ -126,9 +129,10 @@ class Config extends Parser {
     this.exposes = getValue('exposes', is.isObject, this.exposes)
     this.shared = getValue('shared', is.isObject, this.shared)
     this.browserHistory = getValue('browserHistory', is.isBoolean, this.browserHistory)
+    this.webpackConfigure = getValue('webpackConfigure', is.isFunction, this.webpackConfigure)
+    this.webpackConfig = getValue('webpackConfig', is.isFunction, this.webpackConfig)
 
     this.parseLoading(config)
-    this.parseError(config)
     this.parsePlugins(config)
 
     if (this.mode === 'library' && !this.libraryName) {
@@ -161,33 +165,6 @@ class Config extends Parser {
 
     if (layoutLoading) {
       this.loading.layout = this.resolvePath(layoutLoading)
-    }
-  }
-
-  parseError(config) {
-    if (is.isUndefined(config.error)) {
-      return
-    }
-
-    let pageError
-    let layoutError
-    if (is.isString(config.error)) {
-      pageError = config.error
-      layoutError = config.error
-    } else if (is.isObject(config.error)) {
-      pageError = config.error.page
-      layoutError = config.error.layout
-    } else {
-      trace.error('[error] 无效的配置项，请检查配置文件')
-      process.exit(-1)
-    }
-
-    if (pageError) {
-      this.error.page = this.resolvePath(pageError)
-    }
-
-    if (layoutError) {
-      this.error.layout = this.resolvePath(layoutError)
     }
   }
 

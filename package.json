@@ -16,8 +16,9 @@
     "alpha": "pnpm changeset pre enter alpha",
     "rc": "pnpm changeset pre enter rc",
     "exit": "pnpm changeset pre exit",
-    "version": " pnpm install && pnpm changeset && pnpm changeset version",
-    "pub": "pnpm publish -r",
+    "changeset": "pnpm changeset",
+    "version": "pnpm changeset version",
+    "publish": "pnpm publish -r",
     "clean": "rm -rf node_modules **/*/node_modules",
     "docs": "docsify serve docs"
   },
@@ -31,13 +32,13 @@
     ]
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.2",
-    "@commitlint/cli": "^18.6.1",
-    "@commitlint/config-conventional": "^18.6.3",
+    "@changesets/cli": "2.27.2",
+    "@commitlint/cli": "18.6.1",
+    "@commitlint/config-conventional": "18.6.3",
     "@doerjs/eslint-config": "workspace:*",
     "@doerjs/prettier-config": "workspace:*",
-    "docsify-cli": "^4.4.4",
-    "husky": "^8.0.3",
-    "lint-staged": "^15.2.2"
+    "docsify-cli": "4.4.4",
+    "husky": "8.0.3",
+    "lint-staged": "15.2.2"
   }
 }
