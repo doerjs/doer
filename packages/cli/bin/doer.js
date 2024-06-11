@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { createRequire } from 'node:module'
 import { Command, Option, InvalidArgumentError } from 'commander'
 import figlet from 'figlet'

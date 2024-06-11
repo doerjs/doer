@@ -9,13 +9,13 @@ importers:
   .:
     devDependencies:
       '@changesets/cli':
-        specifier: ^2.27.2
-        version: 2.27.2
+        specifier: 2.27.5
+        version: 2.27.5
       '@commitlint/cli':
-        specifier: ^18.6.1
+        specifier: 18.6.1
         version: 18.6.1(@types/node@20.12.12)(typescript@5.4.5)
       '@commitlint/config-conventional':
-        specifier: ^18.6.3
+        specifier: 18.6.3
         version: 18.6.3
       '@doerjs/eslint-config':
         specifier: workspace:*
@@ -24,13 +24,13 @@ importers:
         specifier: workspace:*
         version: link:packages/prettier-config
       docsify-cli:
-        specifier: ^4.4.4
+        specifier: 4.4.4
         version: 4.4.4
       husky:
-        specifier: ^8.0.3
+        specifier: 8.0.3
         version: 8.0.3
       lint-staged:
-        specifier: ^15.2.2
+        specifier: 15.2.2
         version: 15.2.2
 
   packages/cli:
@@ -84,7 +84,7 @@ importers:
         specifier: workspace:*
         version: link:../utils
       '@pmmmwh/react-refresh-webpack-plugin':
-        specifier: ^0.5.15
+        specifier: 0.5.15
         version: 0.5.15(react-refresh@0.14.2)(type-fest@0.21.3)(webpack-dev-server@5.0.4(webpack@5.91.0))(webpack@5.91.0)
       '@svgr/webpack':
         specifier: 8.1.0
@@ -177,7 +177,7 @@ importers:
         specifier: 18.2.0
         version: 18.2.0(react@18.2.0)
       react-refresh:
-        specifier: ^0.14.2
+        specifier: 0.14.2
         version: 0.14.2
       react-router-dom:
         specifier: 6.18.0
@@ -185,12 +185,9 @@ importers:
       semver:
         specifier: 7.5.4
         version: 7.5.4
-      single-react-refresh-plugin:
-        specifier: ^1.0.5
-        version: 1.0.5
       source-map-loader:
-        specifier: 4.0.1
-        version: 4.0.1(webpack@5.91.0)
+        specifier: 5.0.0
+        version: 5.0.0(webpack@5.91.0)
       style-loader:
         specifier: 3.3.3
         version: 3.3.3(webpack@5.91.0)
@@ -218,9 +215,6 @@ importers:
       '@doerjs/utils':
         specifier: workspace:*
         version: link:../utils
-      immer:
-        specifier: 10.1.1
-        version: 10.1.1
 
   packages/context:
     dependencies:
@@ -285,7 +279,7 @@ importers:
         specifier: 5.3.0
         version: 5.3.0
       dayjs:
-        specifier: ^1.11.11
+        specifier: 1.11.11
         version: 1.11.11
 
   packages/plugin-less:
@@ -303,7 +297,7 @@ importers:
         specifier: workspace:*
         version: link:../utils
       cors:
-        specifier: ^2.8.5
+        specifier: 2.8.5
         version: 2.8.5
       express:
         specifier: 4.18.2
@@ -343,7 +337,7 @@ importers:
   packages/utils:
     dependencies:
       signale:
-        specifier: ^1.4.0
+        specifier: 1.4.0
         version: 1.4.0
 
 packages:
@@ -1003,30 +997,30 @@ packages:
     resolution: {integrity: sha512-6mQNsaLeXTw0nxYUYu+NSa4Hx4BlF1x1x8/PMFbiR+GBSr+2DkECc69b8hgy2frEodNcvPffeH8YfWd3LI6jhQ==}
     engines: {node: '>=6.9.0'}
 
-  '@changesets/apply-release-plan@7.0.1':
-    resolution: {integrity: sha512-aPdSq/R++HOyfEeBGjEe6LNG8gs0KMSyRETD/J2092OkNq8mOioAxyKjMbvVUdzgr/HTawzMOz7lfw339KnsCA==}
+  '@changesets/apply-release-plan@7.0.3':
+    resolution: {integrity: sha512-klL6LCdmfbEe9oyfLxnidIf/stFXmrbFO/3gT5LU5pcyoZytzJe4gWpTBx3BPmyNPl16dZ1xrkcW7b98e3tYkA==}
 
-  '@changesets/assemble-release-plan@6.0.0':
-    resolution: {integrity: sha512-4QG7NuisAjisbW4hkLCmGW2lRYdPrKzro+fCtZaILX+3zdUELSvYjpL4GTv0E4aM9Mef3PuIQp89VmHJ4y2bfw==}
+  '@changesets/assemble-release-plan@6.0.2':
+    resolution: {integrity: sha512-n9/Tdq+ze+iUtjmq0mZO3pEhJTKkku9hUxtUadW30jlN7kONqJG3O6ALeXrmc6gsi/nvoCuKjqEJ68Hk8RbMTQ==}
 
   '@changesets/changelog-git@0.2.0':
     resolution: {integrity: sha512-bHOx97iFI4OClIT35Lok3sJAwM31VbUM++gnMBV16fdbtBhgYu4dxsphBF/0AZZsyAHMrnM0yFcj5gZM1py6uQ==}
 
-  '@changesets/cli@2.27.2':
-    resolution: {integrity: sha512-6/kADjKMOrlLwNr/Y5HAq7T9oGOA2Lq5A59AGtwQCCiXuSGp4EgszzdJFeBiF8pdz7Wn1HaLzSUBhAaNToEJqg==}
+  '@changesets/cli@2.27.5':
+    resolution: {integrity: sha512-UVppOvzCjjylBenFcwcZNG5IaZ8jsIaEVraV/pbXgukYNb0Oqa0d8UWb0LkYzA1Bf1HmUrOfccFcRLheRuA7pA==}
     hasBin: true
 
-  '@changesets/config@3.0.0':
-    resolution: {integrity: sha512-o/rwLNnAo/+j9Yvw9mkBQOZySDYyOr/q+wptRLcAVGlU6djOeP9v1nlalbL9MFsobuBVQbZCTp+dIzdq+CLQUA==}
+  '@changesets/config@3.0.1':
+    resolution: {integrity: sha512-nCr8pOemUjvGJ8aUu8TYVjqnUL+++bFOQHBVmtNbLvKzIDkN/uiP/Z4RKmr7NNaiujIURHySDEGFPftR4GbTUA==}
 
   '@changesets/errors@0.2.0':
     resolution: {integrity: sha512-6BLOQUscTpZeGljvyQXlWOItQyU71kCdGz7Pi8H8zdw6BI0g3m43iL4xKUVPWtG+qrrL9DTjpdn8eYuCQSRpow==}
 
-  '@changesets/get-dependents-graph@2.0.0':
-    resolution: {integrity: sha512-cafUXponivK4vBgZ3yLu944mTvam06XEn2IZGjjKc0antpenkYANXiiE6GExV/yKdsCnE8dXVZ25yGqLYZmScA==}
+  '@changesets/get-dependents-graph@2.1.0':
+    resolution: {integrity: sha512-QOt6pQq9RVXKGHPVvyKimJDYJumx7p4DO5MO9AhRJYgAPgv0emhNqAqqysSVKHBm4sxKlGN4S1zXOIb5yCFuhQ==}
 
-  '@changesets/get-release-plan@4.0.0':
-    resolution: {integrity: sha512-9L9xCUeD/Tb6L/oKmpm8nyzsOzhdNBBbt/ZNcjynbHC07WW4E1eX8NMGC5g5SbM5z/V+MOrYsJ4lRW41GCbg3w==}
+  '@changesets/get-release-plan@4.0.2':
+    resolution: {integrity: sha512-rOalz7nMuMV2vyeP7KBeAhqEB7FM2GFPO5RQSoOoUKKH9L6wW3QyPA2K+/rG9kBrWl2HckPVES73/AuwPvbH3w==}
 
   '@changesets/get-version-range-type@0.4.0':
     resolution: {integrity: sha512-hwawtob9DryoGTpixy1D3ZXbGgJu1Rhr+ySH2PvTLHvkZuQ7sRT4oQwMh0hbqZH1weAooedEjRsbrWcGLCeyVQ==}
@@ -1045,6 +1039,9 @@ packages:
 
   '@changesets/read@0.6.0':
     resolution: {integrity: sha512-ZypqX8+/im1Fm98K4YcZtmLKgjs1kDQ5zHpc2U1qdtNBmZZfo/IBiG162RoP0CUF05tvp2y4IspH11PLnPxuuw==}
+
+  '@changesets/should-skip-package@0.1.0':
+    resolution: {integrity: sha512-FxG6Mhjw7yFStlSM7Z0Gmg3RiyQ98d/9VpQAZ3Fzr59dCOM9G6ZdYbjiSAt0XtFr9JR5U2tBaJWPjrkGGc618g==}
 
   '@changesets/types@4.1.0':
     resolution: {integrity: sha512-LDQvVDv5Kb50ny2s25Fhm3d9QSZimsoUGBsUioj6MC3qbMUCuC8GPIvk/M6IvXx3lYhAs0lwWUQLb+VIEUCECw==}
@@ -1855,10 +1852,6 @@ packages:
   JSONStream@1.3.5:
     resolution: {integrity: sha512-E+iruNOY8VV9s4JEbe1aNEm6MiszPRr/UfcHMz0TQh1BXSxHK+ASV1R6W4HpjBhSeS+54PIsAMCBmwD06LLsqQ==}
     hasBin: true
-
-  abab@2.0.6:
-    resolution: {integrity: sha512-j2afSsaIENvHZN2B8GOpF566vZ5WVk5opAiMTvWgaQT8DkbOqsTfvNAvHoRGU2zzP8cPoqys+xHTRDWW8L+/BA==}
-    deprecated: Use your platform's native atob() and btoa() methods instead
 
   accepts@1.3.8:
     resolution: {integrity: sha512-PYAthTa2m2VKxuvSD3DPC/Gy+U+sOA1LAuT8mkmRuvw+NACSaeXEQ+NHcVF7rONl6qcaxV3Uuemwawk+7+SJLw==}
@@ -2751,6 +2744,7 @@ packages:
 
   docsify-server-renderer@4.13.1:
     resolution: {integrity: sha512-XNJeCK3zp+mVO7JZFn0bH4hNBAMMC1MbuCU7CBsjLHYn4NHrjIgCBGmylzEan3/4Qm6kbSzQx8XzUK5T7GQxHw==}
+    deprecated: docsify-server-renderer 4.x and below is no longer supported while we investigate the future of SSR and SSG for Docsify
 
   docsify@4.13.1:
     resolution: {integrity: sha512-BsDypTBhw0mfslw9kZgAspCMZSM+sUIIDg5K/t1hNLkvbem9h64ZQc71e1IpY+iWsi/KdeqfazDfg52y2Lmm0A==}
@@ -3602,9 +3596,6 @@ packages:
     resolution: {integrity: sha512-6TDAlDPZxUFCv+fuOkIoXT/V/f3Qbq8e37p+YOiYrUv3v9cc3/6x78VdfPgFVaB9dZYeLUfKgHRebpkm/oP2VQ==}
     engines: {node: '>=0.10.0'}
     hasBin: true
-
-  immer@10.1.1:
-    resolution: {integrity: sha512-s2MPrmjovJcoMaHtx6K11Ra7oD05NT97w1IC5zpMkT6Atjr7H8LjaDd81iIxUYpMKSRRNMJE703M1Fhr/TctHw==}
 
   import-fresh@3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
@@ -5567,9 +5558,6 @@ packages:
     resolution: {integrity: sha512-iuh+gPf28RkltuJC7W5MRi6XAjTDCAPC/prJUpQoG4vIP3MJZ+GTydVnodXA7pwvTKb2cA0m9OFZW/cdWy/I/w==}
     engines: {node: '>=6'}
 
-  single-react-refresh-plugin@1.0.5:
-    resolution: {integrity: sha512-5C34TmNfSeeVNrID32gQ9z4nFDfSpnFj6DQPQLoI1Z4TTjT32uBsC6HeqFYV2HEwad7V6TPTlhgamK2eK2V5tw==}
-
   sirv@2.0.4:
     resolution: {integrity: sha512-94Bdh3cC2PKrbgSOUqTiGPWVZeSiXfKOVZNJniWoqrWrRkB1CJzBU3NEbiTsPcYy1lDsANA/THzS+9WBiy5nfQ==}
     engines: {node: '>= 10'}
@@ -5622,9 +5610,9 @@ packages:
     resolution: {integrity: sha512-itJW8lvSA0TXEphiRoawsCksnlf8SyvmFzIhltqAHluXd88pkCd+cXJVHTDwdCr0IzwptSm035IHQktUu1QUMg==}
     engines: {node: '>=0.10.0'}
 
-  source-map-loader@4.0.1:
-    resolution: {integrity: sha512-oqXpzDIByKONVY8g1NUPOTQhe0UTU5bWUl32GSkqK2LjJj0HmwTMVKxcUip0RgAYhY1mqgOxjbQM48a0mmeNfA==}
-    engines: {node: '>= 14.15.0'}
+  source-map-loader@5.0.0:
+    resolution: {integrity: sha512-k2Dur7CbSLcAH73sBcIkV5xjPV4SzqO1NJ7+XaQl8if3VODDUj3FNchNGpqgJSKbvUfJuhVdv8K2Eu8/TNl2eA==}
+    engines: {node: '>= 18.12.0'}
     peerDependencies:
       webpack: ^5.72.1
 
@@ -7160,12 +7148,13 @@ snapshots:
       '@babel/helper-validator-identifier': 7.24.5
       to-fast-properties: 2.0.0
 
-  '@changesets/apply-release-plan@7.0.1':
+  '@changesets/apply-release-plan@7.0.3':
     dependencies:
       '@babel/runtime': 7.24.5
-      '@changesets/config': 3.0.0
+      '@changesets/config': 3.0.1
       '@changesets/get-version-range-type': 0.4.0
       '@changesets/git': 3.0.0
+      '@changesets/should-skip-package': 0.1.0
       '@changesets/types': 6.0.0
       '@manypkg/get-packages': 1.1.3
       detect-indent: 6.1.0
@@ -7174,35 +7163,37 @@ snapshots:
       outdent: 0.5.0
       prettier: 2.8.8
       resolve-from: 5.0.0
-      semver: 7.6.2
+      semver: 7.5.4
 
-  '@changesets/assemble-release-plan@6.0.0':
+  '@changesets/assemble-release-plan@6.0.2':
     dependencies:
       '@babel/runtime': 7.24.5
       '@changesets/errors': 0.2.0
-      '@changesets/get-dependents-graph': 2.0.0
+      '@changesets/get-dependents-graph': 2.1.0
+      '@changesets/should-skip-package': 0.1.0
       '@changesets/types': 6.0.0
       '@manypkg/get-packages': 1.1.3
-      semver: 7.6.2
+      semver: 7.5.4
 
   '@changesets/changelog-git@0.2.0':
     dependencies:
       '@changesets/types': 6.0.0
 
-  '@changesets/cli@2.27.2':
+  '@changesets/cli@2.27.5':
     dependencies:
       '@babel/runtime': 7.24.5
-      '@changesets/apply-release-plan': 7.0.1
-      '@changesets/assemble-release-plan': 6.0.0
+      '@changesets/apply-release-plan': 7.0.3
+      '@changesets/assemble-release-plan': 6.0.2
       '@changesets/changelog-git': 0.2.0
-      '@changesets/config': 3.0.0
+      '@changesets/config': 3.0.1
       '@changesets/errors': 0.2.0
-      '@changesets/get-dependents-graph': 2.0.0
-      '@changesets/get-release-plan': 4.0.0
+      '@changesets/get-dependents-graph': 2.1.0
+      '@changesets/get-release-plan': 4.0.2
       '@changesets/git': 3.0.0
       '@changesets/logger': 0.1.0
       '@changesets/pre': 2.0.0
       '@changesets/read': 0.6.0
+      '@changesets/should-skip-package': 0.1.0
       '@changesets/types': 6.0.0
       '@changesets/write': 0.3.1
       '@manypkg/get-packages': 1.1.3
@@ -7219,15 +7210,15 @@ snapshots:
       p-limit: 2.3.0
       preferred-pm: 3.1.3
       resolve-from: 5.0.0
-      semver: 7.6.2
+      semver: 7.5.4
       spawndamnit: 2.0.0
       term-size: 2.2.1
       tty-table: 4.2.3
 
-  '@changesets/config@3.0.0':
+  '@changesets/config@3.0.1':
     dependencies:
       '@changesets/errors': 0.2.0
-      '@changesets/get-dependents-graph': 2.0.0
+      '@changesets/get-dependents-graph': 2.1.0
       '@changesets/logger': 0.1.0
       '@changesets/types': 6.0.0
       '@manypkg/get-packages': 1.1.3
@@ -7238,19 +7229,19 @@ snapshots:
     dependencies:
       extendable-error: 0.1.7
 
-  '@changesets/get-dependents-graph@2.0.0':
+  '@changesets/get-dependents-graph@2.1.0':
     dependencies:
       '@changesets/types': 6.0.0
       '@manypkg/get-packages': 1.1.3
       chalk: 2.4.2
       fs-extra: 7.0.1
-      semver: 7.6.2
+      semver: 7.5.4
 
-  '@changesets/get-release-plan@4.0.0':
+  '@changesets/get-release-plan@4.0.2':
     dependencies:
       '@babel/runtime': 7.24.5
-      '@changesets/assemble-release-plan': 6.0.0
-      '@changesets/config': 3.0.0
+      '@changesets/assemble-release-plan': 6.0.2
+      '@changesets/config': 3.0.1
       '@changesets/pre': 2.0.0
       '@changesets/read': 0.6.0
       '@changesets/types': 6.0.0
@@ -7295,6 +7286,12 @@ snapshots:
       chalk: 2.4.2
       fs-extra: 7.0.1
       p-filter: 2.1.0
+
+  '@changesets/should-skip-package@0.1.0':
+    dependencies:
+      '@babel/runtime': 7.24.5
+      '@changesets/types': 6.0.0
+      '@manypkg/get-packages': 1.1.3
 
   '@changesets/types@4.1.0': {}
 
@@ -8239,8 +8236,6 @@ snapshots:
     dependencies:
       jsonparse: 1.3.1
       through: 2.3.8
-
-  abab@2.0.6: {}
 
   accepts@1.3.8:
     dependencies:
@@ -10318,8 +10313,6 @@ snapshots:
   image-size@0.5.5:
     optional: true
 
-  immer@10.1.1: {}
-
   import-fresh@3.3.0:
     dependencies:
       parent-module: 1.0.1
@@ -12285,8 +12278,6 @@ snapshots:
       figures: 2.0.0
       pkg-conf: 2.1.0
 
-  single-react-refresh-plugin@1.0.5: {}
-
   sirv@2.0.4:
     dependencies:
       '@polka/url': 1.0.0-next.25
@@ -12346,9 +12337,8 @@ snapshots:
 
   source-map-js@1.2.0: {}
 
-  source-map-loader@4.0.1(webpack@5.91.0):
+  source-map-loader@5.0.0(webpack@5.91.0):
     dependencies:
-      abab: 2.0.6
       iconv-lite: 0.6.3
       source-map-js: 1.2.0
       webpack: 5.91.0

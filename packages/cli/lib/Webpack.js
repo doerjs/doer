@@ -92,6 +92,7 @@ class Webpack {
 
   initial() {
     this.config.set('context', this.context.path.runtime)
+    this.config.set('target', 'web')
 
     this.config.set('entry', {})
     this.config.set('entry.main', this.context.path.entry)
