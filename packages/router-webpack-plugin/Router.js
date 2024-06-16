@@ -25,12 +25,9 @@ const templates = [
 }, {})
 
 /**
- * a.b.c.d.e -> a/b/c/d/e
- * a.$b.c.$d.e -> a/:b/c/:d/e
- * a.b.c.d.e$ -> a/b/c/d/*e
  *
  * {
- *  routePath: 'a/:b/c/:d/e', 路由地址
+ *  routePath: 'a/b/c/d', 路由地址
  *  pageName: '', 页面组件名称，以驼峰形式
  *  isEmpty: false, 文件是否为空
  *  dynamicPageFilePath: '', 页面文件生成的动态导入页面地址
@@ -39,23 +36,16 @@ const templates = [
  */
 function resolvePage(pageFile, options) {
   const pagePath = path.dirname(pageFile)
-  const basename = path.basename(pagePath)
-  const routeParts = basename
-    .split('.')
-    .filter((name) => name)
+  const routerBase = path.dirname(pagePath)
+  const routeParts = routerBase
+    .split('/')
+    .filter(Boolean)
+    .slice(2)
     .map((name) => name.toLocaleLowerCase())
 
   // 根据目录文件名解析路由地址
   const routePath = routeParts
     .reduce((result, name, index) => {
-      if (name.startsWith('$')) {
-        result.push(`:${name.replace('$', '')}`)
-        return result
-      } else if (name.endsWith('$')) {
-        result.push(`*${name.replace('$', '')}`)
-        return result
-      }
-
       // 最后一个名称为index时，省略
       if (index === routeParts.length - 1 && name === 'index') {
         return result
@@ -71,16 +61,12 @@ function resolvePage(pageFile, options) {
     'P' +
     routeParts
       .map((name) => {
-        if (name.startsWith('$') || name.endsWith('$')) {
-          return tool.toFirstUpperCase(name.replace('$', ''))
-        }
-
         return tool.toFirstUpperCase(name)
       })
       .join('')
 
   return {
-    routePath,
+    routePath: routePath || '/',
     pageName,
     isEmpty: file.isEmpty(pageFile),
     dynamicPageFilePath: path.resolve(options.outputPath, `pages/${pageName}.js`),

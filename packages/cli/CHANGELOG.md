@@ -1,5 +1,14 @@
 # @doerjs/cli
 
+## 0.1.17
+
+### Patch Changes
+
+- Updated dependencies
+  - @doerjs/router-webpack-plugin@0.1.1
+  - @doerjs/context@0.1.1
+  - @doerjs/log-webpack-plugin@0.1.1
+
 ## 0.1.16
 
 ### Patch Changes
