@@ -3,6 +3,7 @@
 import { createRequire } from 'node:module'
 import { Command, Option, InvalidArgumentError } from 'commander'
 import figlet from 'figlet'
+import * as is from '@doerjs/utils/is.js'
 
 import { cliPackageJsonPath } from '../lib/cliPath.js'
 import create, { validateName } from '../scripts/create.js'
@@ -18,7 +19,7 @@ console.info()
 
 function ensureName(value) {
   const message = validateName(value)
-  if (message) {
+  if (is.isString(message) && message) {
     throw new InvalidArgumentError(message)
   }
 

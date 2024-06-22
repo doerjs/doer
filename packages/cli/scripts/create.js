@@ -30,6 +30,8 @@ export function validateName(value) {
   if (!/^[a-zA-Z]{1}[A-Za-z0-9_-]+$/.test(value)) {
     return '应用名称只能由字母、数字、下划线、中横线组成，且首字符为字母！'
   }
+
+  return true
 }
 
 async function answers(options) {
@@ -75,7 +77,7 @@ async function answers(options) {
 
   if (data.length) {
     const result = await inquirer.prompt(data)
-    return { ...result, ...options }
+    return { ...options, ...result }
   }
 
   return Promise.resolve(options)

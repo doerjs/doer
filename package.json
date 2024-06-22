@@ -11,7 +11,7 @@
   ],
   "type": "module",
   "scripts": {
-    "preinstall": "husky install && npx only-allow pnpm",
+    "prepare": "husky",
     "beta": "pnpm changeset pre enter beta",
     "alpha": "pnpm changeset pre enter alpha",
     "rc": "pnpm changeset pre enter rc",
@@ -19,8 +19,7 @@
     "changeset": "npx changeset",
     "version": "pnpm changeset version",
     "publish": "pnpm publish -r",
-    "clean": "rm -rf node_modules **/*/node_modules",
-    "docs": "docsify serve docs"
+    "clean": "rm -rf node_modules **/*/node_modules"
   },
   "lint-staged": {
     "**/*.{js,jsx}": [
@@ -37,8 +36,7 @@
     "@commitlint/config-conventional": "18.6.3",
     "@doerjs/eslint-config": "workspace:*",
     "@doerjs/prettier-config": "workspace:*",
-    "docsify-cli": "4.4.4",
-    "husky": "8.0.3",
-    "lint-staged": "15.2.2"
+    "husky": "9.0.11",
+    "lint-staged": "15.2.7"
   }
 }
