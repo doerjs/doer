@@ -1,5 +1,12 @@
 # @doerjs/router-webpack-plugin
 
+## 0.1.2
+
+### Patch Changes
+
+- 49f0801: fix: 去除无用的React导入
+- 7e5016d: fix: 修复自动生成的页面路径不正确问题
+
 ## 0.1.1
 
 ### Patch Changes

@@ -1,5 +1,21 @@
 # @doerjs/cli
 
+## 0.1.18
+
+### Patch Changes
+
+- 7e5016d: feat: 支持跨端组件设计
+- 86cb145: fix: 修复脚手架无法创建应用问题
+- Updated dependencies [7e5016d]
+- Updated dependencies [49f0801]
+- Updated dependencies [7e5016d]
+  - @doerjs/plugin-typescript@0.1.1
+  - @doerjs/plugin-less@0.1.1
+  - @doerjs/configure@0.1.1
+  - @doerjs/router-webpack-plugin@0.1.2
+  - @doerjs/context@0.1.2
+  - @doerjs/log-webpack-plugin@0.1.2
+
 ## 0.1.17
 
 ### Patch Changes

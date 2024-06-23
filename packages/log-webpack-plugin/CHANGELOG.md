@@ -1,5 +1,11 @@
 # @doerjs/log-webpack-plugin
 
+## 0.1.2
+
+### Patch Changes
+
+- @doerjs/context@0.1.2
+
 ## 0.1.1
 
 ### Patch Changes

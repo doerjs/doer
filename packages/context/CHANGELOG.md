@@ -1,5 +1,13 @@
 # @doerjs/context
 
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies [7e5016d]
+- Updated dependencies [86cb145]
+  - @doerjs/cli@0.1.18
+
 ## 0.1.1
 
 ### Patch Changes
