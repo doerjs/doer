@@ -19,7 +19,6 @@ export default function (plugin) {
         sourcemap.set('test.tsx', /\.tsx$/)
       }
 
-      const javascript = webpackConfigure.get('module.rules.javascript')
       webpackConfigure.set('module.rules.typescript', {
         test: [],
         resolve: {
@@ -27,7 +26,7 @@ export default function (plugin) {
         },
         include: context.config.extraBabelCompileNodeModules,
         exclude: [],
-        use: [],
+        use: webpackConfigure.get('module.rules.javascript.use').clone(),
       })
 
       const typescript = webpackConfigure.get('module.rules.typescript')
@@ -37,7 +36,6 @@ export default function (plugin) {
       typescript.set('include.src', context.path.src)
       typescript.set('exclude.dts', /\.d\.ts$/)
 
-      typescript.set('use.babel', javascript.get('use.babel').toValue())
       const babel = typescript.get('use.babel')
       const babelPresets = babel.get('options.presets')
       babelPresets.set('presetTypescript', require.resolve('@babel/preset-typescript'))

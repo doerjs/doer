@@ -35,12 +35,12 @@ const templates = [
  * }
  */
 function resolvePage(pageFile, options) {
-  const pagePath = path.dirname(pageFile)
-  const routerBase = path.dirname(pagePath)
-  const routeParts = routerBase
+  const relativePageFile = pageFile.replace(options.srcPath, '')
+  const pagePath = path.dirname(relativePageFile)
+  const routeParts = pagePath
     .split('/')
     .filter(Boolean)
-    .slice(2)
+    .slice(1)
     .map((name) => name.toLocaleLowerCase())
 
   // 根据目录文件名解析路由地址

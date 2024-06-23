@@ -34,6 +34,14 @@ class ArraySet extends Configure {
     }
   }
 
+  cloneValue() {
+    const arraySet = new ArraySet(this.key)
+    this.value.forEach((item) => {
+      arraySet.setValue(item.key, item.cloneValue())
+    })
+    return arraySet
+  }
+
   toValue() {
     return this.value
       .map((item) => {

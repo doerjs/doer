@@ -29,6 +29,14 @@ class ObjectSet extends Configure {
     this.value[key] = value
   }
 
+  cloneValue() {
+    const objectSet = new ObjectSet(this.key)
+    Object.keys(this.value).forEach((key) => {
+      objectSet.setValue(key, this.value[key].cloneValue())
+    })
+    return objectSet
+  }
+
   toValue() {
     return Object.keys(this.value).reduce((result, key) => {
       const value = this.value[key].toValue()

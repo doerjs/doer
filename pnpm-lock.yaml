@@ -228,6 +228,15 @@ importers:
         specifier: 10.0.0
         version: 10.0.0
 
+  packages/cross-webpack-plugin:
+    dependencies:
+      webpack:
+        specifier: '>= 5'
+        version: 5.91.0
+      webpack-sources:
+        specifier: 3.2.3
+        version: 3.2.3
+
   packages/eslint-config:
     dependencies:
       '@rushstack/eslint-patch':
@@ -278,6 +287,21 @@ importers:
       dayjs:
         specifier: 1.11.11
         version: 1.11.11
+
+  packages/plugin-cross:
+    dependencies:
+      '@doerjs/cross-webpack-plugin':
+        specifier: workspace:*
+        version: link:../cross-webpack-plugin
+      '@doerjs/utils':
+        specifier: workspace:*
+        version: link:../utils
+      postcss-px-to-viewport:
+        specifier: 1.1.1
+        version: 1.1.1
+      webpack-sources:
+        specifier: 3.2.3
+        version: 3.2.3
 
   packages/plugin-less:
     dependencies:
@@ -4851,6 +4875,9 @@ packages:
     engines: {node: ^14 || ^16 || >=18}
     peerDependencies:
       postcss: ^8.4
+
+  postcss-px-to-viewport@1.1.1:
+    resolution: {integrity: sha512-2x9oGnBms+e0cYtBJOZdlwrFg/mLR4P1g2IFu7jYKvnqnH/HLhoKyareW2Q/x4sg0BgklHlP1qeWo2oCyPm8FQ==}
 
   postcss-reduce-initial@6.1.0:
     resolution: {integrity: sha512-RarLgBK/CrL1qZags04oKbVbrrVK2wcxhvta3GCxrZO4zveibqbRPmm2VI8sSgCXwoUHEliRSbOfpR0b/VIoiw==}
@@ -11176,6 +11203,11 @@ snapshots:
     dependencies:
       postcss: 8.4.31
       postcss-selector-parser: 6.0.16
+
+  postcss-px-to-viewport@1.1.1:
+    dependencies:
+      object-assign: 4.1.1
+      postcss: 8.4.31
 
   postcss-reduce-initial@6.1.0(postcss@8.4.31):
     dependencies:

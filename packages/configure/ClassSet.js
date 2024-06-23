@@ -24,6 +24,12 @@ class ClassSet extends Configure {
     this.value = value
   }
 
+  cloneValue() {
+    const classSet = new ClassSet(this.key, this.option)
+    classSet.setValue(this.key, this.value.cloneValue())
+    return classSet
+  }
+
   toValue() {
     const { ClassObject, multiple } = this.option
 

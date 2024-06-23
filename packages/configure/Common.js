@@ -22,6 +22,12 @@ class Common extends Configure {
   toValue() {
     return this.value
   }
+
+  cloneValue() {
+    const common = new Common(this.key)
+    common.setValue(undefined, this.value)
+    return common
+  }
 }
 
 export default Common

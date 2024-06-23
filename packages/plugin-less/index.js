@@ -4,18 +4,14 @@ const require = createRequire(import.meta.url)
 
 export default function (plugin) {
   function less(webpackConfigure) {
-    const css = webpackConfigure.get('module.rules.css')
     webpackConfigure.set('module.rules.less', {
       test: [],
       exclude: [],
-      use: [],
+      use: webpackConfigure.get('module.rules.css.use').clone(),
     })
     const less = webpackConfigure.get('module.rules.less')
     less.set('test.less', /\.less$/)
     less.set('exclude.moduleLess', /\.module\.less$/)
-    less.set('use.miniCss', css.get('use.miniCss').toValue())
-    less.set('use.css', css.get('use.css').toValue())
-    less.set('use.postcss', css.get('use.postcss').toValue())
     less.set('use.less', {
       loader: require.resolve('less-loader'),
       options: {
@@ -28,17 +24,12 @@ export default function (plugin) {
   }
 
   function lessModule(webpackConfigure) {
-    const cssModule = webpackConfigure.get('module.rules.cssModule')
     webpackConfigure.set('module.rules.lessModule', {
       test: [],
-      use: [],
+      use: webpackConfigure.get('module.rules.cssModule.use').clone(),
     })
-
     const lessModule = webpackConfigure.get('module.rules.lessModule')
     lessModule.set('test.less', /\.module\.less$/)
-    lessModule.set('use.miniCss', cssModule.get('use.miniCss').toValue())
-    lessModule.set('use.css', cssModule.get('use.css'))
-    lessModule.set('use.postcss', cssModule.get('use.postcss'))
     lessModule.set('use.less', {
       loader: require.resolve('less-loader'),
       options: {

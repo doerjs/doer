@@ -1,3 +1,8 @@
+// eslint-disable-next-line camelcase
+function should_implemented_by_children(instance) {
+  throw new Error(`Class ${instance.constructor.name} of abstract method should be implemented by children class.`)
+}
+
 class Configure {
   // 解析器
   static parsers = []
@@ -89,28 +94,43 @@ class Configure {
     current.setValue(key, Configure.into(key, value, option))
   }
 
+  // 深度拷贝
+  clone() {
+    return this.cloneValue()
+  }
+
   // 检测数据类型是否符合该对象标准
   // 符合该对象标准则执行该对象的parse方法
   static check() {
     // no action 需要子元素去实现
+    should_implemented_by_children(this)
   }
 
   // 该对象对数据的加工处理方法
   static create(value) {
     // no action 需要子元素去实现
+    should_implemented_by_children(this)
   }
 
   getValue(key) {
     // no action 需要子元素去实现
+    should_implemented_by_children(this)
   }
 
   setValue(key, value) {
     // no action 需要子元素去实现
+    should_implemented_by_children(this)
+  }
+
+  cloneValue() {
+    // no action 需要子元素去实现
+    should_implemented_by_children(this)
   }
 
   // 转换为常规json配置
   toValue() {
     // no action 需要子元素去实现
+    should_implemented_by_children(this)
   }
 }
 
