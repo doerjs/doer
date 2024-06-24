@@ -1,5 +1,13 @@
 # @doerjs/plugin-cross
 
+## 0.1.2
+
+### Patch Changes
+
+- e5574ce: 实现脚手架的跨端能力
+- Updated dependencies [e5574ce]
+  - @doerjs/cross-webpack-plugin@0.1.2
+
 ## 0.1.1
 
 ### Patch Changes

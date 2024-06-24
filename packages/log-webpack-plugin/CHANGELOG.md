@@ -1,5 +1,12 @@
 # @doerjs/log-webpack-plugin
 
+## 0.1.3
+
+### Patch Changes
+
+- e5574ce: 实现脚手架的跨端能力
+  - @doerjs/context@0.1.3
+
 ## 0.1.2
 
 ### Patch Changes
