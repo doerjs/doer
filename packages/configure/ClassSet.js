@@ -12,7 +12,7 @@ class ClassSet extends Configure {
 
   static create(key, value, option = {}) {
     const classSet = new ClassSet(key, option)
-    classSet.setValue(undefined, Configure.into(undefined, value))
+    classSet.value = Configure.into(key, value)
     return classSet
   }
 
@@ -20,23 +20,18 @@ class ClassSet extends Configure {
     return this.value.getValue(key)
   }
 
-  setValue(_, value) {
-    this.value = value
+  setValue(key, value) {
+    this.value.setValue(key, value)
   }
 
   cloneValue() {
     const classSet = new ClassSet(this.key, this.option)
-    classSet.setValue(this.key, this.value.cloneValue())
+    classSet.value = this.value.cloneValue()
     return classSet
   }
 
   toValue() {
-    const { ClassObject, multiple } = this.option
-
-    if (multiple) {
-      return new ClassObject(...this.value.toValue())
-    }
-
+    const { ClassObject } = this.option
     return new ClassObject(this.value.toValue())
   }
 }

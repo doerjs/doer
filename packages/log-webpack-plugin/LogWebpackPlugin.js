@@ -102,7 +102,7 @@ class LogWebpackPlugin {
 
   printWarning(stats) {
     stats.warnings.forEach((warn) => {
-      console.log(
+      console.info(
         `👣 ${chalk.yellow('[!]')} ${dayjs().format(this.DATE_FORMAT)} 编译告警：${chalk.green(warn.moduleName || '')}`,
       )
       console.info(chalk.yellow(warn.stack))

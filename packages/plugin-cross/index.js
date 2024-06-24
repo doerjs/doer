@@ -112,12 +112,12 @@ export default function (plugin, options) {
     postcssPlugin.set('pxToViewport.1', pxToViewportOption)
   }
 
-  plugin.hooks.webpackConfigure((webpackConfigure) => {
+  plugin.hooks.webpackConfigure.tap((webpackConfigure) => {
     // 添加webpack跨端模块处理插件
     webpackConfigure.set('plugins.cross', undefined, { type: 'ClassSet', ClassObject: CrossWebpackPlugin })
 
     // 处理跨端模块
-    const exposes = webpackConfigure.get('plugins.moduleFederation.exposes')
+    const exposes = webpackConfigure.get('plugins.moduleFederation.exposes').toValue()
     const crossExpose = Object.keys(exposes).reduce((result, key) => {
       const value = exposes[key]
       if (is.isObject(value)) {
