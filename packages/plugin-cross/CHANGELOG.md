@@ -1,5 +1,12 @@
 # @doerjs/plugin-cross
 
+## 0.1.3
+
+### Patch Changes
+
+- Updated dependencies [1f5aa88]
+  - @doerjs/cross-webpack-plugin@0.1.3
+
 ## 0.1.2
 
 ### Patch Changes
