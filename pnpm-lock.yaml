@@ -50,15 +50,15 @@ importers:
       '@doerjs/configure':
         specifier: workspace:*
         version: link:../configure
-      '@doerjs/context':
-        specifier: workspace:*
-        version: link:../context
       '@doerjs/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
       '@doerjs/log-webpack-plugin':
         specifier: workspace:*
         version: link:../log-webpack-plugin
+      '@doerjs/plugin-cross':
+        specifier: workspace:*
+        version: link:../plugin-cross
       '@doerjs/plugin-less':
         specifier: workspace:*
         version: link:../plugin-less
@@ -216,21 +216,6 @@ importers:
         specifier: workspace:*
         version: link:../utils
 
-  packages/context:
-    dependencies:
-      '@doerjs/cli':
-        specifier: workspace:*
-        version: link:../cli
-      '@doerjs/utils':
-        specifier: workspace:*
-        version: link:../utils
-      dotenv:
-        specifier: 16.3.1
-        version: 16.3.1
-      dotenv-expand:
-        specifier: 10.0.0
-        version: 10.0.0
-
   packages/cross-webpack-plugin:
     dependencies:
       '@babel/generator':
@@ -287,9 +272,6 @@ importers:
 
   packages/log-webpack-plugin:
     dependencies:
-      '@doerjs/context':
-        specifier: workspace:*
-        version: link:../context
       '@doerjs/utils':
         specifier: workspace:*
         version: link:../utils

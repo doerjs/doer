@@ -1,5 +1,13 @@
 # @doerjs/cli
 
+## 0.1.20
+
+### Patch Changes
+
+- 移除context包，调整到cli包中
+- Updated dependencies
+  - @doerjs/log-webpack-plugin@0.1.4
+
 ## 0.1.19
 
 ### Patch Changes

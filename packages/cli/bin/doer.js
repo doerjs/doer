@@ -5,13 +5,13 @@ import { Command, Option, InvalidArgumentError } from 'commander'
 import figlet from 'figlet'
 import * as is from '@doerjs/utils/is.js'
 
-import { cliPackageJsonPath } from '../lib/cliPath.js'
+import cliPath from '../context/cliPath.js'
 import create, { validateName } from '../scripts/create.js'
 import dev from '../scripts/dev.js'
 import build from '../scripts/build.js'
 
 const require = createRequire(import.meta.url)
-const cliPackage = require(cliPackageJsonPath)
+const cliPackage = require(cliPath.packagePath)
 
 console.info(figlet.textSync('Doer', 'Ghost'))
 console.info(`👣 Doer v${cliPackage.version}`)

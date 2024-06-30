@@ -1,14 +1,11 @@
 import path from 'node:path'
-import { createRequire } from 'node:module'
 
 import Parser from './Parser.js'
-
-const require = createRequire(import.meta.url)
+import cliPath from './cliPath.js'
 
 class Path extends Parser {
   constructor() {
     super()
-    const cliPath = path.dirname(require.resolve('@doerjs/cli'))
     const runtimePath = process.cwd()
     const srcPath = path.resolve(runtimePath, 'src')
     const publicPath = path.resolve(runtimePath, './public')
@@ -16,9 +13,9 @@ class Path extends Parser {
     const complierPath = path.resolve(srcPath, complierName)
 
     // 脚手架路径
-    this.cli = cliPath
-    this.cliPackageJson = path.resolve(cliPath, 'package.json')
-    this.cliNodeModules = path.resolve(cliPath, 'node_modules')
+    this.cli = cliPath.rootPath
+    this.cliPackageJson = cliPath.packagePath
+    this.cliNodeModules = cliPath.nodeModulesPath
     // 运行时路径
     this.runtime = runtimePath
     // 源码路径

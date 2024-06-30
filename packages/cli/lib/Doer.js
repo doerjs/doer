@@ -1,4 +1,4 @@
-import Context from '@doerjs/context'
+import Context from '../context/Context.js'
 
 import plugin from './plugin.js'
 import Tap from './Tap.js'

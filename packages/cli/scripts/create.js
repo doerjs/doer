@@ -10,7 +10,7 @@ import * as is from '@doerjs/utils/is.js'
 import * as file from '@doerjs/utils/file.js'
 import * as shell from '@doerjs/utils/shell.js'
 
-import { cliPackageJsonPath } from '../lib/cliPath.js'
+import cliPath from '../context/cliPath.js'
 
 const require = createRequire(import.meta.url)
 
@@ -110,11 +110,12 @@ export default async function create(options) {
   const renderContext = {
     config,
     packages: {
-      '@doerjs/cli': require(cliPackageJsonPath),
+      '@doerjs/cli': require(cliPath.packagePath),
       '@doerjs/utils': require('@doerjs/utils/package.json'),
       '@doerjs/prettier-config': require('@doerjs/prettier-config/package.json'),
       '@doerjs/eslint-config': require('@doerjs/eslint-config/package.json'),
       '@doerjs/plugin-less': require('@doerjs/plugin-less/package.json'),
+      '@doerjs/plugin-cross': require('@doerjs/plugin-less/package.json'),
       '@doerjs/plugin-mock': require('@doerjs/plugin-mock/package.json'),
       '@doerjs/plugin-typescript': require('@doerjs/plugin-typescript/package.json'),
     },
