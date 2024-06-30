@@ -23,7 +23,7 @@ class CrossWebpackPlugin {
             sourceType: 'module',
           })
           babelTraverse.default(ast, {
-            VariableDeclarator(path) {
+            VariableDeclarator: (path) => {
               if (path.node.id.name === 'get') {
                 const node = babelParser.parse(this.generatorAgentSource())
                 path.node.init.body.body.unshift(...node.program.body)

@@ -7,11 +7,10 @@ settings:
 importers:
 
   .:
-    dependencies:
-      '@changesets/changelog-git':
-        specifier: ^0.2.0
-        version: 0.2.0
     devDependencies:
+      '@changesets/changelog-git':
+        specifier: 0.2.0
+        version: 0.2.0
       '@changesets/cli':
         specifier: 2.27.5
         version: 2.27.5
@@ -349,7 +348,7 @@ importers:
     dependencies:
       webpack:
         specifier: '>= 5'
-        version: 5.89.0
+        version: 5.91.0
 
   packages/router-webpack-plugin:
     dependencies:
@@ -5888,16 +5887,6 @@ packages:
   webpack-sources@3.2.3:
     resolution: {integrity: sha512-/DyMEOrDgLKKIG0fmvtz+4dUX/3Ghozwgm6iPp8KRhvn+eQf9+Q7GWxVNMk3+uCPWfdXYC4ExGBckIXdFEfH1w==}
     engines: {node: '>=10.13.0'}
-
-  webpack@5.89.0:
-    resolution: {integrity: sha512-qyfIC10pOr70V+jkmud8tMfajraGCZMBWJtrmuBymQKCrLTRejBI8STDp1MCyZu/QTdZSeacCQYpYNQVOzX5kw==}
-    engines: {node: '>=10.13.0'}
-    hasBin: true
-    peerDependencies:
-      webpack-cli: '*'
-    peerDependenciesMeta:
-      webpack-cli:
-        optional: true
 
   webpack@5.91.0:
     resolution: {integrity: sha512-rzVwlLeBWHJbmgTC/8TvAcu5vpJNII+MelQpylD4jNERPwpBJOE2lEcko1zJX3QJeLjTTAnQxn/OJ8bjDzVQaw==}
@@ -12024,15 +12013,6 @@ snapshots:
       terser: 5.31.0
       webpack: 5.91.0
 
-  terser-webpack-plugin@5.3.9(webpack@5.89.0):
-    dependencies:
-      '@jridgewell/trace-mapping': 0.3.25
-      jest-worker: 27.5.1
-      schema-utils: 3.3.0
-      serialize-javascript: 6.0.2
-      terser: 5.31.0
-      webpack: 5.89.0
-
   terser-webpack-plugin@5.3.9(webpack@5.91.0):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.25
@@ -12334,37 +12314,6 @@ snapshots:
       source-map: 0.6.1
 
   webpack-sources@3.2.3: {}
-
-  webpack@5.89.0:
-    dependencies:
-      '@types/eslint-scope': 3.7.7
-      '@types/estree': 1.0.5
-      '@webassemblyjs/ast': 1.12.1
-      '@webassemblyjs/wasm-edit': 1.12.1
-      '@webassemblyjs/wasm-parser': 1.12.1
-      acorn: 8.11.3
-      acorn-import-assertions: 1.9.0(acorn@8.11.3)
-      browserslist: 4.23.0
-      chrome-trace-event: 1.0.3
-      enhanced-resolve: 5.16.1
-      es-module-lexer: 1.5.3
-      eslint-scope: 5.1.1
-      events: 3.3.0
-      glob-to-regexp: 0.4.1
-      graceful-fs: 4.2.11
-      json-parse-even-better-errors: 2.3.1
-      loader-runner: 4.3.0
-      mime-types: 2.1.35
-      neo-async: 2.6.2
-      schema-utils: 3.3.0
-      tapable: 2.2.1
-      terser-webpack-plugin: 5.3.9(webpack@5.89.0)
-      watchpack: 2.4.1
-      webpack-sources: 3.2.3
-    transitivePeerDependencies:
-      - '@swc/core'
-      - esbuild
-      - uglify-js
 
   webpack@5.91.0:
     dependencies:
