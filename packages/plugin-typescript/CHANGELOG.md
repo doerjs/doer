@@ -1,5 +1,11 @@
 # @doerjs/plugin-typescript
 
+## 0.1.2
+
+### Patch Changes
+
+- 项目内跨端引用的简化改造
+
 ## 0.1.1
 
 ### Patch Changes

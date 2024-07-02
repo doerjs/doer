@@ -1,6 +1,9 @@
 import { createRequire } from 'node:module'
+import path from 'node:path'
 import CrossWebpackPlugin from '@doerjs/cross-webpack-plugin'
 import * as is from '@doerjs/utils/is.js'
+import * as file from '@doerjs/utils/file.js'
+import * as tool from '@doerjs/utils/tool.js'
 
 const require = createRequire(import.meta.url)
 
@@ -112,30 +115,104 @@ export default function (plugin, options) {
     postcssPlugin.set('pxToViewport.1', pxToViewportOption)
   }
 
-  plugin.hooks.webpackConfigure.tap((webpackConfigure) => {
-    // 添加webpack跨端模块处理插件
-    webpackConfigure.set('plugins.cross', undefined, { type: 'ClassSet', ClassObject: CrossWebpackPlugin })
+  function getCrossExpose(context, filePath) {
+    const { dir } = path.parse(filePath)
 
-    // 处理跨端模块
-    const exposes = webpackConfigure.get('plugins.moduleFederation.exposes').toValue()
-    const crossExpose = Object.keys(exposes).reduce((result, key) => {
-      const value = exposes[key]
-      if (is.isObject(value)) {
-        Object.keys(value).forEach((name) => {
-          result[`${key}/${name}`] = value[name]
-        })
-      } else {
-        result[key] = value
+    const agent = path.basename(dir)
+    if (!['mobile', 'pc'].includes(agent)) {
+      return
+    }
+
+    const { name, dir: parentDir } = path.parse(path.parse(dir).dir)
+    const item = parentDir.replace(context.path.src, '').split(path.sep).filter(Boolean)
+    item.push(tool.toFirstUpperCase(name))
+    item.push(agent)
+
+    return {
+      name: `./${item.join('/')}`,
+      path: filePath,
+    }
+  }
+
+  function replaceAlias(context, filePath) {
+    const aliasName = Object.keys(context.config.alias).find((name) => {
+      return filePath.startsWith(name + '/')
+    })
+
+    if (aliasName) {
+      return filePath.replace(aliasName, context.config.alias[aliasName])
+    }
+
+    return filePath
+  }
+
+  const innerCrossExposes = []
+  plugin.hooks.context.tap((context) => {
+    plugin.hooks.eachFile.tap((filePath) => {
+      if (!file.isScript(filePath)) {
+        return
       }
 
-      return result
-    }, {})
-    webpackConfigure.set('plugins.moduleFederation.exposes', crossExpose)
+      const expose = getCrossExpose(context, filePath)
+      if (expose) {
+        innerCrossExposes.push(expose)
+      }
+    })
 
-    // 移动端的样式处理
-    mobileCss(webpackConfigure)
-    mobileCssModule(webpackConfigure)
-    mobileLess(webpackConfigure)
-    mobileLessModule(webpackConfigure)
+    plugin.hooks.watcher.tap((watcher) => {
+      watcher
+        .on('add', (filePath) => {
+          if (getCrossExpose(context, filePath)) {
+            plugin.restart()
+          }
+        })
+        .on('unlink', (filePath) => {
+          if (getCrossExpose(context, filePath)) {
+            plugin.restart()
+          }
+        })
+    })
+
+    plugin.hooks.webpackConfigure.tap((webpackConfigure) => {
+      // 添加webpack跨端模块处理插件
+      webpackConfigure.set('plugins.cross', undefined, { type: 'ClassSet', ClassObject: CrossWebpackPlugin })
+
+      // 处理跨端模块
+      const exposes = webpackConfigure.get('plugins.remote.exposes').toValue()
+      const crossExpose = Object.keys(exposes).reduce((result, key) => {
+        const value = exposes[key]
+        if (is.isObject(value)) {
+          Object.keys(value).forEach((name) => {
+            result[`${key}/${name}`] = value[name]
+          })
+        } else {
+          result[key] = value
+        }
+
+        return result
+      }, {})
+
+      const exposePaths = Object.keys(crossExpose).reduce((result, name) => {
+        const exposePath = path.resolve(replaceAlias(context, crossExpose[name]))
+        result[exposePath] = true
+        return result
+      }, {})
+
+      innerCrossExposes.forEach((expose) => {
+        if (exposePaths[expose.path]) {
+          return
+        }
+
+        crossExpose[expose.name] = expose.path
+      })
+
+      webpackConfigure.set('plugins.remote.exposes', crossExpose)
+
+      // 移动端的样式处理
+      mobileCss(webpackConfigure)
+      mobileCssModule(webpackConfigure)
+      mobileLess(webpackConfigure)
+      mobileLessModule(webpackConfigure)
+    })
   })
 }

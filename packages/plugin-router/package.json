@@ -1,10 +1,10 @@
 {
-  "name": "@doerjs/router-webpack-plugin",
-  "version": "0.1.2",
+  "name": "@doerjs/plugin-router",
+  "version": "0.0.10",
   "description": "",
   "author": "FaureWu <502556093@qq.com>",
   "license": "MIT",
-  "main": "RouterWebpackPlugin.js",
+  "main": "index.js",
   "type": "module",
   "publishConfig": {
     "access": "public"
@@ -12,7 +12,6 @@
   "dependencies": {
     "@babel/parser": "7.23.0",
     "@doerjs/utils": "workspace:*",
-    "chokidar": "3.5.3",
     "ejs": "3.1.10"
   }
 }

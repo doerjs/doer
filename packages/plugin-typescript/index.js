@@ -4,14 +4,17 @@ const require = createRequire(import.meta.url)
 
 export default function (plugin) {
   plugin.hooks.context.tap((context) => {
+    plugin.hooks.plugin.tapStream((pluginData) => {
+      if (pluginData.includes('@doerjs/plugin-router')) {
+        pluginData.option.extensions.push('.ts')
+        pluginData.option.extensions.push('.tsx')
+      }
+    })
+
     plugin.hooks.webpackConfigure.tap((webpackConfigure) => {
       const extensions = webpackConfigure.get('resolve.extensions')
       extensions.set('ts', '.ts')
       extensions.set('tsx', '.tsx')
-
-      const routerExtensions = webpackConfigure.get('plugins.router.extensions')
-      routerExtensions.set('ts', '.ts')
-      routerExtensions.set('tsx', '.tsx')
 
       const sourcemap = webpackConfigure.get('module.rules.sourcemap')
       if (sourcemap) {

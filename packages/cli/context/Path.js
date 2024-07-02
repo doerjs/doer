@@ -9,8 +9,9 @@ class Path extends Parser {
     const runtimePath = process.cwd()
     const srcPath = path.resolve(runtimePath, 'src')
     const publicPath = path.resolve(runtimePath, './public')
-    const complierName = process.env.NODE_ENV === 'production' ? '.doer.prod' : '.doer'
-    const complierPath = path.resolve(srcPath, complierName)
+    const prodComplierPath = path.resolve(srcPath, '.doer.prod')
+    const devComplierPath = path.resolve(srcPath, '.doer')
+    const complierPath = process.env.NODE_ENV === 'production' ? prodComplierPath : devComplierPath
 
     // 脚手架路径
     this.cli = cliPath.rootPath
@@ -30,6 +31,8 @@ class Path extends Parser {
     this.html = path.resolve(publicPath, 'index.html')
     // 编译路径，编译过程中产生的必要文件存放路径
     this.complier = complierPath
+    this.prodComplier = prodComplierPath
+    this.devComplierPath = devComplierPath
     // 编译后输出文件目录
     this.dist = path.resolve(runtimePath, 'dist')
     this.packageJson = path.resolve(runtimePath, 'package.json')

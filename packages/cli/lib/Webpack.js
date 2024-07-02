@@ -5,7 +5,6 @@ import loaderUtils from 'loader-utils'
 import { ObjectSet } from '@doerjs/configure'
 import SetupHtmlWebpackPlugin from '@doerjs/setup-html-webpack-plugin'
 import LogWebpackPlugin from '@doerjs/log-webpack-plugin'
-import RouterWebpackPlugin from '@doerjs/router-webpack-plugin'
 import RemoteWebpackPlugin from '@doerjs/remote-webpack-plugin'
 import MiniCssExtractWebpackPlugin from 'mini-css-extract-plugin'
 import CssMinimizerWebpackPlugin from 'css-minimizer-webpack-plugin'
@@ -20,8 +19,6 @@ import chalk from 'chalk'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 
 import plugin from './plugin.js'
-
-const { ModuleFederationPlugin } = webpack.container
 
 const require = createRequire(import.meta.url)
 
@@ -67,8 +64,6 @@ function getVenderName(module) {
 }
 
 class Webpack {
-  remoteFileName = 'remote.js'
-
   get env() {
     const isProduction = process.env.NODE_ENV === 'production'
     const isEnableProfiler = isProduction && process.env.ENABLE_PROFILER === 'true'
@@ -120,9 +115,10 @@ class Webpack {
     const modules = this.config.get('resolve.modules')
     modules.set('node_modules', 'node_modules')
     const extensions = this.config.get('resolve.extensions')
-    extensions.set('js', '.js')
-    extensions.set('jsx', '.jsx')
-    extensions.set('json', '.json')
+    const extensionsData = ['.js', '.jsx']
+    extensionsData.forEach((item) => {
+      extensions.set(item.replace(/\./g, ''), item)
+    })
 
     this.config.set('module', {
       strictExportPresence: true,
@@ -140,7 +136,6 @@ class Webpack {
     this.cssModule()
     this.javascript()
     this.registerHtmlPlugin()
-    this.registerRouterPlugin()
     this.registerRemotePlugin()
   }
 
@@ -463,26 +458,6 @@ class Webpack {
     this.config.set('plugins.bundleAnalyzer', undefined, { type: 'ClassSet', ClassObject: BundleAnalyzerPlugin })
   }
 
-  registerRouterPlugin() {
-    this.config.set(
-      'plugins.router',
-      {
-        appPackage: this.context.path.packageJson,
-        appConfig: this.context.config,
-        outputPath: this.context.path.complier,
-        srcPath: this.context.path.src,
-        publicPath: this.context.path.publicUrl,
-        remoteFileName: this.remoteFileName,
-        extensions: [],
-      },
-      { type: 'ClassSet', ClassObject: RouterWebpackPlugin },
-    )
-
-    const extensions = this.config.get('plugins.router.extensions')
-    extensions.set('js', '.js')
-    extensions.set('jsx', '.jsx')
-  }
-
   registerRemotePlugin() {
     const packageData = require(this.context.path.packageJson)
     const cliPackageData = require(this.context.path.cliPackageJson)
@@ -490,10 +465,12 @@ class Webpack {
     this.config.set(`entry.${packageData.name}`, path.resolve(this.context.path.complier, 'publicPath.js'))
 
     this.config.set(
-      'plugins.moduleFederation',
+      'plugins.remote',
       {
         name: packageData.name,
-        filename: this.remoteFileName,
+        filename: this.context.remoteFileName,
+        scopeName: 'remote',
+        windowScopeName: '__doer_remotes__',
         exposes: {
           ...this.context.config.exposes,
           './$$Router': path.resolve(this.context.path.complier, 'Router.jsx'),
@@ -523,23 +500,13 @@ class Webpack {
           },
         },
       },
-      { type: 'ClassSet', ClassObject: ModuleFederationPlugin },
+      { type: 'ClassSet', ClassObject: RemoteWebpackPlugin },
     )
 
     this.config.set('plugins.externalRemotes', undefined, {
       type: 'ClassSet',
       ClassObject: ExternalRemotesWebpackPlugin,
     })
-
-    this.config.set(
-      'plugins.remote',
-      {
-        fileName: this.remoteFileName,
-        scopeName: 'remote',
-        windowScopeName: '__doer_remotes__',
-      },
-      { type: 'ClassSet', ClassObject: RemoteWebpackPlugin },
-    )
   }
 
   registerWebpackbarPlugin() {

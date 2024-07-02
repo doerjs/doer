@@ -25,6 +25,15 @@ class Plugin {
 
     next[name] = instance
   }
+
+  // 重启服务
+  restart() {
+    process.send('RESTART')
+  }
 }
 
-export default new Plugin()
+const plugin = new Plugin()
+plugin.Tap = Tap
+plugin.TapStream = TapStream
+
+export default plugin

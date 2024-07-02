@@ -1,14 +1,20 @@
 import { remotes } from './config.js'
-import { isDebug } from './helper.js'
+import { isDebug, isUndefined } from './helper.js'
 
 (async () => {
   window.doer = {}
 
   let urls = await remotes()
 
+  const appName = '<%= appName %>'
+
+  if (isUndefined(urls[appName])) {
+    urls[appName] = process.env.PUBLIC_URL.slice(0, process.env.PUBLIC_URL.length - 1)
+  }
+
   if (isDebug()) {
     try {
-      const localUrls = window.sessionStorage.getItem('<%= appName %>__doer_remotes__')
+      const localUrls = window.sessionStorage.getItem(`${appName}__doer_remotes__`)
       urls = localUrls ? Object.assign(urls, JSON.parse(localUrls)) : urls
     } catch (e) {}
   }

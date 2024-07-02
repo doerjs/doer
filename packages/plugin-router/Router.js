@@ -263,16 +263,11 @@ class Router {
     })
   }
 
-  // 初始化，用于做初始化任务，比如渲染对应的框架模版文件
-  initialize() {
-    shell.execSync(`rm -rf ${this.options.outputPath}`)
-    shell.execSync(`mkdir ${this.options.outputPath}`)
-    file.eachFile(this.options.srcPath, (filePath) => this.parseFile(filePath))
-    this.bootstrap()
-  }
-
   // 启动
   bootstrap() {
+    shell.execSync(`rm -rf ${this.options.outputPath}`)
+    shell.execSync(`mkdir ${this.options.outputPath}`)
+
     this.writeConfig()
     this.writeIndex()
     this.writeAppEntry()

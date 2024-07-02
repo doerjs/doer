@@ -121,10 +121,5 @@ export default class {
         process.exit(0)
       })
     })
-
-    process.stdin.on('end', () => {
-      webpackDevServer.stop()
-      process.exit(0)
-    })
   }
 }

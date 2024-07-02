@@ -5,6 +5,9 @@ import Config from './Config.js'
 class Context {
   static instance = null
 
+  // 远程入口文件
+  remoteFileName = 'remote.js'
+
   static create() {
     if (!Context.instance) {
       Context.instance = new Context()

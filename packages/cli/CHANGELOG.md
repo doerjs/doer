@@ -1,5 +1,15 @@
 # @doerjs/cli
 
+## 0.1.21
+
+### Patch Changes
+
+- 项目内跨端引用的简化改造
+- Updated dependencies
+  - @doerjs/remote-webpack-plugin@0.1.1
+  - @doerjs/plugin-typescript@0.1.2
+  - @doerjs/plugin-cross@0.1.4
+
 ## 0.1.20
 
 ### Patch Changes
